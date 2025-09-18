@@ -1,0 +1,61 @@
+{
+  "success": {
+    "general": "Operation completed successfully",
+    "created": "Resource created successfully",
+    "updated": "Resource updated successfully",
+    "deleted": "Resource deleted successfully"
+  },
+  "error": {
+    "badRequest": "Bad request",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "notFound": "Resource not found",
+    "conflict": "Resource conflict",
+    "validationError": "Validation failed",
+    "internalServerError": "Internal server error",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "databaseError": "Database operation failed"
+  },
+  "auth": {
+    "invalid_credentials": "Invalid credentials",
+    "account_not_active": "Account is not active",
+    "registration_success": "User registered successfully",
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "password_reset_sent": "If the email exists, a password reset link has been sent",
+    "password_reset_success": "Password has been reset successfully",
+    "invalid_expired_token": "Invalid or expired token",
+    "tokenExpired": "Token has expired",
+    "invalidToken": "Invalid token provided",
+    "sessionExpired": "Session has expired",
+    "accountLocked": "Account is locked",
+    "accountInactive": "Account is not active",
+    "emailAlreadyExists": "User with this email already exists",
+    "phoneAlreadyExists": "User with this phone number already exists",
+    "documentAlreadyExists": "User with this document number already exists",
+    "registrationSuccess": "User registered successfully",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "tokenRefreshed": "Token refreshed successfully",
+    "sessionNotFound": "Session not found",
+    "passwordResetRequested": "If the email exists, a password reset link has been sent",
+    "usernameGenerated": "Username generated successfully"
+  },
+  "validation": {
+    "required_fields_missing": "Missing required fields",
+    "passwords_do_not_match": "Passwords do not match",
+    "email_already_exists": "Email already exists",
+    "phone_already_exists": "Phone number already exists",
+    "document_already_exists": "Document number already exists",
+    "dni_password_required": "DNI number and password are required",
+    "email_required": "Email is required",
+    "dni_required": "DNI number is required",
+    "token_password_required": "Token and new password are required",
+    "required": "{{field}} is required",
+    "email": "Please provide a valid email address",
+    "minLength": "{{field}} must be at least {{min}} characters long",
+    "maxLength": "{{field}} must not exceed {{max}} characters",
+    "phoneNumber": "Please provide a valid phone number",
+    "strongPassword": "Password must contain at least 8 characters, including uppercase, lowercase, number and special character"
+  }
+}

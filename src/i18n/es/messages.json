@@ -1,0 +1,62 @@
+{
+  "success": {
+    "general": "Operación completada exitosamente",
+    "created": "Recurso creado exitosamente",
+    "updated": "Recurso actualizado exitosamente",
+    "deleted": "Recurso eliminado exitosamente"
+  },
+  "error": {
+    "badRequest": "Solicitud incorrecta",
+    "unauthorized": "Acceso no autorizado",
+    "forbidden": "Acceso prohibido",
+    "notFound": "Recurso no encontrado",
+    "conflict": "Conflicto de recurso",
+    "validationError": "Error de validación",
+    "internalServerError": "Error interno del servidor",
+    "serviceUnavailable": "Servicio temporalmente no disponible",
+    "databaseError": "Error en la operación de base de datos"
+  },
+  "auth": {
+    "invalid_credentials": "Credenciales inválidas",
+    "account_not_active": "La cuenta no está activa",
+    "registration_success": "Usuario registrado exitosamente",
+    "login_success": "Inicio de sesión exitoso",
+    "logout_success": "Cierre de sesión exitoso",
+    "password_reset_sent": "Si el email existe, se ha enviado un enlace para restablecer la contraseña",
+    "password_reset_success": "La contraseña ha sido restablecida exitosamente",
+    "invalid_expired_token": "Token inválido o expirado",
+    "invalidCredentials": "Email o contraseña inválidos",
+    "tokenExpired": "El token ha expirado",
+    "invalidToken": "Token inválido proporcionado",
+    "sessionExpired": "La sesión ha expirado",
+    "accountLocked": "La cuenta está bloqueada",
+    "accountInactive": "La cuenta no está activa",
+    "emailAlreadyExists": "Ya existe un usuario con este email",
+    "phoneAlreadyExists": "Ya existe un usuario con este número de teléfono",
+    "documentAlreadyExists": "Ya existe un usuario con este número de documento",
+    "registrationSuccess": "Usuario registrado exitosamente",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutSuccess": "Cierre de sesión exitoso",
+    "tokenRefreshed": "Token actualizado exitosamente",
+    "sessionNotFound": "Sesión no encontrada",
+    "passwordResetRequested": "Si el email existe, se ha enviado un enlace para restablecer la contraseña",
+    "usernameGenerated": "Nombre de usuario generado exitosamente"
+  },
+  "validation": {
+    "required_fields_missing": "Faltan campos requeridos",
+    "passwords_do_not_match": "Las contraseñas no coinciden",
+    "email_already_exists": "El email ya existe",
+    "phone_already_exists": "El número de teléfono ya existe",
+    "document_already_exists": "El número de documento ya existe",
+    "dni_password_required": "Se requiere número de DNI y contraseña",
+    "email_required": "Se requiere email",
+    "dni_required": "Se requiere número de DNI",
+    "token_password_required": "Se requiere token y nueva contraseña",
+    "required": "{{field}} es requerido",
+    "email": "Por favor proporcione una dirección de email válida",
+    "minLength": "{{field}} debe tener al menos {{min}} caracteres",
+    "maxLength": "{{field}} no debe exceder {{max}} caracteres",
+    "phoneNumber": "Por favor proporcione un número de teléfono válido",
+    "strongPassword": "La contraseña debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres especiales"
+  }
+}

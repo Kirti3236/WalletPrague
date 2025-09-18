@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: yapague-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-yapague_db}
+      POSTGRES_USER: ${DB_USERNAME:-yapague_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-yapague_password}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - yapague-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-yapague_user} -d ${DB_NAME:-yapague_db}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # NestJS Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yapague-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-yapague_user}
+      DB_PASSWORD: ${DB_PASSWORD:-yapague_password}
+      DB_NAME: ${DB_NAME:-yapague_db}
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - yapague-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for session management (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: yapague-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - yapague-network
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  yapague-network:
+    driver: bridge
