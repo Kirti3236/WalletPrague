@@ -19,8 +19,11 @@ export class PasswordMatchConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export function PasswordMatch(property: string, validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+export function PasswordMatch(
+  property: string,
+  validationOptions?: ValidationOptions,
+) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,

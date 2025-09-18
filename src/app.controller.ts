@@ -6,7 +6,7 @@ import { ResponseService } from './common/services/response.service';
 
 // Root controller (no versioning) - This will handle the root path
 @Controller({ version: VERSION_NEUTRAL })
-export class  AppController {
+export class AppController {
   @Get()
   @ApiExcludeEndpoint()
   getRoot() {
@@ -16,8 +16,8 @@ export class  AppController {
       endpoints: {
         api: '/v1/',
         health: '/v1/health',
-        docs: '/docs'
-      }
+        docs: '/docs',
+      },
     };
   }
 
@@ -27,4 +27,3 @@ export class  AppController {
     res.status(204).end();
   }
 }
-

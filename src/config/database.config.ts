@@ -2,7 +2,9 @@ import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { ConfigService } from '@nestjs/config';
 import { models } from '../models';
 
-export const getDatabaseConfig = (configService: ConfigService): SequelizeModuleOptions => {
+export const getDatabaseConfig = (
+  configService: ConfigService,
+): SequelizeModuleOptions => {
   const isProduction = configService.get('app.nodeEnv') === 'production';
   const dbLogging = configService.get('database.logging');
 
@@ -15,17 +17,21 @@ export const getDatabaseConfig = (configService: ConfigService): SequelizeModule
     database: configService.get('database.name'),
     models: models,
     synchronize: configService.get('database.synchronize'),
-    logging: dbLogging ? (sql: string) => {
-      console.log(`🗄️  [DB Query]: ${sql}`);
-    } : false,
-    dialectOptions: isProduction ? {
-      ssl: { rejectUnauthorized: false }
-    } : {},
+    logging: dbLogging
+      ? (sql: string) => {
+          console.log(`🗄️  [DB Query]: ${sql}`);
+        }
+      : false,
+    dialectOptions: isProduction
+      ? {
+          ssl: { rejectUnauthorized: false },
+        }
+      : {},
     pool: {
-      max: 5,        // Maximum connections
-      min: 1,        // Keep at least 1 connection alive
+      max: 5, // Maximum connections
+      min: 1, // Keep at least 1 connection alive
       acquire: 10000, // 10 seconds to acquire connection
-      idle: 30000,    // 30 seconds before closing idle connections
+      idle: 30000, // 30 seconds before closing idle connections
     },
     define: {
       underscored: true,
@@ -40,8 +46,8 @@ export const getDatabaseConfig = (configService: ConfigService): SequelizeModule
         /EHOSTUNREACH/,
         /ENOTFOUND/,
         /ENETUNREACH/,
-        /EAI_AGAIN/
-      ]
+        /EAI_AGAIN/,
+      ],
     },
   };
 };
@@ -65,7 +71,7 @@ export const sequelizeConfig = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    logging: false,     
+    logging: false,
     ssl: { rejectUnauthorized: false },
   },
 };

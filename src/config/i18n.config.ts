@@ -1,4 +1,9 @@
-import { I18nOptions, AcceptLanguageResolver, QueryResolver, CookieResolver } from 'nestjs-i18n';
+import {
+  I18nOptions,
+  AcceptLanguageResolver,
+  QueryResolver,
+  CookieResolver,
+} from 'nestjs-i18n';
 import * as path from 'path';
 
 export const i18nConfig: I18nOptions = {

@@ -18,9 +18,9 @@ export class LoggingInterceptor implements NestInterceptor {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
-    
+
     // Generate trace ID if not present
-    const traceId = request.headers['x-trace-id'] as string || randomUUID();
+    const traceId = (request.headers['x-trace-id'] as string) || randomUUID();
     request.headers['x-trace-id'] = traceId;
     response.setHeader('X-Trace-Id', traceId);
 
@@ -39,7 +39,7 @@ export class LoggingInterceptor implements NestInterceptor {
         next: (data) => {
           const duration = Date.now() - startTime;
           const { statusCode } = response;
-          
+
           this.logger.log(
             `Outgoing Response: ${method} ${url} - ${statusCode} - ${duration}ms - TraceId: ${traceId}`,
           );
@@ -47,7 +47,7 @@ export class LoggingInterceptor implements NestInterceptor {
         error: (error) => {
           const duration = Date.now() - startTime;
           const statusCode = error.status || 500;
-          
+
           this.logger.error(
             `Error Response: ${method} ${url} - ${statusCode} - ${duration}ms - TraceId: ${traceId}`,
             error.stack,

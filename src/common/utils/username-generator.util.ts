@@ -30,28 +30,28 @@ export class UsernameGeneratorUtil {
     do {
       const randomDigits = this.generateRandomDigits();
       username = `User${randomDigits}`;
-      
+
       // Check if username already exists
       const existingUser = await this.userModel.findOne({
         where: { user_name: username },
         attributes: ['id'],
       });
-      
+
       isUnique = !existingUser;
       attempts++;
-      
+
       if (attempts >= maxAttempts && !isUnique) {
-        // If we can't find a unique username after max attempts, 
+        // If we can't find a unique username after max attempts,
         // use timestamp to ensure uniqueness
         const timestamp = Date.now().toString().slice(-6);
         username = `User${timestamp}`;
-        
+
         // Final check with timestamp-based username
         const finalCheck = await this.userModel.findOne({
           where: { user_name: username },
           attributes: ['id'],
         });
-        
+
         if (!finalCheck) {
           isUnique = true;
         } else {

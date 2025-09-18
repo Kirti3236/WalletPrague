@@ -37,7 +37,7 @@ export class TransformInterceptor<T>
 
     // Determine if this is a GET operation (should include data)
     const isGetOperation = method === 'GET';
-    
+
     return next.handle().pipe(
       map((data) => {
         const baseResponse = {
@@ -47,7 +47,12 @@ export class TransformInterceptor<T>
         };
 
         // Handle paginated responses (always include data for pagination)
-        if (data && typeof data === 'object' && 'items' in data && 'meta' in data) {
+        if (
+          data &&
+          typeof data === 'object' &&
+          'items' in data &&
+          'meta' in data
+        ) {
           return {
             ...baseResponse,
             data: data.items,
@@ -66,22 +71,27 @@ export class TransformInterceptor<T>
         // For non-GET operations (POST, PUT, PATCH, DELETE), handle differently
         if (data && typeof data === 'object') {
           const response: any = { ...baseResponse };
-          
+
           // Include message if it exists
           if ('message' in data) {
             response.message = data.message;
           }
-          
+
           // For auth responses that have success/message structure, extract them
           if ('success' in data && 'message' in data) {
             response.success = data.success;
             response.message = data.message;
             // Only include data for successful operations that have meaningful data
-            if (data.success && 'data' in data && data.data && data.data !== null) {
+            if (
+              data.success &&
+              'data' in data &&
+              data.data &&
+              data.data !== null
+            ) {
               response.data = data.data;
             }
           }
-          
+
           return response;
         }
 

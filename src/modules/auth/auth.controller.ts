@@ -10,7 +10,14 @@ import {
   Req,
   UsePipes,
 } from '@nestjs/common';
-import { IsEmail, IsString, IsOptional, MinLength, MaxLength, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsOptional,
+  MinLength,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 import { PasswordMatch } from '../../common/validators/password-match.validator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -30,7 +37,10 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 import { AuthService } from './auth.service';
-import { AuthResponse, StandardResponse } from './interfaces/auth-response.interface';
+import {
+  AuthResponse,
+  StandardResponse,
+} from './interfaces/auth-response.interface';
 import { JoiValidationPipe } from './pipes/joi-validation.pipe';
 import {
   registerSchema,
@@ -47,7 +57,7 @@ class RegisterRequest {
   @MinLength(2)
   @MaxLength(50)
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'Name must contain only letters, spaces, hyphens and apostrophes'
+    message: 'Name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_first_name: string;
 
@@ -56,7 +66,7 @@ class RegisterRequest {
   @MinLength(2)
   @MaxLength(50)
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'Name must contain only letters, spaces, hyphens and apostrophes'
+    message: 'Name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_last_name: string;
 
@@ -65,7 +75,7 @@ class RegisterRequest {
   @MinLength(6)
   @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]+$/, {
-    message: 'DNI number must contain only letters and numbers'
+    message: 'DNI number must contain only letters and numbers',
   })
   user_DNI_number: string;
 
@@ -74,7 +84,8 @@ class RegisterRequest {
   @MinLength(8)
   @MaxLength(128)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message: 'Password must contain at least 8 characters with uppercase, lowercase, number and special character'
+    message:
+      'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
   })
   user_password: string;
 
@@ -84,26 +95,44 @@ class RegisterRequest {
   confirm_password: string;
 
   // Optional fields (for future use)
-  @ApiProperty({ example: 'john.doe@example.com', required: false, description: 'Optional email address for future use' })
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    required: false,
+    description: 'Optional email address for future use',
+  })
   @IsOptional()
   @IsEmail()
   @MaxLength(255)
   user_email?: string;
 
-  @ApiProperty({ example: '+1234567890', required: false, description: 'Optional phone number for future use' })
+  @ApiProperty({
+    example: '+1234567890',
+    required: false,
+    description: 'Optional phone number for future use',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(20)
   @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: 'Please provide a valid phone number'
+    message: 'Please provide a valid phone number',
   })
   user_phone_number?: string;
 
-  @ApiProperty({ type: 'string', format: 'binary', required: false, description: 'Front ID document file upload' })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Front ID document file upload',
+  })
   @IsOptional()
   frontIdFile?: any;
 
-  @ApiProperty({ type: 'string', format: 'binary', required: false, description: 'Back ID document file upload' })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Back ID document file upload',
+  })
   @IsOptional()
   backIdFile?: any;
 }
@@ -114,7 +143,7 @@ class LoginRequest {
   @MinLength(6)
   @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]+$/, {
-    message: 'DNI number must contain only letters and numbers'
+    message: 'DNI number must contain only letters and numbers',
   })
   user_DNI_number: string;
 
@@ -131,7 +160,7 @@ class ForgotPasswordRequest {
   @MinLength(6)
   @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]+$/, {
-    message: 'DNI number must contain only letters and numbers'
+    message: 'DNI number must contain only letters and numbers',
   })
   user_DNI_number: string;
 }
@@ -148,7 +177,8 @@ class ResetPasswordRequest {
   @MinLength(8)
   @MaxLength(128)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message: 'Password must contain at least 8 characters with uppercase, lowercase, number and special character'
+    message:
+      'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
   })
   new_password: string;
 }
@@ -165,36 +195,45 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'frontIdFile', maxCount: 1 },
-      { name: 'backIdFile', maxCount: 1 },
-    ], {
-      storage: diskStorage({
-        destination: './uploads/documents',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-          const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+    FileFieldsInterceptor(
+      [
+        { name: 'frontIdFile', maxCount: 1 },
+        { name: 'backIdFile', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './src/uploads/documents',
+          filename: (req, file, callback) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          },
+        }),
+        fileFilter: (req, file, callback) => {
+          if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
+            return callback(
+              new Error('Only image and PDF files are allowed!'),
+              false,
+            );
+          }
+          callback(null, true);
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
-          return callback(new Error('Only image and PDF files are allowed!'), false);
-        }
-        callback(null, true);
+        limits: {
+          fileSize: 5 * 1024 * 1024, // 5MB limit
+        },
       },
-      limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
-      },
-    }),
+    ),
   )
   @ApiOperation({
     summary: 'Register a new user',
-    description: 'Register a new user with first name, last name, DNI number and password. Email and phone are optional for future use.'
+    description:
+      'Register a new user with first name, last name, DNI number and password. Email and phone are optional for future use.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'Required: first_name, last_name, user_DNI_number, user_password, confirm_password. Optional: user_email, user_phone_number, file uploads',
+    description:
+      'Required: first_name, last_name, user_DNI_number, user_password, confirm_password. Optional: user_email, user_phone_number, file uploads',
     type: RegisterRequest,
   })
   @ApiResponse({
@@ -211,8 +250,12 @@ export class AuthController {
   })
   async register(
     @Body() body: RegisterRequest,
-    @UploadedFiles() files?: { frontIdFile?: Express.Multer.File[], backIdFile?: Express.Multer.File[] },
-    @Lang() lang?: string
+    @UploadedFiles()
+    files?: {
+      frontIdFile?: Express.Multer.File[];
+      backIdFile?: Express.Multer.File[];
+    },
+    @Lang() lang?: string,
   ): Promise<AuthResponse> {
     return this.authService.register(body, files, lang);
   }
@@ -221,7 +264,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'User login',
-    description: 'Authenticate user using DNI number and password'
+    description: 'Authenticate user using DNI number and password',
   })
   @ApiBody({
     description: 'User login credentials',
@@ -231,10 +274,10 @@ export class AuthController {
         summary: 'Valid login request',
         value: {
           user_DNI_number: '12345678',
-          user_password: 'SecurePassword123!'
-        }
-      }
-    }
+          user_password: 'SecurePassword123!',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -248,7 +291,10 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized - invalid credentials',
   })
-  async login(@Body(new JoiValidationPipe(loginSchema)) body: LoginRequest, @Lang() lang?: string): Promise<AuthResponse> {
+  async login(
+    @Body(new JoiValidationPipe(loginSchema)) body: LoginRequest,
+    @Lang() lang?: string,
+  ): Promise<AuthResponse> {
     return this.authService.login(body, lang);
   }
 
@@ -258,7 +304,7 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'User logout',
-    description: 'Logout authenticated user (requires valid JWT token)'
+    description: 'Logout authenticated user (requires valid JWT token)',
   })
   @ApiResponse({
     status: 200,
@@ -268,7 +314,10 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized - invalid or missing JWT token',
   })
-  async logout(@Req() req: any, @Lang() lang?: string): Promise<StandardResponse> {
+  async logout(
+    @Req() req: any,
+    @Lang() lang?: string,
+  ): Promise<StandardResponse> {
     return this.authService.logout(req.user, lang);
   }
 
@@ -276,7 +325,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Initiate password reset',
-    description: 'Send password reset token using DNI number. Only requires DNI number - no password fields needed. For security, always returns success regardless of whether DNI exists.'
+    description:
+      'Send password reset token using DNI number. Only requires DNI number - no password fields needed. For security, always returns success regardless of whether DNI exists.',
   })
   @ApiBody({
     description: 'User DNI number for password reset',
@@ -290,7 +340,10 @@ export class AuthController {
     status: 400,
     description: 'Bad request - DNI number required',
   })
-  async forgotPassword(@Body() body: ForgotPasswordRequest, @Lang() lang?: string): Promise<StandardResponse> {
+  async forgotPassword(
+    @Body() body: ForgotPasswordRequest,
+    @Lang() lang?: string,
+  ): Promise<StandardResponse> {
     return this.authService.forgotPassword(body, lang);
   }
 
@@ -298,7 +351,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Reset password',
-    description: 'Reset user password using reset token from forgot password email. This endpoint is public because users who forgot their password cannot authenticate with JWT. Uses secure reset token instead.'
+    description:
+      'Reset user password using reset token from forgot password email. This endpoint is public because users who forgot their password cannot authenticate with JWT. Uses secure reset token instead.',
   })
   @ApiBody({
     description: 'Reset token and new password',
@@ -312,7 +366,10 @@ export class AuthController {
     status: 400,
     description: 'Bad request - invalid or expired token',
   })
-  async resetPassword(@Body() body: ResetPasswordRequest, @Lang() lang?: string): Promise<StandardResponse> {
+  async resetPassword(
+    @Body() body: ResetPasswordRequest,
+    @Lang() lang?: string,
+  ): Promise<StandardResponse> {
     return this.authService.resetPassword(body, lang);
   }
 }

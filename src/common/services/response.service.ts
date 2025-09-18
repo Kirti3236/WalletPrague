@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-import { StatusCode, StatusCodeMessages, HttpStatusMapping } from '../constants/status-codes';
+import {
+  StatusCode,
+  StatusCodeMessages,
+  HttpStatusMapping,
+} from '../constants/status-codes';
 import { randomUUID } from 'crypto';
 
 export interface ApiResponse<T = any> {
@@ -32,10 +36,11 @@ export class ResponseService {
     data?: T,
     statusCode: StatusCode = StatusCode.SUCCESS,
     customMessage?: string,
-    lang?: string
+    lang?: string,
   ): ApiResponse<T> {
-    const message = customMessage || this.i18n.t(StatusCodeMessages[statusCode], { lang });
-    
+    const message =
+      customMessage || this.i18n.t(StatusCodeMessages[statusCode], { lang });
+
     return {
       success: true,
       data,
@@ -51,9 +56,12 @@ export class ResponseService {
     statusCode: StatusCode,
     customMessage?: string,
     errors?: any[],
-    lang?: string
+    lang?: string,
   ): ApiErrorResponse {
-    const message = customMessage || this.i18n.t(StatusCodeMessages[statusCode], { lang }) || statusCode;
+    const message =
+      customMessage ||
+      this.i18n.t(StatusCodeMessages[statusCode], { lang }) ||
+      statusCode;
 
     return {
       success: false,
@@ -78,7 +86,11 @@ export class ResponseService {
     return this.success(null, StatusCode.DELETED, customMessage, lang);
   }
 
-  badRequest(customMessage?: string, errors?: any[], lang?: string): ApiErrorResponse {
+  badRequest(
+    customMessage?: string,
+    errors?: any[],
+    lang?: string,
+  ): ApiErrorResponse {
     return this.error(StatusCode.BAD_REQUEST, customMessage, errors, lang);
   }
 
@@ -98,17 +110,31 @@ export class ResponseService {
     return this.error(StatusCode.CONFLICT, customMessage, undefined, lang);
   }
 
-  validationError(errors?: any[], customMessage?: string, lang?: string): ApiErrorResponse {
+  validationError(
+    errors?: any[],
+    customMessage?: string,
+    lang?: string,
+  ): ApiErrorResponse {
     return this.error(StatusCode.VALIDATION_ERROR, customMessage, errors, lang);
   }
 
   internalServerError(customMessage?: string, lang?: string): ApiErrorResponse {
-    return this.error(StatusCode.INTERNAL_SERVER_ERROR, customMessage, undefined, lang);
+    return this.error(
+      StatusCode.INTERNAL_SERVER_ERROR,
+      customMessage,
+      undefined,
+      lang,
+    );
   }
 
   // Auth specific responses
   invalidCredentials(lang?: string): ApiErrorResponse {
-    return this.error(StatusCode.INVALID_CREDENTIALS, undefined, undefined, lang);
+    return this.error(
+      StatusCode.INVALID_CREDENTIALS,
+      undefined,
+      undefined,
+      lang,
+    );
   }
 
   tokenExpired(lang?: string): ApiErrorResponse {
@@ -132,14 +158,29 @@ export class ResponseService {
   }
 
   emailAlreadyExists(lang?: string): ApiErrorResponse {
-    return this.error(StatusCode.EMAIL_ALREADY_EXISTS, undefined, undefined, lang);
+    return this.error(
+      StatusCode.EMAIL_ALREADY_EXISTS,
+      undefined,
+      undefined,
+      lang,
+    );
   }
 
   phoneAlreadyExists(lang?: string): ApiErrorResponse {
-    return this.error(StatusCode.PHONE_ALREADY_EXISTS, undefined, undefined, lang);
+    return this.error(
+      StatusCode.PHONE_ALREADY_EXISTS,
+      undefined,
+      undefined,
+      lang,
+    );
   }
 
   documentAlreadyExists(lang?: string): ApiErrorResponse {
-    return this.error(StatusCode.DOCUMENT_ALREADY_EXISTS, undefined, undefined, lang);
+    return this.error(
+      StatusCode.DOCUMENT_ALREADY_EXISTS,
+      undefined,
+      undefined,
+      lang,
+    );
   }
 }

@@ -36,31 +36,36 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         exception.statusCode,
         exception.message,
         exception.errors,
-        exception.lang || lang
+        exception.lang || lang,
       );
     } else if (exception instanceof HttpException) {
       // Handle standard HTTP exceptions
       const status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       let message: string;
       let errors: any[] | undefined;
-      
+
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const responseObj = exceptionResponse as any;
         message = responseObj.message || exception.message;
         errors = responseObj.errors || responseObj.details;
       } else {
-        message = exceptionResponse as string;
+        message = exceptionResponse;
       }
 
       // Map HTTP status to our status codes
       const statusCode = this.mapHttpStatusToStatusCode(status);
-      errorResponse = this.responseService.error(statusCode, message, errors, lang);
+      errorResponse = this.responseService.error(
+        statusCode,
+        message,
+        errors,
+        lang,
+      );
     } else {
       // Unhandled exceptions
       const traceId = randomUUID();
-      
+
       // Log the full error for debugging
       this.logger.error(
         `Unhandled exception: ${exception}`,

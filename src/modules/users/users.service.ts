@@ -8,7 +8,7 @@ export class UsersService {
     @InjectModel(User)
     private userModel: typeof User,
   ) {}
- 
+
   async findById(id: string): Promise<User | null> {
     return await this.userModel.findOne({
       where: { id: id },

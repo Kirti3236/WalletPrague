@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -10,7 +7,12 @@ import { Op } from 'sequelize';
 import { randomUUID } from 'crypto';
 import { I18nService, I18nContext } from 'nestjs-i18n';
 import { User, UserStatus } from '../../models/user.model';
-import { AuthResponse, StandardResponse, SafeUser, JwtPayload } from './interfaces/auth-response.interface';
+import {
+  AuthResponse,
+  StandardResponse,
+  SafeUser,
+  JwtPayload,
+} from './interfaces/auth-response.interface';
 import { UsernameGeneratorUtil } from '../../common/utils/username-generator.util';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -29,7 +31,11 @@ export class AuthService {
     private i18n: I18nService,
   ) {}
 
-  async register(body: any, files?: any, lang: string = 'en'): Promise<AuthResponse> {
+  async register(
+    body: any,
+    files?: any,
+    lang: string = 'en',
+  ): Promise<AuthResponse> {
     const {
       user_email,
       user_password,
@@ -41,10 +47,18 @@ export class AuthService {
     } = body;
 
     // Basic validation (class-validator handles detailed validation)
-    if (!user_password || !user_first_name || !user_last_name || !user_DNI_number) {
+    if (
+      !user_password ||
+      !user_first_name ||
+      !user_last_name ||
+      !user_DNI_number
+    ) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.required_fields_missing', lang),
+        message: this.getTranslatedMessage(
+          'validation.required_fields_missing',
+          lang,
+        ),
       } as any;
     }
 
@@ -52,7 +66,10 @@ export class AuthService {
     if (user_password !== confirm_password) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.passwords_do_not_match', lang),
+        message: this.getTranslatedMessage(
+          'validation.passwords_do_not_match',
+          lang,
+        ),
       } as any;
     }
 
@@ -64,7 +81,10 @@ export class AuthService {
     if (existingUser) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.document_already_exists', lang),
+        message: this.getTranslatedMessage(
+          'validation.document_already_exists',
+          lang,
+        ),
         data: null,
       } as any;
     }
@@ -110,7 +130,10 @@ export class AuthService {
     if (!user_DNI_number || !user_password) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.dni_password_required', lang),
+        message: this.getTranslatedMessage(
+          'validation.dni_password_required',
+          lang,
+        ),
         data: null,
       } as any;
     }
@@ -179,7 +202,10 @@ export class AuthService {
     };
   }
 
-  async forgotPassword(body: any, lang: string = 'en'): Promise<StandardResponse> {
+  async forgotPassword(
+    body: any,
+    lang: string = 'en',
+  ): Promise<StandardResponse> {
     const { user_DNI_number } = body;
 
     if (!user_DNI_number) {
@@ -215,7 +241,9 @@ export class AuthService {
 
     // TODO: Send notification with reset token
     // In a real application, you would send an SMS or email here
-    this.logger.log(`Password reset token for DNI ${user.user_DNI_number}: ${resetToken}`);
+    this.logger.log(
+      `Password reset token for DNI ${user.user_DNI_number}: ${resetToken}`,
+    );
 
     return {
       success: true,
@@ -223,13 +251,19 @@ export class AuthService {
     };
   }
 
-  async resetPassword(body: any, lang: string = 'en'): Promise<StandardResponse> {
+  async resetPassword(
+    body: any,
+    lang: string = 'en',
+  ): Promise<StandardResponse> {
     const { token, new_password } = body;
 
     if (!token || !new_password) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.token_password_required', lang),
+        message: this.getTranslatedMessage(
+          'validation.token_password_required',
+          lang,
+        ),
         data: null,
       };
     }
@@ -317,55 +351,71 @@ export class AuthService {
         'validation.document_already_exists': 'Document number already exists',
         'validation.required_fields_missing': 'Missing required fields',
         'validation.passwords_do_not_match': 'Passwords do not match',
-        'validation.dni_password_required': 'DNI number and password are required',
+        'validation.dni_password_required':
+          'DNI number and password are required',
         'validation.dni_required': 'DNI number is required',
-        'validation.dni_number_required': 'DNI number is required for registration',
-        'validation.token_password_required': 'Token and new password are required',
+        'validation.dni_number_required':
+          'DNI number is required for registration',
+        'validation.token_password_required':
+          'Token and new password are required',
         'auth.registration_success': 'User registered successfully',
         'auth.login_success': 'Login successful',
         'auth.logout_success': 'Logout successful',
         'auth.invalid_credentials': 'Invalid credentials',
         'auth.account_not_active': 'Account is not active',
-        'auth.password_reset_sent': 'If the email exists, a password reset link has been sent',
+        'auth.password_reset_sent':
+          'If the email exists, a password reset link has been sent',
         'auth.password_reset_success': 'Password has been reset successfully',
         'auth.invalid_expired_token': 'Invalid or expired token',
       },
       es: {
         'validation.email_already_exists': 'El email ya existe',
         'validation.phone_already_exists': 'El número de teléfono ya existe',
-        'validation.document_already_exists': 'El número de documento ya existe',
+        'validation.document_already_exists':
+          'El número de documento ya existe',
         'validation.required_fields_missing': 'Faltan campos requeridos',
         'validation.passwords_do_not_match': 'Las contraseñas no coinciden',
-        'validation.dni_password_required': 'Se requiere número de DNI y contraseña',
+        'validation.dni_password_required':
+          'Se requiere número de DNI y contraseña',
         'validation.dni_required': 'Se requiere número de DNI',
-        'validation.dni_number_required': 'Se requiere número de DNI para el registro',
-        'validation.token_password_required': 'Se requiere token y nueva contraseña',
+        'validation.dni_number_required':
+          'Se requiere número de DNI para el registro',
+        'validation.token_password_required':
+          'Se requiere token y nueva contraseña',
         'auth.registration_success': 'Usuario registrado exitosamente',
         'auth.login_success': 'Inicio de sesión exitoso',
         'auth.logout_success': 'Cierre de sesión exitoso',
         'auth.invalid_credentials': 'Credenciales inválidas',
         'auth.account_not_active': 'La cuenta no está activa',
-        'auth.password_reset_sent': 'Si el email existe, se ha enviado un enlace para restablecer la contraseña',
-        'auth.password_reset_success': 'La contraseña ha sido restablecida exitosamente',
+        'auth.password_reset_sent':
+          'Si el email existe, se ha enviado un enlace para restablecer la contraseña',
+        'auth.password_reset_success':
+          'La contraseña ha sido restablecida exitosamente',
         'auth.invalid_expired_token': 'Token inválido o expirado',
       },
       fr: {
         'validation.email_already_exists': "L'email existe déjà",
         'validation.phone_already_exists': 'Le numéro de téléphone existe déjà',
-        'validation.document_already_exists': 'Le numéro de document existe déjà',
+        'validation.document_already_exists':
+          'Le numéro de document existe déjà',
         'validation.required_fields_missing': 'Champs requis manquants',
-        'validation.passwords_do_not_match': 'Les mots de passe ne correspondent pas',
+        'validation.passwords_do_not_match':
+          'Les mots de passe ne correspondent pas',
         'validation.dni_password_required': 'Numéro DNI et mot de passe requis',
         'validation.dni_required': 'Numéro DNI requis',
-        'validation.dni_number_required': 'Numéro DNI requis pour l\'inscription',
-        'validation.token_password_required': 'Token et nouveau mot de passe requis',
+        'validation.dni_number_required':
+          "Numéro DNI requis pour l'inscription",
+        'validation.token_password_required':
+          'Token et nouveau mot de passe requis',
         'auth.registration_success': 'Utilisateur enregistré avec succès',
         'auth.login_success': 'Connexion réussie',
         'auth.logout_success': 'Déconnexion réussie',
         'auth.invalid_credentials': 'Identifiants invalides',
         'auth.account_not_active': "Le compte n'est pas actif",
-        'auth.password_reset_sent': "Si l'email existe, un lien de réinitialisation du mot de passe a été envoyé",
-        'auth.password_reset_success': 'Le mot de passe a été réinitialisé avec succès',
+        'auth.password_reset_sent':
+          "Si l'email existe, un lien de réinitialisation du mot de passe a été envoyé",
+        'auth.password_reset_success':
+          'Le mot de passe a été réinitialisé avec succès',
         'auth.invalid_expired_token': 'Token invalide ou expiré',
       },
     };

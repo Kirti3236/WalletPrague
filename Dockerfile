@@ -1,42 +1,31 @@
-# Multi-stage Dockerfile for NestJS
-FROM node:18-alpine AS base
+FROM node:20 AS build_image
 
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+# Set the working directory
 WORKDIR /app
+# Copy only package.json and package-lock.json to install dependencies
+COPY package.json ./
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# Copy the rest of the application files
 COPY . .
 
-# Build the application
+# Build the Node.js app
 RUN npm run build
 
-# Production image, copy all the files and run nest
-FROM base AS runner
+# Stage 2: Production Image
+FROM node:20
+
+# Set the working directory
 WORKDIR /app
 
-ENV NODE_ENV=production
+COPY --from=build_image /app/dist ./dist
+COPY --from=build_image /app/node_modules ./node_modules
+COPY --from=build_image /app/package.json ./package.json
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nestjs
-
-# Copy built application
-COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
-
-USER nestjs
-
+# Expose the port that the Node.js app runs on
 EXPOSE 3000
 
-ENV PORT=3000
-
-CMD ["node", "dist/main"]
+# Start the Node.js app
+CMD ["node", "./dist/main.js"]

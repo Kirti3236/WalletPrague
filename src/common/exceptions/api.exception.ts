@@ -10,7 +10,7 @@ export class ApiException extends HttpException {
     statusCode: StatusCode,
     message?: string,
     errors?: any[],
-    lang?: string
+    lang?: string,
   ) {
     super(message || statusCode, HttpStatusMapping[statusCode]);
     this.statusCode = statusCode;
