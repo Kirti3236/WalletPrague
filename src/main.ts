@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType, BadRequestException } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
 import { getConnectionToken } from '@nestjs/sequelize';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -13,7 +15,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 async function bootstrap() {
   try {
     // Create the Nest application with minimal logging
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['error', 'warn'], // Only show errors and warnings, hide verbose logs
     });
 
@@ -26,7 +28,9 @@ async function bootstrap() {
 
     // CORS configuration
     app.enableCors({
-      origin: configService.get('cors.origin') || ['http://localhost:3000'],
+      origin: configService.get('app.nodeEnv') === 'development' 
+        ? true // Allow all origins in development
+        : configService.get('cors.origin') || ['http://localhost:3000'],
       credentials: configService.get('cors.credentials'),
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: [
@@ -34,26 +38,45 @@ async function bootstrap() {
         'Authorization',
         'X-Requested-With',
         'X-Trace-Id',
+        'Accept',
+        'Origin',
       ],
+      optionsSuccessStatus: 200, // Some legacy browsers choke on 204
     });
 
-    // API versioning
+    // Get API version from configuration and ensure it's just the number
+    let apiVersionNumber = configService.get('app.apiVersion') || '1';
+    
+    const apiVersion = `v${apiVersionNumber}`; // Create full version string for display
+    
+    // API versioning (NestJS adds 'v' automatically to the number)
     app.enableVersioning({
       type: VersioningType.URI,
-      defaultVersion: configService.get('app.apiVersion') || 'v1',
+      defaultVersion: apiVersionNumber, // Use just '1', NestJS will make it 'v1'
     });
 
     // Global pipes
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
-        forbidNonWhitelisted: true,
+        forbidNonWhitelisted: false, // Allow additional properties for Joi validation
         transform: true,
         transformOptions: {
           enableImplicitConversion: true,
         },
+        exceptionFactory: (errors) => {
+          // Get the first error message from the first validation error
+          const firstError = errors[0];
+          const firstConstraint = Object.values(firstError.constraints || {})[0];
+          throw new BadRequestException(firstConstraint);
+        },
       }),
     );
+
+    // Serve static files from uploads directory
+    app.useStaticAssets(join(process.cwd(), 'src', 'uploads'), {
+      prefix: '/uploads/',
+    });
 
     // Global interceptors (filter is configured in app.module.ts)
     app.useGlobalInterceptors(
@@ -61,24 +84,61 @@ async function bootstrap() {
       new TransformInterceptor(),
     );
 
+    const port = configService.get('app.port') || 3000;
+
     // Swagger documentation
     if (configService.get('swagger.enabled')) {
       const config = new DocumentBuilder()
         .setTitle('YaPague! Payment Management System API')
-        .setDescription('Payment Management System API Documentation')
+        .setDescription(`
+## 🏗️ API Architecture Overview
+
+### 📍 Route Structure
+The API follows a clean approach with **public** and **private** route categories:
+
+- **🌐 Public Routes**: \`/${apiVersion}/public/*\` - No authentication required
+- **🔐 Private Routes**: \`/${apiVersion}/private/*\` - JWT authentication required
+
+### 🔐 Authentication Guide
+
+**For Private Endpoints:**
+1. First, login using \`POST /${apiVersion}/public/auth/login\`
+2. Copy the JWT token from response
+3. Click the **🔓 Authorize** button above
+4. Enter: \`Bearer <your-jwt-token>\`
+5. Click **Authorize** to enable access to private endpoints
+
+### 📊 Endpoint Categories
+
+#### 🌐 Public Routes (No Auth Required)
+- User registration and authentication
+- Password recovery flows
+- Public information endpoints
+
+#### 🔐 Private Routes (JWT Required)
+- User profile management
+- Account operations
+- Protected data access
+
+**Icon Legend:**
+- 🌐 = Public/Global endpoints
+- 🔐 = Private/Secured endpoints
+        `)
         .setVersion('1.0')
+        .addServer(`http://localhost:${port}`, 'Development server')
         .addBearerAuth(
           {
             type: 'http',
             scheme: 'bearer',
             bearerFormat: 'JWT',
             name: 'JWT',
-            description: 'Enter JWT token',
+            description: 'Enter JWT token obtained from login endpoint',
             in: 'header',
           },
           'JWT-auth',
         )
-        .addTag('Authentication', 'User authentication and authorization')
+        .addTag('🌐 Authentication', 'Public authentication endpoints (no token required)')
+        .addTag('🔐 Users', 'Private user management endpoints (JWT token required)')
         .build();
 
       const document = SwaggerModule.createDocument(app, config);
@@ -89,21 +149,29 @@ async function bootstrap() {
         {
           swaggerOptions: {
             persistAuthorization: true,
+            tagsSorter: 'alpha',
+            operationsSorter: 'alpha',
+            docExpansion: 'list',
+            filter: true,
+            showRequestHeaders: true,
           },
+          customSiteTitle: 'YaPague! API Documentation',
+          customfavIcon: '/favicon.ico',
+          customJs: [
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+          ],
         },
       );
     }
-
-    const port = configService.get('app.port') || 3000;
 
     // Start the server
     await app.listen(port);
 
     console.log(`🚀 YaPague! Server started.`);
     console.log(`🌐 Server: http://localhost:${port}`);
-    console.log(
-      `📚 Swagger: http://localhost:${port}/${configService.get('swagger.path') || 'docs'}`,
-    );
+    console.log(`📚 Swagger: http://localhost:${port}/${configService.get('swagger.path') || 'docs'}`);
+    console.log(`🔑 Public routes: http://localhost:${port}/${apiVersion}/public/*`);
+    console.log(`🔒 Private routes: http://localhost:${port}/${apiVersion}/private/*`);
 
     // Test database connection
     try {

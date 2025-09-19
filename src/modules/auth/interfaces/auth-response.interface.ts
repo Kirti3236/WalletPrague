@@ -21,6 +21,8 @@ export interface SafeUser {
   user_last_name: string;
   user_status: string;
   user_role: string;
+  frontIdFileUrl?: string;
+  backIdFileUrl?: string;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;

@@ -10,15 +10,8 @@ import {
   Req,
   UsePipes,
 } from '@nestjs/common';
-import {
-  IsEmail,
-  IsString,
-  IsOptional,
-  MinLength,
-  MaxLength,
-  Matches,
-} from 'class-validator';
-import { PasswordMatch } from '../../common/validators/password-match.validator';
+import { IsOptional, IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import { PasswordMatch } from '../../common/decorators/password-match.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -41,39 +34,33 @@ import {
   AuthResponse,
   StandardResponse,
 } from './interfaces/auth-response.interface';
-import { JoiValidationPipe } from './pipes/joi-validation.pipe';
-import {
-  registerSchema,
-  loginSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-} from './validators/auth.validators';
+// Using global ValidationPipe with class-validator decorators
 
-// Request body classes for Swagger documentation
+// Request body classes with class-validator decorators
 class RegisterRequest {
   // Required fields for registration
   @ApiProperty({ example: 'John', required: true })
   @IsString()
-  @MinLength(2)
-  @MaxLength(50)
+  @MinLength(2, { message: 'First name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'First name must not exceed 50 characters' })
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'Name must contain only letters, spaces, hyphens and apostrophes',
+    message: 'First name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_first_name: string;
 
   @ApiProperty({ example: 'Doe', required: true })
   @IsString()
-  @MinLength(2)
-  @MaxLength(50)
+  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'Name must contain only letters, spaces, hyphens and apostrophes',
+    message: 'Last name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_last_name: string;
 
   @ApiProperty({ example: '12345678', required: true })
   @IsString()
-  @MinLength(6)
-  @MaxLength(20)
+  @MinLength(6, { message: 'DNI number must be at least 6 characters long' })
+  @MaxLength(20, { message: 'DNI number must not exceed 20 characters' })
   @Matches(/^[a-zA-Z0-9]+$/, {
     message: 'DNI number must contain only letters and numbers',
   })
@@ -81,17 +68,16 @@ class RegisterRequest {
 
   @ApiProperty({ example: 'SecurePassword123!', required: true })
   @IsString()
-  @MinLength(8)
-  @MaxLength(128)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @MaxLength(128, { message: 'Password must not exceed 128 characters' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
+    message: 'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
   })
   user_password: string;
 
   @ApiProperty({ example: 'SecurePassword123!', required: true })
   @IsString()
-  @PasswordMatch('user_password')
+  @PasswordMatch('user_password', { message: 'Passwords do not match' })
   confirm_password: string;
 
   // Optional fields (for future use)
@@ -101,8 +87,9 @@ class RegisterRequest {
     description: 'Optional email address for future use',
   })
   @IsOptional()
-  @IsEmail()
-  @MaxLength(255)
+  @IsString()
+  @MaxLength(255, { message: 'Email must not exceed 255 characters' })
+  @Matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: 'Please provide a valid email address' })
   user_email?: string;
 
   @ApiProperty({
@@ -112,10 +99,8 @@ class RegisterRequest {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(20)
-  @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: 'Please provide a valid phone number',
-  })
+  @MaxLength(20, { message: 'Phone number must not exceed 20 characters' })
+  @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Please provide a valid phone number' })
   user_phone_number?: string;
 
   @ApiProperty({
@@ -124,7 +109,6 @@ class RegisterRequest {
     required: false,
     description: 'Front ID document file upload',
   })
-  @IsOptional()
   frontIdFile?: any;
 
   @ApiProperty({
@@ -133,15 +117,14 @@ class RegisterRequest {
     required: false,
     description: 'Back ID document file upload',
   })
-  @IsOptional()
   backIdFile?: any;
 }
 
 class LoginRequest {
   @ApiProperty({ example: '12345678', required: true })
   @IsString()
-  @MinLength(6)
-  @MaxLength(20)
+  @MinLength(6, { message: 'DNI number must be at least 6 characters long' })
+  @MaxLength(20, { message: 'DNI number must not exceed 20 characters' })
   @Matches(/^[a-zA-Z0-9]+$/, {
     message: 'DNI number must contain only letters and numbers',
   })
@@ -149,42 +132,39 @@ class LoginRequest {
 
   @ApiProperty({ example: 'SecurePassword123!', required: true })
   @IsString()
-  @MinLength(1)
-  @MaxLength(128)
+  @MinLength(1, { message: 'Password is required' })
+  @MaxLength(128, { message: 'Password must not exceed 128 characters' })
   user_password: string;
 }
 
 class ForgotPasswordRequest {
   @ApiProperty({ example: '12345678', required: true })
   @IsString()
-  @MinLength(6)
-  @MaxLength(20)
+  @MinLength(6, { message: 'DNI number must be at least 6 characters long' })
+  @MaxLength(20, { message: 'DNI number must not exceed 20 characters' })
   @Matches(/^[a-zA-Z0-9]+$/, {
     message: 'DNI number must contain only letters and numbers',
   })
   user_DNI_number: string;
-}
-
-class ResetPasswordRequest {
-  @ApiProperty({ example: 'abc123def456', required: true })
-  @IsString()
-  @MinLength(10)
-  @MaxLength(500)
-  token: string;
 
   @ApiProperty({ example: 'NewSecurePassword123!', required: true })
   @IsString()
-  @MinLength(8)
-  @MaxLength(128)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
+  @MinLength(8, { message: 'New password must be at least 8 characters long' })
+  @MaxLength(128, { message: 'New password must not exceed 128 characters' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
+    message: 'New password must contain at least 8 characters with uppercase, lowercase, number and special character',
   })
   new_password: string;
+
+  @ApiProperty({ example: 'NewSecurePassword123!', required: true })
+  @IsString()
+  @PasswordMatch('new_password', { message: 'Passwords do not match' })
+  confirm_password: string;
 }
 
-@ApiTags('Authentication')
-@Controller({ path: 'auth', version: '1' })
+
+@ApiTags('🌐 Authentication')
+@Controller('public/auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
   constructor(
@@ -226,9 +206,9 @@ export class AuthController {
     ),
   )
   @ApiOperation({
-    summary: 'Register a new user',
+    summary: '🌐 Register a new user',
     description:
-      'Register a new user with first name, last name, DNI number and password. Email and phone are optional for future use.',
+      '**PUBLIC ENDPOINT** - Register a new user with first name, last name, DNI number and password. Email and phone are optional for future use. No authentication required.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -260,11 +240,56 @@ export class AuthController {
     return this.authService.register(body, files, lang);
   }
 
+  @Post('register-json')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: '🌐 Register a new user (JSON)',
+    description:
+      '**PUBLIC ENDPOINT** - Register a new user with JSON payload. For testing and clients that prefer JSON over multipart/form-data. No file uploads supported in this endpoint.',
+  })
+  @ApiBody({
+    description:
+      'Required: first_name, last_name, user_DNI_number, user_password, confirm_password. Optional: user_email, user_phone_number',
+    type: RegisterRequest,
+    examples: {
+      example1: {
+        summary: 'Valid JSON registration',
+        value: {
+          user_first_name: 'John',
+          user_last_name: 'Doe',
+          user_DNI_number: '87654321',
+          user_password: 'SecurePassword123!',
+          confirm_password: 'SecurePassword123!',
+          user_email: 'john.doe@example.com',
+          user_phone_number: '+1234567890',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - validation failed',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict - user already exists',
+  })
+  async registerJson(
+    @Body() body: RegisterRequest,
+    @Lang() lang?: string,
+  ): Promise<AuthResponse> {
+    return this.authService.register(body, null, lang); // No files for JSON endpoint
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'User login',
-    description: 'Authenticate user using DNI number and password',
+    summary: '🌐 User login',
+    description: '**PUBLIC ENDPOINT** - Authenticate user using DNI number and password. Returns JWT token for accessing private endpoints.',
   })
   @ApiBody({
     description: 'User login credentials',
@@ -292,53 +317,45 @@ export class AuthController {
     description: 'Unauthorized - invalid credentials',
   })
   async login(
-    @Body(new JoiValidationPipe(loginSchema)) body: LoginRequest,
+    @Body() body: LoginRequest,
     @Lang() lang?: string,
   ): Promise<AuthResponse> {
     return this.authService.login(body, lang);
   }
 
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({
-    summary: 'User logout',
-    description: 'Logout authenticated user (requires valid JWT token)',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Logout successful',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - invalid or missing JWT token',
-  })
-  async logout(
-    @Req() req: any,
-    @Lang() lang?: string,
-  ): Promise<StandardResponse> {
-    return this.authService.logout(req.user, lang);
-  }
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Initiate password reset',
+    summary: '🌐 Reset forgotten password',
     description:
-      'Send password reset token using DNI number. Only requires DNI number - no password fields needed. For security, always returns success regardless of whether DNI exists.',
+      '**PUBLIC ENDPOINT** - Reset user password when they have forgotten it. Requires only DNI number and new password. System validates that new password is different from current password.',
   })
   @ApiBody({
-    description: 'User DNI number for password reset',
+    description: 'DNI number, new password, and confirmation',
     type: ForgotPasswordRequest,
+    examples: {
+      example1: {
+        summary: 'Valid forgot password request',
+        value: {
+          user_DNI_number: '12345678',
+          new_password: 'NewSecurePassword123!',
+          confirm_password: 'NewSecurePassword123!',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
-    description: 'Password reset notification sent (if DNI exists)',
+    description: 'Password reset successfully',
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request - DNI number required',
+    description: 'Bad request - validation failed or new password same as current password',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found with provided DNI number',
   })
   async forgotPassword(
     @Body() body: ForgotPasswordRequest,
@@ -347,29 +364,4 @@ export class AuthController {
     return this.authService.forgotPassword(body, lang);
   }
 
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Reset password',
-    description:
-      'Reset user password using reset token from forgot password email. This endpoint is public because users who forgot their password cannot authenticate with JWT. Uses secure reset token instead.',
-  })
-  @ApiBody({
-    description: 'Reset token and new password',
-    type: ResetPasswordRequest,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Password reset successful',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - invalid or expired token',
-  })
-  async resetPassword(
-    @Body() body: ResetPasswordRequest,
-    @Lang() lang?: string,
-  ): Promise<StandardResponse> {
-    return this.authService.resetPassword(body, lang);
-  }
 }

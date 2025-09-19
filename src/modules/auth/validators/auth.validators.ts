@@ -4,7 +4,7 @@ import * as Joi from 'joi';
 const passwordPattern = Joi.string()
   .min(8)
   .max(128)
-  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/)
   .required()
   .messages({
     'string.pattern.base':
@@ -66,16 +66,27 @@ export const registerSchema = Joi.object({
   user_DNI_number: dniPattern,
 }).options({ stripUnknown: true });
 
+// Register validation schema for multipart/form-data (with file uploads)
+export const registerMultipartSchema = Joi.object({
+  user_email: emailPattern,
+  user_password: passwordPattern,
+  confirm_password: Joi.string()
+    .valid(Joi.ref('user_password'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Password confirmation is required',
+    }),
+  user_first_name: namePattern,
+  user_last_name: namePattern,
+  user_phone_number: phonePattern,
+  user_DNI_number: dniPattern,
+  // Files are handled by multer, not Joi
+}).options({ stripUnknown: true });
+
 // Login validation schema
 export const loginSchema = Joi.object({
-  user_DNI_number: Joi.string().alphanum().min(6).max(20).required().messages({
-    'string.alphanum': 'DNI number must contain only letters and numbers',
-    'string.min': 'DNI number must be at least 6 characters long',
-    'string.max': 'DNI number must not exceed 20 characters',
-    'any.required': 'user_DNI_number is required',
-    'string.base': 'user_DNI_number must be a string',
-    'string.empty': 'user_DNI_number cannot be empty',
-  }),
+  user_DNI_number: dniPattern,
   user_password: Joi.string().min(1).max(128).required().messages({
     'string.min': 'Password is required',
     'string.max': 'Password must not exceed 128 characters',
@@ -85,30 +96,39 @@ export const loginSchema = Joi.object({
   }),
 }).options({ stripUnknown: true, allowUnknown: false });
 
-// Forgot password validation schema
+// Forgot password validation schema (for when user forgot their password)
 export const forgotPasswordSchema = Joi.object({
-  user_DNI_number: Joi.string().alphanum().min(6).max(20).required().messages({
-    'string.alphanum': 'DNI number must contain only letters and numbers',
-    'string.min': 'DNI number must be at least 6 characters long',
-    'string.max': 'DNI number must not exceed 20 characters',
-    'any.required': 'DNI number is required',
-  }),
+  user_DNI_number: dniPattern,
+  new_password: passwordPattern, // Use common pattern, avoid duplicate messages
+  confirm_password: Joi.string()
+    .valid(Joi.ref('new_password'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Password confirmation is required',
+    }),
 }).options({ stripUnknown: true });
 
-// Reset password validation schema
+// Reset password validation schema (for token-based reset - now deprecated)
 export const resetPasswordSchema = Joi.object({
   token: Joi.string().min(10).max(500).required().messages({
     'string.min': 'Invalid token format',
     'string.max': 'Invalid token format',
     'any.required': 'Reset token is required',
   }),
-  new_password: passwordPattern.messages({
-    'string.pattern.base':
-      'New password must contain at least 8 characters with uppercase, lowercase, number and special character',
-    'string.min': 'New password must be at least 8 characters long',
-    'string.max': 'New password must not exceed 128 characters',
-    'any.required': 'New password is required',
-  }),
+  new_password: passwordPattern, // Use common pattern, avoid duplicate messages
+}).options({ stripUnknown: true });
+
+// Reset password with JWT token validation schema (for private endpoint)
+export const resetPasswordWithTokenSchema = Joi.object({
+  new_password: passwordPattern, // Use common pattern, avoid duplicate messages
+  confirm_password: Joi.string()
+    .valid(Joi.ref('new_password'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Password confirmation is required',
+    }),
 }).options({ stripUnknown: true });
 
 // File validation for register endpoint (optional - files are validated by multer)

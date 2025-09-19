@@ -7,15 +7,16 @@ import {
 import type { ObjectSchema } from 'joi';
 
 @Injectable()
-export class JoiValidationPipe implements PipeTransform {
+export class MultipartValidationPipe implements PipeTransform {
   constructor(private schema: ObjectSchema) {}
 
   transform(value: any, metadata: ArgumentMetadata) {
-    // Debug: log what we're receiving
-    console.log('JoiValidationPipe received:', JSON.stringify(value, null, 2));
+    // Debug: log what we're receiving for multipart
+    console.log('MultipartValidationPipe received:', JSON.stringify(value, null, 2));
     console.log('Type:', typeof value);
     
-    // Use the value as-is if it's already an object
+    // For multipart/form-data, the body comes as individual fields
+    // We need to validate the body structure
     const { error, value: validatedValue } = this.schema.validate(value, {
       abortEarly: true, // Return first error only
       stripUnknown: true,

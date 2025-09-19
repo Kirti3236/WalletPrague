@@ -46,32 +46,7 @@ export class AuthService {
       user_DNI_number,
     } = body;
 
-    // Basic validation (class-validator handles detailed validation)
-    if (
-      !user_password ||
-      !user_first_name ||
-      !user_last_name ||
-      !user_DNI_number
-    ) {
-      return {
-        success: false,
-        message: this.getTranslatedMessage(
-          'validation.required_fields_missing',
-          lang,
-        ),
-      } as any;
-    }
-
-    // Validate password confirmation
-    if (user_password !== confirm_password) {
-      return {
-        success: false,
-        message: this.getTranslatedMessage(
-          'validation.passwords_do_not_match',
-          lang,
-        ),
-      } as any;
-    }
+    // Joi validation handles all field validation, so no manual validation needed here
 
     // Check if user already exists by DNI number (primary identifier for login)
     const existingUser = await this.userModel.findOne({
@@ -92,9 +67,13 @@ export class AuthService {
     // Generate unique username
     const user_name = await this.usernameGenerator.generateUniqueUsername();
 
-    // Handle file uploads
-    const front_document_name = files?.frontIdFile?.[0]?.filename;
-    const back_document_name = files?.backIdFile?.[0]?.filename;
+    // Handle file uploads and construct URLs
+    const frontIdFileUrl = files?.frontIdFile?.[0]?.filename 
+      ? `${this.configService.get('app.baseUrl')}/uploads/documents/${files.frontIdFile[0].filename}`
+      : null;
+    const backIdFileUrl = files?.backIdFile?.[0]?.filename 
+      ? `${this.configService.get('app.baseUrl')}/uploads/documents/${files.backIdFile[0].filename}`
+      : null;
 
     // Create new user
     const savedUser = await this.userModel.create<User>({
@@ -105,8 +84,8 @@ export class AuthService {
       user_last_name,
       user_phone_number,
       user_DNI_number,
-      front_document_name,
-      back_document_name,
+      frontIdFileUrl,
+      backIdFileUrl,
     } as any);
 
     // Generate access token
@@ -206,48 +185,41 @@ export class AuthService {
     body: any,
     lang: string = 'en',
   ): Promise<StandardResponse> {
-    const { user_DNI_number } = body;
+    const { user_DNI_number, new_password, confirm_password } = body;
 
-    if (!user_DNI_number) {
-      return {
-        success: false,
-        message: this.getTranslatedMessage('validation.dni_required', lang),
-        data: null,
-      };
-    }
+    // Joi validation handles all field validation and password matching
 
     // Find user by DNI number
     const user = await this.userModel.findOne({
       where: { user_DNI_number },
     });
 
-    // Always return success message for security (don't reveal if DNI exists)
     if (!user) {
       return {
-        success: true,
-        message: this.getTranslatedMessage('auth.password_reset_sent', lang),
+        success: false,
+        message: this.getTranslatedMessage('auth.user_not_found', lang),
+        data: null,
       };
     }
 
-    // Generate reset token
-    const resetToken = randomUUID().replace(/-/g, '');
-    const resetTokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+    // Check if new password is same as current password
+    const isSameAsCurrentPassword = await user.validatePassword(new_password);
+    if (isSameAsCurrentPassword) {
+      return {
+        success: false,
+        message: this.getTranslatedMessage('auth.new_password_same_as_current', lang),
+        data: null,
+      };
+    }
 
-    // Update user with reset token
+    // Update password
     await user.update({
-      resetToken,
-      resetTokenExpiresAt,
+      user_password: new_password, // Will be hashed by the model hook
     });
-
-    // TODO: Send notification with reset token
-    // In a real application, you would send an SMS or email here
-    this.logger.log(
-      `Password reset token for DNI ${user.user_DNI_number}: ${resetToken}`,
-    );
 
     return {
       success: true,
-      message: this.getTranslatedMessage('auth.password_reset_sent', lang),
+      message: this.getTranslatedMessage('auth.password_reset_success', lang),
     };
   }
 
@@ -299,6 +271,26 @@ export class AuthService {
     };
   }
 
+  async resetPasswordWithToken(
+    body: any,
+    currentUser: User,
+    lang: string = 'en',
+  ): Promise<StandardResponse> {
+    const { new_password, confirm_password } = body;
+
+    // Joi validation handles all field validation and password matching
+
+    // Update password for the authenticated user
+    await currentUser.update({
+      user_password: new_password, // Will be hashed by the model hook
+    });
+
+    return {
+      success: true,
+      message: this.getTranslatedMessage('auth.password_reset_success', lang),
+    };
+  }
+
   private async generateAccessToken(user: User): Promise<string> {
     const payload: JwtPayload = {
       sub: user.id,
@@ -336,6 +328,8 @@ export class AuthService {
       user_last_name: user.user_last_name,
       user_status: user.user_status,
       user_role: user.user_role,
+      frontIdFileUrl: user.frontIdFileUrl,
+      backIdFileUrl: user.backIdFileUrl,
       lastLoginAt: user.lastLoginAt,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -367,6 +361,12 @@ export class AuthService {
           'If the email exists, a password reset link has been sent',
         'auth.password_reset_success': 'Password has been reset successfully',
         'auth.invalid_expired_token': 'Invalid or expired token',
+        'auth.new_password_same_as_current': 'New password cannot be the same as current password',
+        'auth.password_changed_success': 'Password changed successfully',
+        'auth.user_not_found': 'User not found',
+        'validation.all_fields_required': 'All required fields must be provided',
+        'validation.passwords_dont_match': 'New password and confirmation do not match',
+        'validation.password_fields_required': 'New password and confirmation are required',
       },
       es: {
         'validation.email_already_exists': 'El email ya existe',
@@ -392,6 +392,12 @@ export class AuthService {
         'auth.password_reset_success':
           'La contraseña ha sido restablecida exitosamente',
         'auth.invalid_expired_token': 'Token inválido o expirado',
+        'auth.new_password_same_as_current': 'La nueva contraseña no puede ser la misma que la actual',
+        'auth.password_changed_success': 'Contraseña cambiada exitosamente',
+        'auth.user_not_found': 'Usuario no encontrado',
+        'validation.all_fields_required': 'Todos los campos requeridos deben ser proporcionados',
+        'validation.passwords_dont_match': 'La nueva contraseña y la confirmación no coinciden',
+        'validation.password_fields_required': 'La nueva contraseña y la confirmación son requeridas',
       },
       fr: {
         'validation.email_already_exists': "L'email existe déjà",

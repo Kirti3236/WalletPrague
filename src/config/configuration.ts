@@ -6,7 +6,7 @@ export const configValidationSchema = Joi.object({
     .valid('development', 'production', 'test', 'staging')
     .default('development'),
   PORT: Joi.number().default(3000),
-  API_VERSION: Joi.string().default('v1'),
+  API_VERSION: Joi.string().required(),
 
   // Database
   DB_HOST: Joi.string().required(),
@@ -62,6 +62,7 @@ export default () => ({
     nodeEnv: process.env.NODE_ENV,
     port: parseInt(process.env.PORT || '3000', 10),
     apiVersion: process.env.API_VERSION,
+    baseUrl: process.env.BASE_URL || `http://localhost:${process.env.PORT || '3000'}`,
   },
   database: {
     host: process.env.DB_HOST,

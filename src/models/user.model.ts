@@ -150,6 +150,22 @@ export class User extends Model<User> {
   })
   declare resetTokenExpiresAt?: Date;
 
+  @ApiProperty({ description: 'Front ID document file URL' })
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+    field: 'front_id_file_url',
+  })
+  declare frontIdFileUrl?: string;
+
+  @ApiProperty({ description: 'Back ID document file URL' })
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+    field: 'back_id_file_url',
+  })
+  declare backIdFileUrl?: string;
+
   // Hooks
   @BeforeCreate
   @BeforeUpdate
