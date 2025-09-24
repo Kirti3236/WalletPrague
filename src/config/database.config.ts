@@ -15,7 +15,7 @@ export const getDatabaseConfig = (
     username: configService.get('database.username'),
     password: configService.get('database.password'),
     database: configService.get('database.name'),
-    models: models,
+    models: models as any,
     synchronize: configService.get('database.synchronize'),
     logging: dbLogging
       ? (sql: string) => {

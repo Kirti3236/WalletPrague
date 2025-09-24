@@ -32,7 +32,7 @@ export class UsernameGeneratorUtil {
       username = `User${randomDigits}`;
 
       // Check if username already exists
-      const existingUser = await this.userModel.findOne({
+      const existingUser = await (this.userModel as any).findOne({
         where: { user_name: username },
         attributes: ['id'],
       });
@@ -47,7 +47,7 @@ export class UsernameGeneratorUtil {
         username = `User${timestamp}`;
 
         // Final check with timestamp-based username
-        const finalCheck = await this.userModel.findOne({
+      const finalCheck = await (this.userModel as any).findOne({
           where: { user_name: username },
           attributes: ['id'],
         });

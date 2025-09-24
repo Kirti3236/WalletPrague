@@ -12,6 +12,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ResponseService } from './common/services/response.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { WalletsModule } from './modules/wallets/wallets.module';
+import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { TransfersModule } from './modules/transfers/transfers.module';
+import { BanksModule } from './modules/banks/banks.module';
+import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
+import { DepositsModule } from './modules/deposits/deposits.module';
+import { SeederService } from './seeds/seeder.service';
 
 @Module({
   imports: [
@@ -56,11 +65,20 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
     // Feature modules
     AuthModule,
     UsersModule,
+    WalletsModule,
+    WithdrawalsModule,
+    PaymentsModule,
+    TransfersModule,
+    BanksModule,
+    PaymentMethodsModule,
+    TransactionsModule,
+    DepositsModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     ResponseService,
+    SeederService,
     {
       provide: 'APP_FILTER',
       useClass: GlobalExceptionFilter,

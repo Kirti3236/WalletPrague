@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import { randomUUID } from 'crypto';
 import { I18nService, I18nContext } from 'nestjs-i18n';
 import { User, UserStatus } from '../../models/user.model';
+import { Wallet } from '../../models/wallet.model';
 import {
   AuthResponse,
   StandardResponse,
@@ -49,7 +50,7 @@ export class AuthService {
     // Joi validation handles all field validation, so no manual validation needed here
 
     // Check if user already exists by DNI number (primary identifier for login)
-    const existingUser = await this.userModel.findOne({
+    const existingUser = await (this.userModel as any).findOne({
       where: { user_DNI_number },
     });
 
@@ -64,8 +65,8 @@ export class AuthService {
       } as any;
     }
 
-    // Generate unique username
-    const user_name = await this.usernameGenerator.generateUniqueUsername();
+    // Generate unique username (with limited retries on race conditions)
+    let user_name = await this.usernameGenerator.generateUniqueUsername();
 
     // Handle file uploads and construct URLs
     const frontIdFileUrl = files?.frontIdFile?.[0]?.filename 
@@ -75,18 +76,84 @@ export class AuthService {
       ? `${this.configService.get('app.baseUrl')}/uploads/documents/${files.backIdFile[0].filename}`
       : null;
 
-    // Create new user
-    const savedUser = await this.userModel.create<User>({
-      user_email,
-      user_name,
-      user_password,
-      user_first_name,
-      user_last_name,
-      user_phone_number,
-      user_DNI_number,
-      frontIdFileUrl,
-      backIdFileUrl,
-    } as any);
+    // Create new user with retry for username uniqueness
+    let savedUser: User | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        savedUser = await (this.userModel as any).create({
+          user_email,
+          user_name,
+          user_password,
+          user_first_name,
+          user_last_name,
+          user_phone_number,
+          user_DNI_number,
+          frontIdFileUrl,
+          backIdFileUrl,
+        } as any);
+        break;
+      } catch (err: any) {
+        // Handle unique violations gracefully
+        const isUnique = err?.name?.includes('UniqueConstraint') || err?.name?.includes('SequelizeUniqueConstraintError');
+        if (isUnique) {
+          const path = err?.errors?.[0]?.path || '';
+          if (path.includes('user_name')) {
+            // regenerate username and retry
+            user_name = await this.usernameGenerator.generateUniqueUsername();
+            continue;
+          }
+          if (path.includes('user_DNI_number')) {
+            return {
+              success: false,
+              message: this.getTranslatedMessage('validation.document_already_exists', lang),
+              data: null,
+            } as any;
+          }
+          if (path.includes('user_email')) {
+            return {
+              success: false,
+              message: this.getTranslatedMessage('validation.email_already_exists', lang),
+              data: null,
+            } as any;
+          }
+          if (path.includes('user_phone_number')) {
+            return {
+              success: false,
+              message: this.getTranslatedMessage('validation.phone_already_exists', lang),
+              data: null,
+            } as any;
+          }
+        }
+        // Unknown error → log and rethrow to be handled by global filter
+        this.logger.error(`Register failed: ${err?.message || err}`);
+        throw err;
+      }
+    }
+    if (!savedUser) {
+      return {
+        success: false,
+        message: this.getTranslatedMessage('validation.required_fields_missing', lang),
+        data: null,
+      } as any;
+    }
+
+    // Ensure user has a default wallet for LPS currency
+    try {
+      const existingWallet = await (Wallet as any).findOne({ where: { user_id: savedUser.id, currency: 'LPS' } });
+      if (!existingWallet) {
+        await (Wallet as any).create({
+          user_id: savedUser.id,
+          wallet_name: 'Primary LPS',
+          currency: 'LPS',
+          available_balance: '0.00',
+          ledger_balance: '0.00',
+          reserved_balance: '0.00',
+          status: 'active',
+        });
+      }
+    } catch (e) {
+      this.logger.warn(`Auto wallet create skipped: ${e instanceof Error ? e.message : e}`);
+    }
 
     // Generate access token
     const accessToken = await this.generateAccessToken(savedUser);
@@ -118,7 +185,7 @@ export class AuthService {
     }
 
     // Find user by DNI number
-    const user = await this.userModel.findOne({
+    const user = await (this.userModel as any).findOne({
       where: { user_DNI_number },
     });
 
@@ -190,7 +257,7 @@ export class AuthService {
     // Joi validation handles all field validation and password matching
 
     // Find user by DNI number
-    const user = await this.userModel.findOne({
+    const user = await (this.userModel as any).findOne({
       where: { user_DNI_number },
     });
 

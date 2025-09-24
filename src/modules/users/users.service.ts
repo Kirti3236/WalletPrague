@@ -27,13 +27,13 @@ export class UsersService {
   ) {}
 
   async findById(id: string): Promise<User | null> {
-    return await this.userModel.findOne({
+    return await (this.userModel as any).findOne({
       where: { id: id },
     });
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userModel.findAll({
+    return await (this.userModel as any).findAll({
       order: [['createdAt', 'DESC']],
     });
   }

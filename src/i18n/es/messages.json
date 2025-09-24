@@ -58,5 +58,28 @@
     "maxLength": "{{field}} no debe exceder {{max}} caracteres",
     "phoneNumber": "Por favor proporcione un número de teléfono válido",
     "strongPassword": "La contraseña debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres especiales"
+  },
+  "transfers": {
+    "wallet_not_found": "Billetera no encontrada",
+    "insufficient_funds": "Fondos insuficientes para esta transferencia",
+    "sender_not_found": "Remitente no encontrado",
+    "recipient_not_found": "Destinatario no encontrado",
+    "transfer_not_found": "Transferencia no encontrada",
+    "self_transfer_not_allowed": "No puedes transferir a ti mismo",
+    "recipient_inactive": "La cuenta del destinatario no está activa",
+    "no_active_wallets": "El destinatario no tiene billeteras activas",
+    "no_wallet_for_currency": "El destinatario no tiene una billetera {{currency}} activa",
+    "invalid_transfer_id": "Formato de ID de transferencia inválido. Debe ser un UUID válido",
+    "recipient_validation_failed": "Falló la validación del destinatario",
+    "transfer_success": "Transferencia completada exitosamente",
+    "recipient_validated": "Destinatario validado exitosamente",
+    "transfer_details_retrieved": "Detalles de transferencia obtenidos exitosamente"
+  },
+  "payments": {
+    "payment_code_not_found": "Código de pago no encontrado",
+    "payment_code_not_found_or_expired": "Código de pago no encontrado o expirado",
+    "invalid_qr_format": "Formato de código QR inválido",
+    "qr_generated": "Código QR generado exitosamente",
+    "payment_processed": "Pago procesado exitosamente"
   }
 }

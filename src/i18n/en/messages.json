@@ -57,5 +57,28 @@
     "maxLength": "{{field}} must not exceed {{max}} characters",
     "phoneNumber": "Please provide a valid phone number",
     "strongPassword": "Password must contain at least 8 characters, including uppercase, lowercase, number and special character"
+  },
+  "transfers": {
+    "wallet_not_found": "Wallet not found",
+    "insufficient_funds": "Insufficient funds for this transfer",
+    "sender_not_found": "Sender not found",
+    "recipient_not_found": "Recipient not found",
+    "transfer_not_found": "Transfer not found",
+    "self_transfer_not_allowed": "Cannot transfer to yourself",
+    "recipient_inactive": "Recipient account is not active",
+    "no_active_wallets": "Recipient has no active wallets",
+    "no_wallet_for_currency": "Recipient does not have an active {{currency}} wallet",
+    "invalid_transfer_id": "Invalid transfer ID format. Must be a valid UUID",
+    "recipient_validation_failed": "Recipient validation failed",
+    "transfer_success": "Transfer completed successfully",
+    "recipient_validated": "Recipient validated successfully",
+    "transfer_details_retrieved": "Transfer details retrieved successfully"
+  },
+  "payments": {
+    "payment_code_not_found": "Payment code not found",
+    "payment_code_not_found_or_expired": "Payment code not found or expired",
+    "invalid_qr_format": "Invalid QR code format",
+    "qr_generated": "QR code generated successfully",
+    "payment_processed": "Payment processed successfully"
   }
 }

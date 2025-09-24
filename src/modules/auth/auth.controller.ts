@@ -9,6 +9,9 @@ import {
   UploadedFiles,
   Req,
   UsePipes,
+  UnauthorizedException,
+  ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { IsOptional, IsString, MinLength, MaxLength, Matches } from 'class-validator';
 import { PasswordMatch } from '../../common/decorators/password-match.decorator';
@@ -282,7 +285,18 @@ export class AuthController {
     @Body() body: RegisterRequest,
     @Lang() lang?: string,
   ): Promise<AuthResponse> {
-    return this.authService.register(body, null, lang); // No files for JSON endpoint
+    const result = await this.authService.register(body, null, lang); // No files for JSON endpoint
+
+    // If registration failed, throw appropriate HTTP exception
+    if (!result.success) {
+      if (result.message.includes('already exists') || result.message.includes('duplicate')) {
+        throw new ConflictException(result.message);
+      } else {
+        throw new BadRequestException(result.message);
+      }
+    }
+
+    return result;
   }
 
   @Post('login')
@@ -320,7 +334,14 @@ export class AuthController {
     @Body() body: LoginRequest,
     @Lang() lang?: string,
   ): Promise<AuthResponse> {
-    return this.authService.login(body, lang);
+    const result = await this.authService.login(body, lang);
+
+    // If login failed, throw appropriate HTTP exception
+    if (!result.success) {
+      throw new UnauthorizedException(result.message);
+    }
+
+    return result;
   }
 
 

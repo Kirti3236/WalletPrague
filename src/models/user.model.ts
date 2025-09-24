@@ -4,13 +4,17 @@ import {
   DataType,
   BeforeCreate,
   BeforeUpdate,
+  AfterSave,
   Index,
   PrimaryKey,
   Model,
+  HasMany,
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
+import { writeAudit } from '../common/utils/audit.util';
+import { QrCode } from './qr-code.model';
 
 export enum UserStatus {
   ACTIVE = 'active',
@@ -39,6 +43,7 @@ export class User extends Model<User> {
   declare id: string;
 
   @ApiProperty({ description: 'User email address', required: false })
+  @Index({ unique: true })
   @Column({
     type: DataType.STRING(255),
     allowNull: true,
@@ -57,6 +62,7 @@ export class User extends Model<User> {
   declare user_name: string;
 
   @ApiProperty({ description: 'User phone number', required: false })
+  @Index({ unique: true })
   @Column({
     type: DataType.STRING(20),
     allowNull: true,
@@ -177,6 +183,14 @@ export class User extends Model<User> {
         saltRounds,
       );
     }
+    (instance as any).updated_at = new Date();
+  }
+
+  // After save hook to write minimal audit
+  @AfterSave
+  static logAuditHook(instance: User) {
+    const { id, user_status, user_role } = instance;
+    void writeAudit('user', id, 'update', null, { user_status, user_role });
   }
 
   // Methods
@@ -187,4 +201,8 @@ export class User extends Model<User> {
   get fullName(): string {
     return `${this.user_first_name} ${this.user_last_name}`;
   }
+
+  // Associations
+  @HasMany(() => QrCode, 'user_id')
+  declare qrCodes?: QrCode[];
 }

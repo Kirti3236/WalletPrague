@@ -137,8 +137,17 @@ The API follows a clean approach with **public** and **private** route categorie
           },
           'JWT-auth',
         )
+        // High-level groups used across modules
         .addTag('🌐 Authentication', 'Public authentication endpoints (no token required)')
         .addTag('🔐 Users', 'Private user management endpoints (JWT token required)')
+        .addTag('🔐 Wallets', 'Wallet overview and balances')
+        .addTag('🔐 Payment Methods', 'Cards and bank accounts (mock)')
+        .addTag('🔐 Deposits', 'Deposit funds from card or bank (mock)')
+        .addTag('🔐 Payments', 'Payment requests, QR codes and redemptions (mock)')
+        .addTag('🔐 Withdrawals', 'Withdraw funds (mock)')
+        .addTag('🔐 Transfers', 'Peer-to-peer transfers')
+        .addTag('🔐 Transactions', 'Transaction history and search')
+        .addTag('banks', 'Public bank directory lookups')
         .build();
 
       const document = SwaggerModule.createDocument(app, config);
