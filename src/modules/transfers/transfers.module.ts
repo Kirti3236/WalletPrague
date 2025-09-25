@@ -8,9 +8,7 @@ import { Wallet } from '../../models/wallet.model';
 import { ResponseService } from '../../common/services/response.service';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Transaction, User, Wallet]),
-  ],
+  imports: [SequelizeModule.forFeature([Transaction, User, Wallet])],
   controllers: [TransfersController],
   providers: [TransfersService, ResponseService],
   exports: [TransfersService],

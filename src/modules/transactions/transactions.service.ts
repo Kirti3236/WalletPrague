@@ -1,16 +1,21 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, WhereOptions } from 'sequelize';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { User } from '../../models/user.model';
 import { Wallet } from '../../models/wallet.model';
-import { 
-  TransactionHistoryDto, 
-  TransactionSearchDto, 
+import {
+  TransactionHistoryDto,
+  TransactionSearchDto,
   TransactionHistoryResponseDto,
   TransactionItemDto,
   PaginationMetaDto,
-  TransactionSummaryDto
+  TransactionSummaryDto,
 } from './dto/transaction-history.dto';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -31,10 +36,20 @@ export class TransactionsService {
 
   async getTransactionHistory(
     dto: TransactionHistoryDto,
-    lang: string = 'en'
+    lang: string = 'en',
   ): Promise<TransactionHistoryResponseDto> {
     try {
-      const { user_id, page = 1, limit = 20, type, start_date, end_date, min_amount, max_amount, currency } = dto;
+      const {
+        user_id,
+        page = 1,
+        limit = 20,
+        type,
+        start_date,
+        end_date,
+        min_amount,
+        max_amount,
+        currency,
+      } = dto;
 
       // Verify user exists
       const user = await this.userModel.findByPk(user_id);
@@ -44,20 +59,17 @@ export class TransactionsService {
 
       // Build where conditions
       const whereConditions: WhereOptions = {
-        [Op.or]: [
-          { sender_user_id: user_id },
-          { receiver_user_id: user_id }
-        ]
+        [Op.or]: [{ sender_user_id: user_id }, { receiver_user_id: user_id }],
       };
 
       // Apply type filter
       if (type && type !== 'all') {
         const typeMapping = {
-          'payments': [TransactionType.P2P_PAYMENT, TransactionType.QR_PAYMENT],
-          'collections': [TransactionType.QR_PAYMENT], // When user is receiver
-          'deposits': [TransactionType.DEPOSIT],
-          'withdrawals': [TransactionType.WITHDRAWAL],
-          'transfers': [TransactionType.P2P_PAYMENT]
+          payments: [TransactionType.P2P_PAYMENT, TransactionType.QR_PAYMENT],
+          collections: [TransactionType.QR_PAYMENT], // When user is receiver
+          deposits: [TransactionType.DEPOSIT],
+          withdrawals: [TransactionType.WITHDRAWAL],
+          transfers: [TransactionType.P2P_PAYMENT],
         };
 
         if (typeMapping[type]) {
@@ -90,33 +102,49 @@ export class TransactionsService {
       const offset = (page - 1) * limit;
 
       // Get transactions with pagination
-      const { rows: transactions, count: totalItems } = await this.transactionModel.findAndCountAll({
-        where: whereConditions,
-        include: [
-          {
-            model: User,
-            as: 'senderUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: false
-          },
-          {
-            model: User,
-            as: 'receiverUser', 
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: false
-          }
-        ],
-        order: [['created_at', 'DESC']],
-        limit,
-        offset,
-        distinct: true
-      });
+      const { rows: transactions, count: totalItems } =
+        await this.transactionModel.findAndCountAll({
+          where: whereConditions,
+          include: [
+            {
+              model: User,
+              as: 'senderUser',
+              attributes: [
+                'id',
+                'user_first_name',
+                'user_last_name',
+                'user_name',
+              ],
+              required: false,
+            },
+            {
+              model: User,
+              as: 'receiverUser',
+              attributes: [
+                'id',
+                'user_first_name',
+                'user_last_name',
+                'user_name',
+              ],
+              required: false,
+            },
+          ],
+          order: [['created_at', 'DESC']],
+          limit,
+          offset,
+          distinct: true,
+        });
 
       // Transform transactions
-      const transformedTransactions = transactions.map(tx => this.transformTransaction(tx, user_id));
+      const transformedTransactions = transactions.map((tx) =>
+        this.transformTransaction(tx, user_id),
+      );
 
       // Calculate summary
-      const summary = await this.calculateTransactionSummary(whereConditions, user_id);
+      const summary = await this.calculateTransactionSummary(
+        whereConditions,
+        user_id,
+      );
 
       // Build pagination metadata
       const totalPages = Math.ceil(totalItems / limit);
@@ -126,24 +154,26 @@ export class TransactionsService {
         total_records: totalItems,
         per_page: limit,
         has_next: page < totalPages,
-        has_previous: page > 1
+        has_previous: page > 1,
       };
 
       return {
         transactions: transformedTransactions,
         pagination,
-        summary
+        summary,
       };
-
     } catch (error) {
-      this.logger.error(`Error getting transaction history: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error getting transaction history: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
   async searchTransactions(
     dto: TransactionSearchDto,
-    lang: string = 'en'
+    lang: string = 'en',
   ): Promise<TransactionHistoryResponseDto> {
     try {
       const { user_id, query, amount, page = 1, limit = 20 } = dto;
@@ -156,10 +186,7 @@ export class TransactionsService {
 
       // Build search conditions
       const whereConditions: WhereOptions = {
-        [Op.or]: [
-          { sender_user_id: user_id },
-          { receiver_user_id: user_id }
-        ]
+        [Op.or]: [{ sender_user_id: user_id }, { receiver_user_id: user_id }],
       };
 
       // Add search conditions
@@ -168,14 +195,14 @@ export class TransactionsService {
       if (query && query.trim()) {
         searchConditions.push({
           description: {
-            [Op.iLike]: `%${query.trim()}%`
-          }
+            [Op.iLike]: `%${query.trim()}%`,
+          },
         });
       }
 
       if (amount) {
         searchConditions.push({
-          amount: parseFloat(amount)
+          amount: parseFloat(amount),
         });
       }
 
@@ -187,33 +214,49 @@ export class TransactionsService {
       const offset = (page - 1) * limit;
 
       // Get transactions
-      const { rows: transactions, count: totalItems } = await this.transactionModel.findAndCountAll({
-        where: whereConditions,
-        include: [
-          {
-            model: User,
-            as: 'senderUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: false
-          },
-          {
-            model: User,
-            as: 'receiverUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: false
-          }
-        ],
-        order: [['created_at', 'DESC']],
-        limit,
-        offset,
-        distinct: true
-      });
+      const { rows: transactions, count: totalItems } =
+        await this.transactionModel.findAndCountAll({
+          where: whereConditions,
+          include: [
+            {
+              model: User,
+              as: 'senderUser',
+              attributes: [
+                'id',
+                'user_first_name',
+                'user_last_name',
+                'user_name',
+              ],
+              required: false,
+            },
+            {
+              model: User,
+              as: 'receiverUser',
+              attributes: [
+                'id',
+                'user_first_name',
+                'user_last_name',
+                'user_name',
+              ],
+              required: false,
+            },
+          ],
+          order: [['created_at', 'DESC']],
+          limit,
+          offset,
+          distinct: true,
+        });
 
       // Transform transactions
-      const transformedTransactions = transactions.map(tx => this.transformTransaction(tx, user_id));
+      const transformedTransactions = transactions.map((tx) =>
+        this.transformTransaction(tx, user_id),
+      );
 
       // Calculate summary
-      const summary = await this.calculateTransactionSummary(whereConditions, user_id);
+      const summary = await this.calculateTransactionSummary(
+        whereConditions,
+        user_id,
+      );
 
       // Build pagination metadata
       const totalPages = Math.ceil(totalItems / limit);
@@ -223,58 +266,73 @@ export class TransactionsService {
         total_records: totalItems,
         per_page: limit,
         has_next: page < totalPages,
-        has_previous: page > 1
+        has_previous: page > 1,
       };
 
       return {
         transactions: transformedTransactions,
         pagination,
-        summary
+        summary,
       };
-
     } catch (error) {
-      this.logger.error(`Error searching transactions: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error searching transactions: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async getTransactionDetails(transactionId: string, userId: string, lang: string = 'en'): Promise<any> {
+  async getTransactionDetails(
+    transactionId: string,
+    userId: string,
+    lang: string = 'en',
+  ): Promise<any> {
     try {
       // Find transaction
       const transaction = await this.transactionModel.findOne({
         where: {
           id: transactionId,
-          [Op.or]: [
-            { sender_user_id: userId },
-            { receiver_user_id: userId }
-          ]
+          [Op.or]: [{ sender_user_id: userId }, { receiver_user_id: userId }],
         },
         include: [
           {
             model: User,
             as: 'senderUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name', 'user_DNI_number'],
-            required: false
+            attributes: [
+              'id',
+              'user_first_name',
+              'user_last_name',
+              'user_name',
+              'user_DNI_number',
+            ],
+            required: false,
           },
           {
             model: User,
             as: 'receiverUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name', 'user_DNI_number'],
-            required: false
+            attributes: [
+              'id',
+              'user_first_name',
+              'user_last_name',
+              'user_name',
+              'user_DNI_number',
+            ],
+            required: false,
           },
           {
             model: Wallet,
             as: 'senderWallet',
             attributes: ['id', 'wallet_name', 'currency'],
-            required: false
+            required: false,
           },
           {
             model: Wallet,
             as: 'receiverWallet',
             attributes: ['id', 'wallet_name', 'currency'],
-            required: false
-          }
-        ]
+            required: false,
+          },
+        ],
       });
 
       if (!transaction) {
@@ -283,20 +341,29 @@ export class TransactionsService {
 
       // Transform detailed transaction
       return this.transformDetailedTransaction(transaction, userId);
-
     } catch (error) {
-      this.logger.error(`Error getting transaction details: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error getting transaction details: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  private transformTransaction(transaction: Transaction, currentUserId: string): TransactionItemDto {
+  private transformTransaction(
+    transaction: Transaction,
+    currentUserId: string,
+  ): TransactionItemDto {
     const isOutgoing = transaction.sender_user_id === currentUserId;
-    const otherUser = isOutgoing ? (transaction as any).receiverUser : (transaction as any).senderUser;
-    
+    const otherUser = isOutgoing
+      ? (transaction as any).receiverUser
+      : (transaction as any).senderUser;
+
     let otherPartyName = 'Unknown';
     if (otherUser) {
-      otherPartyName = `${otherUser.user_first_name} ${otherUser.user_last_name}`.trim() || otherUser.user_name;
+      otherPartyName =
+        `${otherUser.user_first_name} ${otherUser.user_last_name}`.trim() ||
+        otherUser.user_name;
     }
 
     return {
@@ -309,13 +376,16 @@ export class TransactionsService {
       other_party: otherPartyName,
       direction: isOutgoing ? 'outgoing' : 'incoming',
       created_at: transaction.createdAt,
-      processed_at: transaction.processed_at || undefined
+      processed_at: transaction.processed_at || undefined,
     };
   }
 
-  private transformDetailedTransaction(transaction: Transaction, currentUserId: string): any {
+  private transformDetailedTransaction(
+    transaction: Transaction,
+    currentUserId: string,
+  ): any {
     const isOutgoing = transaction.sender_user_id === currentUserId;
-    
+
     return {
       id: transaction.id,
       type: transaction.type,
@@ -326,39 +396,46 @@ export class TransactionsService {
       status: transaction.status,
       description: transaction.description,
       direction: isOutgoing ? 'outgoing' : 'incoming',
-      sender: (transaction as any).senderUser ? {
-        id: (transaction as any).senderUser.id,
-        name: `${(transaction as any).senderUser.user_first_name} ${(transaction as any).senderUser.user_last_name}`.trim(),
-        username: (transaction as any).senderUser.user_name,
-        dni: (transaction as any).senderUser.user_DNI_number
-      } : null,
-      receiver: (transaction as any).receiverUser ? {
-        id: (transaction as any).receiverUser.id,
-        name: `${(transaction as any).receiverUser.user_first_name} ${(transaction as any).receiverUser.user_last_name}`.trim(),
-        username: (transaction as any).receiverUser.user_name,
-        dni: (transaction as any).receiverUser.user_DNI_number
-      } : null,
+      sender: (transaction as any).senderUser
+        ? {
+            id: (transaction as any).senderUser.id,
+            name: `${(transaction as any).senderUser.user_first_name} ${(transaction as any).senderUser.user_last_name}`.trim(),
+            username: (transaction as any).senderUser.user_name,
+            dni: (transaction as any).senderUser.user_DNI_number,
+          }
+        : null,
+      receiver: (transaction as any).receiverUser
+        ? {
+            id: (transaction as any).receiverUser.id,
+            name: `${(transaction as any).receiverUser.user_first_name} ${(transaction as any).receiverUser.user_last_name}`.trim(),
+            username: (transaction as any).receiverUser.user_name,
+            dni: (transaction as any).receiverUser.user_DNI_number,
+          }
+        : null,
       sender_wallet: (transaction as any).senderWallet,
       receiver_wallet: (transaction as any).receiverWallet,
       payment_method: transaction.payment_method,
       gateway_reference: transaction.gateway_reference,
       created_at: transaction.createdAt,
       updated_at: transaction.updatedAt,
-      processed_at: transaction.processed_at
+      processed_at: transaction.processed_at,
     };
   }
 
-  private async calculateTransactionSummary(whereConditions: WhereOptions, userId: string): Promise<TransactionSummaryDto> {
+  private async calculateTransactionSummary(
+    whereConditions: WhereOptions,
+    userId: string,
+  ): Promise<TransactionSummaryDto> {
     // Get all transactions for summary
     const allTransactions = await this.transactionModel.findAll({
       where: whereConditions,
-      attributes: ['amount', 'sender_user_id', 'receiver_user_id']
+      attributes: ['amount', 'sender_user_id', 'receiver_user_id'],
     });
 
     let totalIncoming = 0;
     let totalOutgoing = 0;
 
-    allTransactions.forEach(tx => {
+    allTransactions.forEach((tx) => {
       const amount = parseFloat(tx.amount);
       if (tx.receiver_user_id === userId) {
         totalIncoming += amount;
@@ -372,7 +449,7 @@ export class TransactionsService {
       transaction_count: allTransactions.length,
       total_received: totalIncoming.toFixed(2),
       total_sent: totalOutgoing.toFixed(2),
-      net_balance: (totalIncoming - totalOutgoing).toFixed(2)
+      net_balance: (totalIncoming - totalOutgoing).toFixed(2),
     };
   }
 }

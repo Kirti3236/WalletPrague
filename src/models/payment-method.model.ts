@@ -1,4 +1,14 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+} from 'sequelize-typescript';
 import { User } from './user.model';
 
 export enum PaymentMethodType {

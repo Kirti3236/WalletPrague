@@ -1,4 +1,15 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { Transaction } from './transaction.model';
 import { User } from './user.model';
 import { DisputeStatusCatalog } from './dispute-status.model';
@@ -44,7 +55,12 @@ export class Dispute extends Model<Dispute> {
   @Column({ type: DataType.STRING(32) })
   declare status: string;
 
-  @BelongsTo(() => DisputeStatusCatalog, { foreignKey: 'status', targetKey: 'code', onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => DisputeStatusCatalog, {
+    foreignKey: 'status',
+    targetKey: 'code',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   declare statusRef?: DisputeStatusCatalog;
 
   @AllowNull(false)

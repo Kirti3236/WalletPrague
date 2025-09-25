@@ -23,7 +23,9 @@ export class SeederService implements OnModuleInit {
       await this.tryDedupeUsers();
       this.logger.log('✅ Database seed completed');
     } catch (e) {
-      this.logger.warn(`Seeding skipped/partial: ${e instanceof Error ? e.message : e}`);
+      this.logger.warn(
+        `Seeding skipped/partial: ${e instanceof Error ? e.message : e}`,
+      );
     }
   }
 
@@ -52,7 +54,9 @@ export class SeederService implements OnModuleInit {
         END$$;
       `);
     } catch (e) {
-      this.logger.warn(`Dedup users skipped: ${e instanceof Error ? e.message : e}`);
+      this.logger.warn(
+        `Dedup users skipped: ${e instanceof Error ? e.message : e}`,
+      );
     }
   }
 
@@ -72,7 +76,15 @@ export class SeederService implements OnModuleInit {
   }
 
   private async seedTxnStatuses() {
-    const codes = ['pending', 'processing', 'completed', 'failed', 'expired', 'cancelled', 'rejected'];
+    const codes = [
+      'pending',
+      'processing',
+      'completed',
+      'failed',
+      'expired',
+      'cancelled',
+      'rejected',
+    ];
     for (const code of codes) {
       const found = await TxnStatus.findByPk(code);
       if (!found) {
@@ -86,20 +98,41 @@ export class SeederService implements OnModuleInit {
     for (const code of codes) {
       const found = await DisputeStatusCatalog.findByPk(code);
       if (!found) {
-        await DisputeStatusCatalog.create({ code, label: code.toUpperCase() } as any);
+        await DisputeStatusCatalog.create({
+          code,
+          label: code.toUpperCase(),
+        } as any);
       }
     }
   }
 
   private async seedFeePolicies() {
-    const defaults: Array<{ code: string; amount: string; description: string }> = [
-      { code: 'transfer_fee_flat', amount: '0.50', description: 'Default P2P transfer flat fee' },
-      { code: 'withdrawal_fee_flat', amount: '0.50', description: 'Default withdrawal flat fee' },
+    const defaults: Array<{
+      code: string;
+      amount: string;
+      description: string;
+    }> = [
+      {
+        code: 'transfer_fee_flat',
+        amount: '0.50',
+        description: 'Default P2P transfer flat fee',
+      },
+      {
+        code: 'withdrawal_fee_flat',
+        amount: '0.50',
+        description: 'Default withdrawal flat fee',
+      },
     ];
     for (const def of defaults) {
       const found = await FeePolicy.findByPk(def.code);
       if (!found) {
-        await FeePolicy.create({ code: def.code, amount: def.amount, currency: 'HNL', is_active: true, description: def.description } as any);
+        await FeePolicy.create({
+          code: def.code,
+          amount: def.amount,
+          currency: 'HNL',
+          is_active: true,
+          description: def.description,
+        } as any);
       }
     }
   }
@@ -111,7 +144,9 @@ export class SeederService implements OnModuleInit {
     try {
       const users = await User.findAll();
       for (const u of users) {
-        const existing = await Wallet.findOne({ where: { user_id: u.id, currency: 'LPS' } as any });
+        const existing = await Wallet.findOne({
+          where: { user_id: u.id, currency: 'LPS' } as any,
+        });
         if (!existing) {
           await Wallet.create({
             user_id: u.id,
@@ -126,9 +161,9 @@ export class SeederService implements OnModuleInit {
         }
       }
     } catch (e) {
-      this.logger.warn(`ensureDefaultWallets skipped: ${e instanceof Error ? e.message : e}`);
+      this.logger.warn(
+        `ensureDefaultWallets skipped: ${e instanceof Error ? e.message : e}`,
+      );
     }
   }
 }
-
-

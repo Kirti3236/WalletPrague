@@ -1,47 +1,57 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsOptional, IsIn, Matches, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsUUID,
+  IsOptional,
+  IsIn,
+  IsString,
+  MaxLength,
+  MinLength,
+  Matches,
+} from 'class-validator';
+import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class GenerateQrDto {
   @ApiProperty({
     description: 'User ID generating the QR code',
     format: 'uuid',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id?: string;
 
-  @ApiProperty({ 
-    description: 'Wallet ID for the payment', 
+  @ApiProperty({
+    description: 'Wallet ID for the payment',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'Wallet ID must be a valid UUID' })
   wallet_id: string;
 
-  @ApiProperty({ 
-    description: 'Payment amount as string to avoid float rounding',
-    example: '50.00' 
+  @ApiProperty({
+    description: 'Payment amount (can be string or number)',
+    example: '50.00',
+    oneOf: [{ type: 'string' }, { type: 'number' }],
   })
-  @Matches(/^\d+(\.\d{1,2})?$/, { message: 'Amount must be a valid decimal with up to 2 decimal places' })
-  amount: string;
+  @IsAmount()
+  amount: string | number;
 
-  @ApiProperty({ 
-    description: 'Payment description/note', 
+  @ApiProperty({
+    description: 'Payment description/note',
     example: 'Coffee payment',
     required: false,
-    maxLength: 500 
+    maxLength: 500,
   })
   @IsOptional()
   @IsString()
   @MaxLength(500, { message: 'Description must not exceed 500 characters' })
   description?: string;
 
-  @ApiProperty({ 
-    description: 'Currency code', 
-    enum: ['LPS', 'USD'], 
+  @ApiProperty({
+    description: 'Currency code',
+    enum: ['LPS', 'USD'],
     example: 'LPS',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsIn(['LPS', 'USD'])
@@ -49,22 +59,25 @@ export class GenerateQrDto {
 }
 
 export class GetPaymentCodeDto {
-  @ApiProperty({ 
-    description: 'Payment code to validate', 
+  @ApiProperty({
+    description: 'Payment code to validate',
     example: 'ABCD-1234',
     minLength: 8,
-    maxLength: 20 
+    maxLength: 20,
   })
   @IsString()
   @MinLength(8, { message: 'Payment code must be at least 8 characters long' })
   @MaxLength(20, { message: 'Payment code must not exceed 20 characters' })
-  @Matches(/^[A-Z0-9-]+$/, { message: 'Payment code must contain only uppercase letters, numbers, and hyphens' })
+  @Matches(/^[A-Z0-9-]+$/, {
+    message:
+      'Payment code must contain only uppercase letters, numbers, and hyphens',
+  })
   code: string;
 
-  @ApiProperty({ 
-    description: 'User ID requesting code details', 
+  @ApiProperty({
+    description: 'User ID requesting code details',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id: string;
@@ -74,7 +87,7 @@ export class SharePaymentDto {
   @ApiProperty({
     description: 'QR code ID to share',
     format: 'uuid',
-    required: true
+    required: true,
   })
   @IsUUID(4, { message: 'QR ID must be a valid UUID' })
   qr_id: string;
@@ -82,17 +95,17 @@ export class SharePaymentDto {
   @ApiProperty({
     description: 'User ID sharing the payment',
     format: 'uuid',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id?: string;
 
-  @ApiProperty({ 
-    description: 'Share method', 
-    enum: ['link', 'whatsapp', 'sms', 'email'], 
+  @ApiProperty({
+    description: 'Share method',
+    enum: ['link', 'whatsapp', 'sms', 'email'],
     example: 'link',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsIn(['link', 'whatsapp', 'sms', 'email'])
@@ -103,7 +116,7 @@ export class ScanQrDto {
   @ApiProperty({
     description: 'QR code data or payment code',
     example: 'ABCD-1234 or QR data string',
-    required: true
+    required: true,
   })
   @IsString()
   @MinLength(8, { message: 'QR data must be at least 8 characters long' })
@@ -113,68 +126,74 @@ export class ScanQrDto {
   @ApiProperty({
     description: 'User ID scanning the QR',
     format: 'uuid',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   scanner_user_id?: string;
 
-  @ApiProperty({ 
-    description: 'Scanner wallet ID for payment', 
+  @ApiProperty({
+    description: 'Scanner wallet ID for payment',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'Scanner wallet ID must be a valid UUID' })
   scanner_wallet_id: string;
 }
 
 export class RedeemByCodeDto {
-  @ApiProperty({ 
-    description: 'Payment code to redeem', 
+  @ApiProperty({
+    description: 'Payment code to redeem',
     example: 'ABCD-1234',
     minLength: 8,
-    maxLength: 20 
+    maxLength: 20,
   })
   @IsString()
   @MinLength(8, { message: 'Payment code must be at least 8 characters long' })
   @MaxLength(20, { message: 'Payment code must not exceed 20 characters' })
-  @Matches(/^[A-Z0-9-]+$/, { message: 'Payment code must contain only uppercase letters, numbers, and hyphens' })
+  @Matches(/^[A-Z0-9-]+$/, {
+    message:
+      'Payment code must contain only uppercase letters, numbers, and hyphens',
+  })
   code: string;
 
-  @ApiProperty({ 
-    description: 'Receiver user ID', 
+  @ApiProperty({
+    description: 'Receiver user ID',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'Receiver user ID must be a valid UUID' })
   receiver_user_id: string;
 
-  @ApiProperty({ 
-    description: 'Receiver wallet ID', 
+  @ApiProperty({
+    description: 'Receiver wallet ID',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'Receiver wallet ID must be a valid UUID' })
   receiver_wallet_id: string;
 }
 
 export class ValidateCodeDto {
-  @ApiProperty({ 
-    description: 'Payment code to validate', 
+  @ApiProperty({
+    description: 'Payment code to validate',
     example: 'ABCD-1234',
     minLength: 8,
-    maxLength: 20 
+    maxLength: 20,
   })
   @IsString()
   @MinLength(8, { message: 'Payment code must be at least 8 characters long' })
   @MaxLength(20, { message: 'Payment code must not exceed 20 characters' })
-  @Matches(/^[A-Z0-9-]+$/, { message: 'Payment code must contain only uppercase letters, numbers, and hyphens' })
+  @Matches(/^[A-Z0-9-]+$/, {
+    message:
+      'Payment code must contain only uppercase letters, numbers, and hyphens',
+  })
   code: string;
 
-  @ApiProperty({ 
-    description: 'User ID validating the code', 
+  @ApiProperty({
+    description: 'User ID validating the code',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id: string;

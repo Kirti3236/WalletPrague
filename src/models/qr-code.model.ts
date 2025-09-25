@@ -1,4 +1,15 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { User } from './user.model';
 import { Transaction } from './transaction.model';
 

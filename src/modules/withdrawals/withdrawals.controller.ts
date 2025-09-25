@@ -1,5 +1,11 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { WithdrawalsService } from './withdrawals.service';
 import { GenerateWithdrawalDto } from './dto/generate-withdrawal.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -17,10 +23,18 @@ export class WithdrawalsController {
   @ApiOperation({ summary: '🔐 Generate a cash withdrawal code (24h expiry)' })
   @ApiOkResponse({ description: 'Returns code and expiry; safe response' })
   @ApiBody({ type: GenerateWithdrawalDto })
-  async generate(@Body() dto: GenerateWithdrawalDto, @GetUser() currentUser: User) {
+  async generate(
+    @Body() dto: GenerateWithdrawalDto,
+    @GetUser() currentUser: User,
+  ) {
     // Override user_id with current user from JWT
     dto.user_id = currentUser.id;
-    const res = await this.withdrawalsService.generateWithdrawal(dto.user_id, dto.wallet_id, dto.amount, dto.currency ?? 'LPS');
+    const res = await this.withdrawalsService.generateWithdrawal(
+      dto.user_id,
+      dto.wallet_id,
+      dto.amount,
+      dto.currency ?? 'LPS',
+    );
     return res;
   }
 }

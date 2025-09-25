@@ -1,25 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsIn, IsDateString, IsNumberString, IsUUID, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsIn,
+  IsDateString,
+  IsNumberString,
+  IsUUID,
+  Min,
+  Max,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class TransactionHistoryDto {
-  @ApiProperty({ 
-    description: 'Page number for pagination', 
-    example: 1, 
+  @ApiProperty({
+    description: 'Page number for pagination',
+    example: 1,
     required: false,
-    minimum: 1 
+    minimum: 1,
   })
   @IsOptional()
   @Type(() => Number)
   @Min(1, { message: 'Page must be at least 1' })
   page?: number = 1;
 
-  @ApiProperty({ 
-    description: 'Number of items per page', 
-    example: 20, 
+  @ApiProperty({
+    description: 'Number of items per page',
+    example: 20,
     required: false,
     minimum: 1,
-    maximum: 100 
+    maximum: 100,
   })
   @IsOptional()
   @Type(() => Number)
@@ -27,120 +36,146 @@ export class TransactionHistoryDto {
   @Max(100, { message: 'Limit cannot exceed 100' })
   limit?: number = 20;
 
-  @ApiProperty({ 
-    description: 'Filter by transaction type', 
-    enum: ['all', 'payments', 'collections', 'deposits', 'withdrawals', 'transfers'], 
+  @ApiProperty({
+    description: 'Filter by transaction type',
+    enum: [
+      'all',
+      'payments',
+      'collections',
+      'deposits',
+      'withdrawals',
+      'transfers',
+    ],
     example: 'all',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
-  @IsIn(['all', 'payments', 'collections', 'deposits', 'withdrawals', 'transfers'])
+  @IsIn([
+    'all',
+    'payments',
+    'collections',
+    'deposits',
+    'withdrawals',
+    'transfers',
+  ])
   type?: string = 'all';
 
-  @ApiProperty({ 
-    description: 'Start date for filtering (ISO 8601)', 
+  @ApiProperty({
+    description: 'Start date for filtering (ISO 8601)',
     example: '2024-01-01T00:00:00.000Z',
-    required: false 
+    required: false,
   })
   @IsOptional()
-  @IsDateString({}, { message: 'Start date must be a valid ISO 8601 date string' })
+  @IsDateString(
+    {},
+    { message: 'Start date must be a valid ISO 8601 date string' },
+  )
   start_date?: string;
 
-  @ApiProperty({ 
-    description: 'End date for filtering (ISO 8601)', 
+  @ApiProperty({
+    description: 'End date for filtering (ISO 8601)',
     example: '2024-12-31T23:59:59.999Z',
-    required: false 
+    required: false,
   })
   @IsOptional()
-  @IsDateString({}, { message: 'End date must be a valid ISO 8601 date string' })
+  @IsDateString(
+    {},
+    { message: 'End date must be a valid ISO 8601 date string' },
+  )
   end_date?: string;
 
-  @ApiProperty({ 
-    description: 'Minimum amount for filtering', 
+  @ApiProperty({
+    description: 'Minimum amount for filtering',
     example: '10.00',
-    required: false 
+    required: false,
   })
   @IsOptional()
-  @IsNumberString({}, { message: 'Minimum amount must be a valid number string' })
+  @IsNumberString(
+    {},
+    { message: 'Minimum amount must be a valid number string' },
+  )
   min_amount?: string;
 
-  @ApiProperty({ 
-    description: 'Maximum amount for filtering', 
+  @ApiProperty({
+    description: 'Maximum amount for filtering',
     example: '1000.00',
-    required: false 
+    required: false,
   })
   @IsOptional()
-  @IsNumberString({}, { message: 'Maximum amount must be a valid number string' })
+  @IsNumberString(
+    {},
+    { message: 'Maximum amount must be a valid number string' },
+  )
   max_amount?: string;
 
-  @ApiProperty({ 
-    description: 'Currency filter', 
-    enum: ['LPS', 'USD'], 
+  @ApiProperty({
+    description: 'Currency filter',
+    enum: ['LPS', 'USD'],
     example: 'LPS',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
   @IsIn(['LPS', 'USD'])
   currency?: string;
 
-  @ApiProperty({ 
-    description: 'User ID to filter transactions', 
+  @ApiProperty({
+    description: 'User ID to filter transactions',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id: string;
 }
 
 export class TransactionSearchDto {
-  @ApiProperty({ 
-    description: 'Search query for transaction description or notes', 
+  @ApiProperty({
+    description: 'Search query for transaction description or notes',
     example: 'coffee payment',
     required: true,
     minLength: 2,
-    maxLength: 100 
+    maxLength: 100,
   })
   @IsString()
   @Transform(({ value }) => value?.trim())
   @IsOptional()
   query?: string;
 
-  @ApiProperty({ 
-    description: 'Search by specific amount', 
+  @ApiProperty({
+    description: 'Search by specific amount',
     example: '25.50',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsNumberString({}, { message: 'Amount must be a valid number string' })
   amount?: string;
 
-  @ApiProperty({ 
-    description: 'User ID for search scope', 
+  @ApiProperty({
+    description: 'User ID for search scope',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id: string;
 
-  @ApiProperty({ 
-    description: 'Page number for pagination', 
-    example: 1, 
+  @ApiProperty({
+    description: 'Page number for pagination',
+    example: 1,
     required: false,
-    minimum: 1 
+    minimum: 1,
   })
   @IsOptional()
   @Type(() => Number)
   @Min(1, { message: 'Page must be at least 1' })
   page?: number = 1;
 
-  @ApiProperty({ 
-    description: 'Number of items per page', 
-    example: 20, 
+  @ApiProperty({
+    description: 'Number of items per page',
+    example: 20,
     required: false,
     minimum: 1,
-    maximum: 50 
+    maximum: 50,
   })
   @IsOptional()
   @Type(() => Number)
@@ -150,18 +185,18 @@ export class TransactionSearchDto {
 }
 
 export class TransactionDetailsDto {
-  @ApiProperty({ 
-    description: 'Transaction ID', 
+  @ApiProperty({
+    description: 'Transaction ID',
     format: 'uuid',
-    example: '550e8400-e29b-41d4-a716-446655440000' 
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID(4, { message: 'Transaction ID must be a valid UUID' })
   transaction_id: string;
 
-  @ApiProperty({ 
-    description: 'User ID requesting the details', 
+  @ApiProperty({
+    description: 'User ID requesting the details',
     format: 'uuid',
-    required: true 
+    required: true,
   })
   @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id: string;

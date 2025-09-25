@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { I18nService } from 'nestjs-i18n';
-import { PaymentMethod, PaymentMethodBrand, PaymentMethodType } from '../../models/payment-method.model';
+import {
+  PaymentMethod,
+  PaymentMethodBrand,
+  PaymentMethodType,
+} from '../../models/payment-method.model';
 
 export interface AddStaticCardDto {
   user_id: string;
@@ -69,10 +73,26 @@ export class PaymentMethodsService {
     return rows.map(this.toSafe);
   }
 
+  async listUserBankAccounts(userId: string) {
+    const rows = await this.paymentMethods.findAll({
+      where: {
+        user_id: userId,
+        type: PaymentMethodType.BANK_ACCOUNT,
+        is_active: true,
+      },
+      order: [['createdAt', 'DESC']],
+    });
+    return rows.map(this.toSafe);
+  }
+
   async deleteCard(userId: string, id: string, lang: string = 'en') {
-    const row = await this.paymentMethods.findOne({ where: { id, user_id: userId } });
+    const row = await this.paymentMethods.findOne({
+      where: { id, user_id: userId },
+    });
     if (!row) {
-      throw new NotFoundException(this.getTranslatedMessage('error.notFound', lang));
+      throw new NotFoundException(
+        this.getTranslatedMessage('error.notFound', lang),
+      );
     }
     await row.update({ is_active: false });
     return { success: true };
@@ -81,7 +101,11 @@ export class PaymentMethodsService {
   /**
    * Get translated message using i18n service with fallback
    */
-  private getTranslatedMessage(key: string, lang: string = 'en', params?: any): string {
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
     try {
       return this.i18n.t(`messages.${key}`, { lang, args: params });
     } catch (error) {
@@ -90,10 +114,8 @@ export class PaymentMethodsService {
   }
 
   private toSafe = (pm: PaymentMethod) => {
-    const json = pm.toJSON() as any;
+    const json = pm.toJSON();
     delete json.gateway_token;
     return json;
   };
 }
-
-

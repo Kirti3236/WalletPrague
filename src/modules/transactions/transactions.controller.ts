@@ -22,10 +22,10 @@ import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Lang } from '../../common/decorators/lang.decorator';
 import { User } from '../../models/user.model';
 import { TransactionsService } from './transactions.service';
-import { 
-  TransactionHistoryDto, 
+import {
+  TransactionHistoryDto,
   TransactionSearchDto,
-  TransactionHistoryResponseDto 
+  TransactionHistoryResponseDto,
 } from './dto/transaction-history.dto';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -41,7 +41,8 @@ export class TransactionsController {
   ) {}
 
   private isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
@@ -67,14 +68,61 @@ export class TransactionsController {
 - Export transaction data
     `,
   })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20, max: 100)' })
-  @ApiQuery({ name: 'type', required: false, enum: ['all', 'payments', 'collections', 'deposits', 'withdrawals', 'transfers'], description: 'Transaction type filter' })
-  @ApiQuery({ name: 'start_date', required: false, type: String, description: 'Start date (ISO 8601)' })
-  @ApiQuery({ name: 'end_date', required: false, type: String, description: 'End date (ISO 8601)' })
-  @ApiQuery({ name: 'min_amount', required: false, type: String, description: 'Minimum amount' })
-  @ApiQuery({ name: 'max_amount', required: false, type: String, description: 'Maximum amount' })
-  @ApiQuery({ name: 'currency', required: false, enum: ['LPS', 'USD'], description: 'Currency filter' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 20, max: 100)',
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    enum: [
+      'all',
+      'payments',
+      'collections',
+      'deposits',
+      'withdrawals',
+      'transfers',
+    ],
+    description: 'Transaction type filter',
+  })
+  @ApiQuery({
+    name: 'start_date',
+    required: false,
+    type: String,
+    description: 'Start date (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'end_date',
+    required: false,
+    type: String,
+    description: 'End date (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'min_amount',
+    required: false,
+    type: String,
+    description: 'Minimum amount',
+  })
+  @ApiQuery({
+    name: 'max_amount',
+    required: false,
+    type: String,
+    description: 'Maximum amount',
+  })
+  @ApiQuery({
+    name: 'currency',
+    required: false,
+    enum: ['LPS', 'USD'],
+    description: 'Currency filter',
+  })
   @ApiResponse({
     status: 200,
     description: 'Transaction history retrieved successfully',
@@ -133,11 +181,16 @@ export class TransactionsController {
         const minAmount = parseFloat(dto.min_amount);
         const maxAmount = parseFloat(dto.max_amount);
         if (minAmount > maxAmount) {
-          throw new BadRequestException('Minimum amount must be less than maximum amount');
+          throw new BadRequestException(
+            'Minimum amount must be less than maximum amount',
+          );
         }
       }
 
-      const result = await this.transactionsService.getTransactionHistory(dto, lang);
+      const result = await this.transactionsService.getTransactionHistory(
+        dto,
+        lang,
+      );
 
       return this.responseService.success(
         result,
@@ -169,10 +222,30 @@ export class TransactionsController {
 - Quick transaction lookup
     `,
   })
-  @ApiQuery({ name: 'query', required: false, type: String, description: 'Search query for description/notes' })
-  @ApiQuery({ name: 'amount', required: false, type: String, description: 'Exact amount to search for' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20, max: 50)' })
+  @ApiQuery({
+    name: 'query',
+    required: false,
+    type: String,
+    description: 'Search query for description/notes',
+  })
+  @ApiQuery({
+    name: 'amount',
+    required: false,
+    type: String,
+    description: 'Exact amount to search for',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 20, max: 50)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Search results retrieved successfully',
@@ -194,7 +267,9 @@ export class TransactionsController {
     try {
       // Validate search parameters
       if (!query.query && !query.amount) {
-        throw new BadRequestException('Either query or amount parameter is required');
+        throw new BadRequestException(
+          'Either query or amount parameter is required',
+        );
       }
 
       // Build DTO from query parameters
@@ -214,7 +289,10 @@ export class TransactionsController {
         throw new BadRequestException('Limit must be between 1 and 50');
       }
 
-      const result = await this.transactionsService.searchTransactions(dto, lang);
+      const result = await this.transactionsService.searchTransactions(
+        dto,
+        lang,
+      );
 
       return this.responseService.success(
         result,
@@ -278,7 +356,9 @@ export class TransactionsController {
     try {
       // Validate UUID format
       if (!this.isValidUUID(transactionId)) {
-        throw new BadRequestException('Invalid transaction ID format. Must be a valid UUID.');
+        throw new BadRequestException(
+          'Invalid transaction ID format. Must be a valid UUID.',
+        );
       }
 
       const result = await this.transactionsService.getTransactionDetails(

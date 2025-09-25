@@ -1,9 +1,31 @@
-import { Body, Controller, Post, Get, Param, UseGuards, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiBody, ApiBearerAuth, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiBody,
+  ApiBearerAuth,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { I18nService } from 'nestjs-i18n';
 import { TransfersService } from './transfers.service';
 import { P2PTransferDto } from './dto/p2p-transfer.dto';
-import { ValidateRecipientDto, TransferByDniDto, TransferConfirmationDto } from './dto/validate-recipient.dto';
+import {
+  ValidateRecipientDto,
+  TransferByDniDto,
+  TransferConfirmationDto,
+} from './dto/validate-recipient.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Lang } from '../../common/decorators/lang.decorator';
@@ -24,14 +46,19 @@ export class TransfersController {
   ) {}
 
   private isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
   /**
    * Get translated message using i18n service with fallback
    */
-  private getTranslatedMessage(key: string, lang: string = 'en', params?: any): string {
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
     try {
       return this.i18n.t(`messages.${key}`, { lang, args: params });
     } catch (error) {
@@ -146,7 +173,9 @@ export class TransfersController {
       if (!dto.sender_wallet_id) {
         // Best effort: use the user's default LPS wallet if sender_wallet_id not provided
         const defaultCurrency = dto.currency || 'LPS';
-        const wallet = await (Wallet as any).findOne({ where: { user_id: currentUser.id, currency: defaultCurrency } });
+        const wallet = await (Wallet as any).findOne({
+          where: { user_id: currentUser.id, currency: defaultCurrency },
+        });
         if (wallet) {
           dto.sender_wallet_id = wallet.id;
         }
@@ -215,7 +244,9 @@ export class TransfersController {
     try {
       // Validate UUID format
       if (!this.isValidUUID(transferId)) {
-        throw new BadRequestException(this.getTranslatedMessage('transfers.invalid_transfer_id', lang));
+        throw new BadRequestException(
+          this.getTranslatedMessage('transfers.invalid_transfer_id', lang),
+        );
       }
 
       const result = await this.transfersService.getTransferConfirmation(

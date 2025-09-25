@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType, BadRequestException } from '@nestjs/common';
+import {
+  ValidationPipe,
+  VersioningType,
+  BadRequestException,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
@@ -28,9 +32,10 @@ async function bootstrap() {
 
     // CORS configuration
     app.enableCors({
-      origin: configService.get('app.nodeEnv') === 'development' 
-        ? true // Allow all origins in development
-        : configService.get('cors.origin') || ['http://localhost:3000'],
+      origin:
+        configService.get('app.nodeEnv') === 'development'
+          ? true // Allow all origins in development
+          : configService.get('cors.origin') || ['http://localhost:3000'],
       credentials: configService.get('cors.credentials'),
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: [
@@ -45,10 +50,10 @@ async function bootstrap() {
     });
 
     // Get API version from configuration and ensure it's just the number
-    let apiVersionNumber = configService.get('app.apiVersion') || '1';
-    
+    const apiVersionNumber = configService.get('app.apiVersion') || '1';
+
     const apiVersion = `v${apiVersionNumber}`; // Create full version string for display
-    
+
     // API versioning (NestJS adds 'v' automatically to the number)
     app.enableVersioning({
       type: VersioningType.URI,
@@ -67,7 +72,9 @@ async function bootstrap() {
         exceptionFactory: (errors) => {
           // Get the first error message from the first validation error
           const firstError = errors[0];
-          const firstConstraint = Object.values(firstError.constraints || {})[0];
+          const firstConstraint = Object.values(
+            firstError.constraints || {},
+          )[0];
           throw new BadRequestException(firstConstraint);
         },
       }),
@@ -90,7 +97,8 @@ async function bootstrap() {
     if (configService.get('swagger.enabled')) {
       const config = new DocumentBuilder()
         .setTitle('YaPague! Payment Management System API')
-        .setDescription(`
+        .setDescription(
+          `
 ## 🏗️ API Architecture Overview
 
 ### 📍 Route Structure
@@ -123,7 +131,8 @@ The API follows a clean approach with **public** and **private** route categorie
 **Icon Legend:**
 - 🌐 = Public/Global endpoints
 - 🔐 = Private/Secured endpoints
-        `)
+        `,
+        )
         .setVersion('1.0')
         .addServer(`http://localhost:${port}`, 'Development server')
         .addBearerAuth(
@@ -138,12 +147,21 @@ The API follows a clean approach with **public** and **private** route categorie
           'JWT-auth',
         )
         // High-level groups used across modules
-        .addTag('🌐 Authentication', 'Public authentication endpoints (no token required)')
-        .addTag('🔐 Users', 'Private user management endpoints (JWT token required)')
+        .addTag(
+          '🌐 Authentication',
+          'Public authentication endpoints (no token required)',
+        )
+        .addTag(
+          '🔐 Users',
+          'Private user management endpoints (JWT token required)',
+        )
         .addTag('🔐 Wallets', 'Wallet overview and balances')
         .addTag('🔐 Payment Methods', 'Cards and bank accounts (mock)')
         .addTag('🔐 Deposits', 'Deposit funds from card or bank (mock)')
-        .addTag('🔐 Payments', 'Payment requests, QR codes and redemptions (mock)')
+        .addTag(
+          '🔐 Payments',
+          'Payment requests, QR codes and redemptions (mock)',
+        )
         .addTag('🔐 Withdrawals', 'Withdraw funds (mock)')
         .addTag('🔐 Transfers', 'Peer-to-peer transfers')
         .addTag('🔐 Transactions', 'Transaction history and search')
@@ -178,9 +196,15 @@ The API follows a clean approach with **public** and **private** route categorie
 
     console.log(`🚀 YaPague! Server started.`);
     console.log(`🌐 Server: http://localhost:${port}`);
-    console.log(`📚 Swagger: http://localhost:${port}/${configService.get('swagger.path') || 'docs'}`);
-    console.log(`🔑 Public routes: http://localhost:${port}/${apiVersion}/public/*`);
-    console.log(`🔒 Private routes: http://localhost:${port}/${apiVersion}/private/*`);
+    console.log(
+      `📚 Swagger: http://localhost:${port}/${configService.get('swagger.path') || 'docs'}`,
+    );
+    console.log(
+      `🔑 Public routes: http://localhost:${port}/${apiVersion}/public/*`,
+    );
+    console.log(
+      `🔒 Private routes: http://localhost:${port}/${apiVersion}/private/*`,
+    );
 
     // Test database connection
     try {

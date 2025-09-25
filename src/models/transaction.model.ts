@@ -1,4 +1,18 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index, BeforeValidate, BelongsTo, BeforeUpdate, AfterSave } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+  BeforeValidate,
+  BelongsTo,
+  BeforeUpdate,
+  AfterSave,
+} from 'sequelize-typescript';
 import { Wallet } from './wallet.model';
 import { User } from './user.model';
 import { TxnStatus } from './txn-status.model';
@@ -102,7 +116,12 @@ export class Transaction extends Model<Transaction> {
   @Column({ type: DataType.STRING(32) })
   declare status: string;
 
-  @BelongsTo(() => TxnStatus, { foreignKey: 'status', targetKey: 'code', onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => TxnStatus, {
+    foreignKey: 'status',
+    targetKey: 'code',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   declare statusRef?: TxnStatus;
 
   @AllowNull(true)
@@ -135,27 +154,49 @@ export class Transaction extends Model<Transaction> {
   @Column({ type: DataType.UUID })
   declare qr_code_id?: string | null;
 
-  @BelongsTo(() => QrCode, { foreignKey: 'qr_code_id', onDelete: 'SET NULL', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => QrCode, {
+    foreignKey: 'qr_code_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'RESTRICT',
+  })
   declare qrCode?: QrCode | null;
 
   // User associations
-  @BelongsTo(() => User, { foreignKey: 'sender_user_id', as: 'senderUser', onDelete: 'SET NULL', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => User, {
+    foreignKey: 'sender_user_id',
+    as: 'senderUser',
+    onDelete: 'SET NULL',
+    onUpdate: 'RESTRICT',
+  })
   declare senderUser?: User | null;
 
-  @BelongsTo(() => User, { foreignKey: 'receiver_user_id', as: 'receiverUser', onDelete: 'SET NULL', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => User, {
+    foreignKey: 'receiver_user_id',
+    as: 'receiverUser',
+    onDelete: 'SET NULL',
+    onUpdate: 'RESTRICT',
+  })
   declare receiverUser?: User | null;
 
   // Wallet associations
-  @BelongsTo(() => Wallet, { foreignKey: 'sender_wallet_id', as: 'senderWallet' })
+  @BelongsTo(() => Wallet, {
+    foreignKey: 'sender_wallet_id',
+    as: 'senderWallet',
+  })
   declare senderWallet?: Wallet | null;
 
-  @BelongsTo(() => Wallet, { foreignKey: 'receiver_wallet_id', as: 'receiverWallet' })
+  @BelongsTo(() => Wallet, {
+    foreignKey: 'receiver_wallet_id',
+    as: 'receiverWallet',
+  })
   declare receiverWallet?: Wallet | null;
 
   @BeforeValidate
   static enforceBusinessRules(instance: Transaction) {
     const amountNum = parseFloat((instance.amount as unknown as string) || '0');
-    const feeNum = parseFloat((instance.fee_amount as unknown as string) || '0');
+    const feeNum = parseFloat(
+      (instance.fee_amount as unknown as string) || '0',
+    );
     instance.net_amount = (amountNum - feeNum).toFixed(2) as unknown as string;
 
     // processed_at required when status = completed
@@ -166,13 +207,19 @@ export class Transaction extends Model<Transaction> {
     // Type-specific integrity
     const hasSender = !!instance.sender_wallet_id;
     const hasReceiver = !!instance.receiver_wallet_id;
-    if (instance.type === TransactionType.DEPOSIT || instance.type === TransactionType.WITHDRAWAL) {
+    if (
+      instance.type === TransactionType.DEPOSIT ||
+      instance.type === TransactionType.WITHDRAWAL
+    ) {
       // exactly one side present
       if (hasSender === hasReceiver) {
         throw new Error('invalid_parties_for_deposit_withdrawal');
       }
     }
-    if (instance.type === TransactionType.P2P_PAYMENT || instance.type === TransactionType.QR_PAYMENT) {
+    if (
+      instance.type === TransactionType.P2P_PAYMENT ||
+      instance.type === TransactionType.QR_PAYMENT
+    ) {
       if (!hasSender || !hasReceiver) {
         throw new Error('both_parties_required_for_p2p_qr');
       }
@@ -187,6 +234,11 @@ export class Transaction extends Model<Transaction> {
   @AfterSave
   static logAudit(instance: Transaction, _options: any) {
     const { id, type, status, amount, currency } = instance as any;
-    void writeAudit('transaction', id, 'update', null, { type, status, amount, currency });
+    void writeAudit('transaction', id, 'update', null, {
+      type,
+      status,
+      amount,
+      currency,
+    });
   }
 }

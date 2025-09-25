@@ -1,4 +1,12 @@
-import { Table, Column, DataType, Model, PrimaryKey, AllowNull, Default } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  AllowNull,
+  Default,
+} from 'sequelize-typescript';
 
 @Table({
   tableName: 'yapague_fee_policies',
@@ -28,5 +36,3 @@ export class FeePolicy extends Model<FeePolicy> {
   @Column({ type: DataType.STRING(255) })
   declare description?: string;
 }
-
-

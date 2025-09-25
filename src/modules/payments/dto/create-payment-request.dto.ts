@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsOptional, IsIn, Matches } from 'class-validator';
+import { IsUUID, IsOptional, IsIn } from 'class-validator';
+import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class CreatePaymentRequestDto {
   @ApiProperty({ format: 'uuid' })
@@ -10,9 +11,12 @@ export class CreatePaymentRequestDto {
   @IsUUID()
   wallet_id: string;
 
-  @ApiProperty({ description: 'Amount as string to avoid float rounding' })
-  @Matches(/^\d+(\.\d{1,2})?$/)
-  amount: string;
+  @ApiProperty({
+    description: 'Amount (can be string or number)',
+    oneOf: [{ type: 'string' }, { type: 'number' }],
+  })
+  @IsAmount()
+  amount: string | number;
 
   @ApiProperty({ required: false, enum: ['LPS', 'USD'] })
   @IsOptional()

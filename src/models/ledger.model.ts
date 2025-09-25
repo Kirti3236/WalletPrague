@@ -1,4 +1,15 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { Transaction } from './transaction.model';
 import { Wallet } from './wallet.model';
 
@@ -30,7 +41,11 @@ export class Ledger extends Model<Ledger> {
   @Column({ type: DataType.UUID, allowNull: false })
   declare transaction_id: string;
 
-  @BelongsTo(() => Transaction, { foreignKey: 'transaction_id', onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => Transaction, {
+    foreignKey: 'transaction_id',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   declare transaction?: Transaction;
 
   @ForeignKey(() => Wallet)
@@ -38,7 +53,11 @@ export class Ledger extends Model<Ledger> {
   @Column({ type: DataType.UUID, allowNull: false })
   declare wallet_id: string;
 
-  @BelongsTo(() => Wallet, { foreignKey: 'wallet_id', onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => Wallet, {
+    foreignKey: 'wallet_id',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   declare wallet?: Wallet;
 
   @AllowNull(false)

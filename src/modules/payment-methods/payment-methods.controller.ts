@@ -1,5 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { PaymentMethodsService } from './payment-methods.service';
 import { AddBankAccountDto, AddCardDto } from './dto/payment-methods.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -25,9 +39,14 @@ export class PaymentMethodsController {
   }
 
   @Post('bank-accounts')
-  @ApiOperation({ summary: 'Add a bank account (mock, no real account details stored)' })
+  @ApiOperation({
+    summary: 'Add a bank account (mock, no real account details stored)',
+  })
   @ApiBody({ type: AddBankAccountDto })
-  async addBankAccount(@Body() dto: AddBankAccountDto, @GetUser() currentUser: User) {
+  async addBankAccount(
+    @Body() dto: AddBankAccountDto,
+    @GetUser() currentUser: User,
+  ) {
     // Always override user_id from JWT to avoid client-side spoofing
     dto.user_id = currentUser.id;
     return this.service.addBankAccount(dto as any);
@@ -40,6 +59,13 @@ export class PaymentMethodsController {
     return this.service.listUserCards(userId);
   }
 
+  @Get('bank-accounts/:user_id')
+  @ApiOperation({ summary: 'List user bank accounts' })
+  @ApiParam({ name: 'user_id', description: 'User ID (UUID)' })
+  async listBankAccounts(@Param('user_id') userId: string) {
+    return this.service.listUserBankAccounts(userId);
+  }
+
   @Delete('cards/:user_id/:id')
   @ApiOperation({ summary: 'Delete a card (soft deactivate)' })
   @ApiParam({ name: 'user_id' })
@@ -48,5 +74,3 @@ export class PaymentMethodsController {
     return this.service.deleteCard(userId, id);
   }
 }
-
-

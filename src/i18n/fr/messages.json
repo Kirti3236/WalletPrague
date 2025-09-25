@@ -55,6 +55,6 @@
     "minLength": "{{field}} doit contenir au moins {{min}} caractères",
     "maxLength": "{{field}} ne doit pas dépasser {{max}} caractères",
     "phoneNumber": "Veuillez fournir un numéro de téléphone valide",
-    "strongPassword": "Le mot de passe doit contenir au moins 8 caractères, incluant majuscules, minuscules, chiffres et caractères spéciaux"
+    "strongPassword": "Le mot de passe doit contenir au moins 8 caractères, incluant majuscules, minuscules et chiffres"
   }
 }

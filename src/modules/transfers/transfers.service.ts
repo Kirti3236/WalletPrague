@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +21,7 @@ import {
   ValidateRecipientResponseDto,
   TransferByDniDto,
   TransferConfirmationDto,
-  TransferConfirmationResponseDto
+  TransferConfirmationResponseDto,
 } from './dto/validate-recipient.dto';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -37,19 +42,42 @@ export class TransfersService {
     private readonly responseService: ResponseService,
   ) {}
 
-  async p2pByDni(senderUserId: string, senderWalletId: string, receiverUserId: string, receiverWalletId: string, amount: string, description?: string, currency = 'LPS') {
+  async p2pByDni(
+    senderUserId: string,
+    senderWalletId: string,
+    receiverUserId: string,
+    receiverWalletId: string,
+    amount: string | number,
+    description?: string,
+    currency = 'LPS',
+  ) {
+    const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
     const policy = await FeePolicy.findByPk('transfer_fee_flat');
-    const fixedFee = parseFloat((policy?.amount as unknown as string) || '0.50');
+    const fixedFee = parseFloat(
+      (policy?.amount as unknown as string) || '0.50',
+    );
     return this.sequelize.transaction(async (tx) => {
-      const senderWallet = await (Wallet as any).findByPk(senderWalletId, { transaction: tx, lock: tx.LOCK.UPDATE });
-      const receiverWallet = await (Wallet as any).findByPk(receiverWalletId, { transaction: tx, lock: tx.LOCK.UPDATE });
+      const senderWallet = await (Wallet as any).findByPk(senderWalletId, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
+      const receiverWallet = await (Wallet as any).findByPk(receiverWalletId, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
       if (!senderWallet || !receiverWallet) {
-        throw new BadRequestException(this.getTranslatedMessage('transfers.wallet_not_found'));
+        throw new BadRequestException(
+          this.getTranslatedMessage('transfers.wallet_not_found'),
+        );
       }
-      const amt = parseFloat(amount);
-      const senderBal = parseFloat(senderWallet.available_balance as unknown as string);
+      const amt = amountNum;
+      const senderBal = parseFloat(
+        senderWallet.available_balance as unknown as string,
+      );
       if (senderBal < amt) {
-        throw new BadRequestException(this.getTranslatedMessage('transfers.insufficient_funds'));
+        throw new BadRequestException(
+          this.getTranslatedMessage('transfers.insufficient_funds'),
+        );
       }
 
       const txn = await (Transaction as any).create(
@@ -60,7 +88,7 @@ export class TransfersService {
           sender_user_id: senderUserId,
           receiver_user_id: receiverUserId,
           type: TransactionType.P2P_PAYMENT,
-          amount,
+          amount: amt.toFixed(2),
           currency,
           fee_amount: fixedFee.toFixed(2),
           net_amount: (amt - fixedFee).toFixed(2),
@@ -108,9 +136,15 @@ export class TransfersService {
       );
 
       // Update balances
-      senderWallet.available_balance = (senderBal - amt).toFixed(2) as unknown as string;
-      const receiverBal = parseFloat(receiverWallet.available_balance as unknown as string);
-      receiverWallet.available_balance = (receiverBal + amt).toFixed(2) as unknown as string;
+      senderWallet.available_balance = (senderBal - amt).toFixed(
+        2,
+      ) as unknown as string;
+      const receiverBal = parseFloat(
+        receiverWallet.available_balance as unknown as string,
+      );
+      receiverWallet.available_balance = (receiverBal + amt).toFixed(
+        2,
+      ) as unknown as string;
       await senderWallet.save({ transaction: tx });
       await receiverWallet.save({ transaction: tx });
 
@@ -127,7 +161,10 @@ export class TransfersService {
     });
   }
 
-  async validateRecipient(dto: ValidateRecipientDto, lang: string = 'en'): Promise<ValidateRecipientResponseDto> {
+  async validateRecipient(
+    dto: ValidateRecipientDto,
+    lang: string = 'en',
+  ): Promise<ValidateRecipientResponseDto> {
     try {
       const { identifier, recipient_dni, sender_user_id } = dto;
       // Use identifier as the primary field, fallback to recipient_dni for backward compatibility
@@ -136,7 +173,9 @@ export class TransfersService {
       // Check if sender exists
       const sender = await this.userModel.findByPk(sender_user_id);
       if (!sender) {
-        throw new NotFoundException(this.getTranslatedMessage('transfers.sender_not_found', lang));
+        throw new NotFoundException(
+          this.getTranslatedMessage('transfers.sender_not_found', lang),
+        );
       }
 
       // Check if trying to send to self
@@ -144,20 +183,26 @@ export class TransfersService {
         return {
           success: false,
           is_valid: false,
-          message: this.getTranslatedMessage('transfers.self_transfer_not_allowed', lang),
+          message: this.getTranslatedMessage(
+            'transfers.self_transfer_not_allowed',
+            lang,
+          ),
         };
       }
 
       // Find recipient by DNI
       const recipient = await this.userModel.findOne({
-        where: { user_DNI_number: recipientDni }
+        where: { user_DNI_number: recipientDni },
       });
 
       if (!recipient) {
         return {
           success: false,
           is_valid: false,
-          message: this.getTranslatedMessage('transfers.recipient_not_found', lang),
+          message: this.getTranslatedMessage(
+            'transfers.recipient_not_found',
+            lang,
+          ),
         };
       }
 
@@ -166,7 +211,10 @@ export class TransfersService {
         return {
           success: false,
           is_valid: false,
-          message: this.getTranslatedMessage('transfers.recipient_inactive', lang),
+          message: this.getTranslatedMessage(
+            'transfers.recipient_inactive',
+            lang,
+          ),
         };
       }
 
@@ -174,66 +222,97 @@ export class TransfersService {
       const wallets = await this.walletModel.findAll({
         where: {
           user_id: recipient.id,
-          status: 'active'
+          status: 'active',
         },
-        attributes: ['id', 'wallet_name', 'currency', 'status']
+        attributes: ['id', 'wallet_name', 'currency', 'status'],
       });
 
       if (wallets.length === 0) {
         return {
           success: false,
           is_valid: false,
-          message: this.getTranslatedMessage('transfers.no_active_wallets', lang),
+          message: this.getTranslatedMessage(
+            'transfers.no_active_wallets',
+            lang,
+          ),
         };
       }
 
       return {
         success: true,
         is_valid: true,
-        message: this.getTranslatedMessage('transfers.recipient_validated', lang),
+        message: this.getTranslatedMessage(
+          'transfers.recipient_validated',
+          lang,
+        ),
         recipient: {
           user_id: recipient.id,
-          full_name: `${recipient.user_first_name} ${recipient.user_last_name}`.trim(),
+          full_name:
+            `${recipient.user_first_name} ${recipient.user_last_name}`.trim(),
           username: recipient.user_name,
           dni_number: recipient.user_DNI_number,
-          phone_number: recipient.user_phone_number
+          phone_number: recipient.user_phone_number,
         },
-        available_wallets: wallets.map(wallet => ({
+        available_wallets: wallets.map((wallet) => ({
           wallet_id: wallet.id,
           wallet_name: wallet.wallet_name || `${wallet.currency} Wallet`,
           wallet_type: 'personal',
           currency: wallet.currency,
           balance: '0.00',
-          is_active: wallet.status === 'active'
-        }))
+          is_active: wallet.status === 'active',
+        })),
       };
-
     } catch (error) {
-      this.logger.error(`Error validating recipient: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error validating recipient: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async transferByDni(dto: TransferByDniDto, lang: string = 'en'): Promise<any> {
+  async transferByDni(
+    dto: TransferByDniDto,
+    lang: string = 'en',
+  ): Promise<any> {
     try {
-      const { sender_user_id, sender_wallet_id, recipient_dni, amount, description, currency = 'LPS' } = dto;
+      const {
+        sender_user_id,
+        sender_wallet_id,
+        recipient_dni,
+        amount,
+        description,
+        currency = 'LPS',
+      } = dto;
 
       // First validate recipient
-      const recipientValidation = await this.validateRecipient({
-        identifier: recipient_dni,
-        recipient_dni,
-        sender_user_id
-      }, lang);
+      const recipientValidation = await this.validateRecipient(
+        {
+          identifier: recipient_dni,
+          recipient_dni,
+          sender_user_id,
+        },
+        lang,
+      );
 
       if (!recipientValidation.is_valid) {
-        throw new BadRequestException(this.getTranslatedMessage('transfers.recipient_validation_failed', lang));
+        throw new BadRequestException(
+          this.getTranslatedMessage(
+            'transfers.recipient_validation_failed',
+            lang,
+          ),
+        );
       }
 
       // Find recipient's wallet for the specified currency
-      const recipientWallet = recipientValidation.available_wallets?.find(w => w.currency === currency);
+      const recipientWallet = recipientValidation.available_wallets?.find(
+        (w) => w.currency === currency,
+      );
       if (!recipientWallet) {
         throw new BadRequestException(
-          this.getTranslatedMessage('transfers.no_wallet_for_currency', lang, { currency })
+          this.getTranslatedMessage('transfers.no_wallet_for_currency', lang, {
+            currency,
+          }),
         );
       }
 
@@ -245,16 +324,21 @@ export class TransfersService {
         recipientWallet.wallet_id,
         amount.toString(),
         description,
-        currency
+        currency,
       );
-
     } catch (error) {
-      this.logger.error(`Error in transfer by DNI: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error in transfer by DNI: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async getTransferConfirmation(dto: TransferConfirmationDto, lang: string = 'en'): Promise<TransferConfirmationResponseDto> {
+  async getTransferConfirmation(
+    dto: TransferConfirmationDto,
+    lang: string = 'en',
+  ): Promise<TransferConfirmationResponseDto> {
     try {
       const { transaction_id, user_id } = dto;
 
@@ -262,46 +346,59 @@ export class TransfersService {
       const transaction = await this.transactionModel.findOne({
         where: {
           id: transaction_id,
-          [Op.or]: [
-            { sender_user_id: user_id },
-            { receiver_user_id: user_id }
-          ]
+          [Op.or]: [{ sender_user_id: user_id }, { receiver_user_id: user_id }],
         },
         include: [
           {
             model: User,
             as: 'senderUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: false
+            attributes: [
+              'id',
+              'user_first_name',
+              'user_last_name',
+              'user_name',
+            ],
+            required: false,
           },
           {
             model: User,
             as: 'receiverUser',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name', 'user_DNI_number'],
-            required: false
+            attributes: [
+              'id',
+              'user_first_name',
+              'user_last_name',
+              'user_name',
+              'user_DNI_number',
+            ],
+            required: false,
           },
           {
             model: Wallet,
             as: 'senderWallet',
             attributes: ['id', 'wallet_name', 'currency'],
-            required: false
+            required: false,
           },
           {
             model: Wallet,
             as: 'receiverWallet',
             attributes: ['id', 'wallet_name', 'currency'],
-            required: false
-          }
-        ]
+            required: false,
+          },
+        ],
       });
 
       if (!transaction) {
-        throw new NotFoundException(this.getTranslatedMessage('transfers.transfer_not_found', lang));
+        throw new NotFoundException(
+          this.getTranslatedMessage('transfers.transfer_not_found', lang),
+        );
       }
 
       return {
         success: true,
-        message: this.getTranslatedMessage('transfers.transfer_details_retrieved', lang),
+        message: this.getTranslatedMessage(
+          'transfers.transfer_details_retrieved',
+          lang,
+        ),
         transfer: {
           id: transaction.id,
           type: transaction.type,
@@ -309,12 +406,15 @@ export class TransfersService {
           currency: transaction.currency,
           status: transaction.status,
           description: transaction.description,
-          created_at: transaction.createdAt?.toISOString() || new Date().toISOString()
-        }
+          created_at:
+            transaction.createdAt?.toISOString() || new Date().toISOString(),
+        },
       };
-
     } catch (error) {
-      this.logger.error(`Error getting transfer confirmation: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error getting transfer confirmation: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -322,7 +422,11 @@ export class TransfersService {
   /**
    * Get translated message using i18n service with fallback
    */
-  private getTranslatedMessage(key: string, lang: string = 'en', params?: any): string {
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
     try {
       return this.i18n.t(`messages.${key}`, { lang, args: params });
     } catch (error) {

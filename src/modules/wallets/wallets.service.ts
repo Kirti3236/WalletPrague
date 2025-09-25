@@ -9,14 +9,31 @@ export class WalletsService {
   async getWalletByUser(userId: string, currency = 'LPS') {
     return (Wallet as any).findOne({
       where: { user_id: userId, currency },
-      attributes: ['id', 'wallet_name', 'currency', 'available_balance', 'ledger_balance', 'status', 'updated_at'],
+      attributes: [
+        'id',
+        'wallet_name',
+        'currency',
+        'available_balance',
+        'ledger_balance',
+        'status',
+        'updated_at',
+      ],
       include: [
         {
           model: User,
-          attributes: ['id', 'user_first_name', 'user_last_name', 'user_name', 'user_email', 'user_phone_number', 'user_DNI_number', 'user_status'],
-          as: 'user'
-        }
-      ]
+          attributes: [
+            'id',
+            'user_first_name',
+            'user_last_name',
+            'user_name',
+            'user_email',
+            'user_phone_number',
+            'user_DNI_number',
+            'user_status',
+          ],
+          as: 'user',
+        },
+      ],
     });
   }
 
@@ -27,7 +44,15 @@ export class WalletsService {
       },
       order: [['created_at', 'DESC']],
       limit,
-      attributes: ['id', 'type', 'status', 'amount', 'currency', 'description', 'created_at'],
+      attributes: [
+        'id',
+        'type',
+        'status',
+        'amount',
+        'currency',
+        'description',
+        'created_at',
+      ],
     });
   }
 }

@@ -19,11 +19,9 @@ export async function writeAudit(
       old_values: old_values as any,
       new_values: new_values as any,
       ip_address: (ip_address || null) as any,
-      user_agent: (user_agent || null) || undefined,
+      user_agent: user_agent || null || undefined,
     } as any);
   } catch {
     // swallow auditing failures
   }
 }
-
-

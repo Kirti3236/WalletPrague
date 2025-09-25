@@ -1,4 +1,12 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+} from 'sequelize-typescript';
 
 export enum SettlementStatus {
   PENDING = 'pending',

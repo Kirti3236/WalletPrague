@@ -4,11 +4,11 @@ import * as Joi from 'joi';
 const passwordPattern = Joi.string()
   .min(8)
   .max(128)
-  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/)
+  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
   .required()
   .messages({
     'string.pattern.base':
-      'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
+      'Password must contain at least 8 characters with uppercase, lowercase, and number',
     'string.min': 'Password must be at least 8 characters long',
     'string.max': 'Password must not exceed 128 characters',
     'any.required': 'Password is required',

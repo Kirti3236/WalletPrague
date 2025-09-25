@@ -47,7 +47,7 @@ export class UsernameGeneratorUtil {
         username = `User${timestamp}`;
 
         // Final check with timestamp-based username
-      const finalCheck = await (this.userModel as any).findOne({
+        const finalCheck = await (this.userModel as any).findOne({
           where: { user_name: username },
           attributes: ['id'],
         });

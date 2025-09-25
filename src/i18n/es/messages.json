@@ -57,7 +57,7 @@
     "minLength": "{{field}} debe tener al menos {{min}} caracteres",
     "maxLength": "{{field}} no debe exceder {{max}} caracteres",
     "phoneNumber": "Por favor proporcione un número de teléfono válido",
-    "strongPassword": "La contraseña debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres especiales"
+    "strongPassword": "La contraseña debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números"
   },
   "transfers": {
     "wallet_not_found": "Billetera no encontrada",

@@ -69,10 +69,10 @@ export class AuthService {
     let user_name = await this.usernameGenerator.generateUniqueUsername();
 
     // Handle file uploads and construct URLs
-    const frontIdFileUrl = files?.frontIdFile?.[0]?.filename 
+    const frontIdFileUrl = files?.frontIdFile?.[0]?.filename
       ? `${this.configService.get('app.baseUrl')}/uploads/documents/${files.frontIdFile[0].filename}`
       : null;
-    const backIdFileUrl = files?.backIdFile?.[0]?.filename 
+    const backIdFileUrl = files?.backIdFile?.[0]?.filename
       ? `${this.configService.get('app.baseUrl')}/uploads/documents/${files.backIdFile[0].filename}`
       : null;
 
@@ -94,7 +94,9 @@ export class AuthService {
         break;
       } catch (err: any) {
         // Handle unique violations gracefully
-        const isUnique = err?.name?.includes('UniqueConstraint') || err?.name?.includes('SequelizeUniqueConstraintError');
+        const isUnique =
+          err?.name?.includes('UniqueConstraint') ||
+          err?.name?.includes('SequelizeUniqueConstraintError');
         if (isUnique) {
           const path = err?.errors?.[0]?.path || '';
           if (path.includes('user_name')) {
@@ -105,21 +107,30 @@ export class AuthService {
           if (path.includes('user_DNI_number')) {
             return {
               success: false,
-              message: this.getTranslatedMessage('validation.document_already_exists', lang),
+              message: this.getTranslatedMessage(
+                'validation.document_already_exists',
+                lang,
+              ),
               data: null,
             } as any;
           }
           if (path.includes('user_email')) {
             return {
               success: false,
-              message: this.getTranslatedMessage('validation.email_already_exists', lang),
+              message: this.getTranslatedMessage(
+                'validation.email_already_exists',
+                lang,
+              ),
               data: null,
             } as any;
           }
           if (path.includes('user_phone_number')) {
             return {
               success: false,
-              message: this.getTranslatedMessage('validation.phone_already_exists', lang),
+              message: this.getTranslatedMessage(
+                'validation.phone_already_exists',
+                lang,
+              ),
               data: null,
             } as any;
           }
@@ -132,14 +143,19 @@ export class AuthService {
     if (!savedUser) {
       return {
         success: false,
-        message: this.getTranslatedMessage('validation.required_fields_missing', lang),
+        message: this.getTranslatedMessage(
+          'validation.required_fields_missing',
+          lang,
+        ),
         data: null,
       } as any;
     }
 
     // Ensure user has a default wallet for LPS currency
     try {
-      const existingWallet = await (Wallet as any).findOne({ where: { user_id: savedUser.id, currency: 'LPS' } });
+      const existingWallet = await (Wallet as any).findOne({
+        where: { user_id: savedUser.id, currency: 'LPS' },
+      });
       if (!existingWallet) {
         await (Wallet as any).create({
           user_id: savedUser.id,
@@ -152,7 +168,9 @@ export class AuthService {
         });
       }
     } catch (e) {
-      this.logger.warn(`Auto wallet create skipped: ${e instanceof Error ? e.message : e}`);
+      this.logger.warn(
+        `Auto wallet create skipped: ${e instanceof Error ? e.message : e}`,
+      );
     }
 
     // Generate access token
@@ -274,7 +292,10 @@ export class AuthService {
     if (isSameAsCurrentPassword) {
       return {
         success: false,
-        message: this.getTranslatedMessage('auth.new_password_same_as_current', lang),
+        message: this.getTranslatedMessage(
+          'auth.new_password_same_as_current',
+          lang,
+        ),
         data: null,
       };
     }
@@ -428,12 +449,16 @@ export class AuthService {
           'If the email exists, a password reset link has been sent',
         'auth.password_reset_success': 'Password has been reset successfully',
         'auth.invalid_expired_token': 'Invalid or expired token',
-        'auth.new_password_same_as_current': 'New password cannot be the same as current password',
+        'auth.new_password_same_as_current':
+          'New password cannot be the same as current password',
         'auth.password_changed_success': 'Password changed successfully',
         'auth.user_not_found': 'User not found',
-        'validation.all_fields_required': 'All required fields must be provided',
-        'validation.passwords_dont_match': 'New password and confirmation do not match',
-        'validation.password_fields_required': 'New password and confirmation are required',
+        'validation.all_fields_required':
+          'All required fields must be provided',
+        'validation.passwords_dont_match':
+          'New password and confirmation do not match',
+        'validation.password_fields_required':
+          'New password and confirmation are required',
       },
       es: {
         'validation.email_already_exists': 'El email ya existe',
@@ -459,12 +484,16 @@ export class AuthService {
         'auth.password_reset_success':
           'La contraseña ha sido restablecida exitosamente',
         'auth.invalid_expired_token': 'Token inválido o expirado',
-        'auth.new_password_same_as_current': 'La nueva contraseña no puede ser la misma que la actual',
+        'auth.new_password_same_as_current':
+          'La nueva contraseña no puede ser la misma que la actual',
         'auth.password_changed_success': 'Contraseña cambiada exitosamente',
         'auth.user_not_found': 'Usuario no encontrado',
-        'validation.all_fields_required': 'Todos los campos requeridos deben ser proporcionados',
-        'validation.passwords_dont_match': 'La nueva contraseña y la confirmación no coinciden',
-        'validation.password_fields_required': 'La nueva contraseña y la confirmación son requeridas',
+        'validation.all_fields_required':
+          'Todos los campos requeridos deben ser proporcionados',
+        'validation.passwords_dont_match':
+          'La nueva contraseña y la confirmación no coinciden',
+        'validation.password_fields_required':
+          'La nueva contraseña y la confirmación son requeridas',
       },
       fr: {
         'validation.email_already_exists': "L'email existe déjà",

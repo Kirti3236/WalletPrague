@@ -1,5 +1,12 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiBody, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiBody,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { DepositsService } from './deposits.service';
 import { DepositFromCardDto, DepositFromBankDto } from './dto/deposit.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -14,7 +21,7 @@ export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
   @Post('from-card')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Deposit money from saved card to wallet',
     description: `
 **PRIVATE ENDPOINT** - Add money to wallet using a saved card.
@@ -32,7 +39,7 @@ export class DepositsController {
 - Simulate card-based deposits
 
 **Note:** This is a simulation - no real payment processing occurs.
-    `
+    `,
   })
   @ApiOkResponse({ description: 'Deposit completed successfully' })
   @ApiBody({ type: DepositFromCardDto })
@@ -52,14 +59,17 @@ export class DepositsController {
     status: 404,
     description: 'Card not found or not active',
   })
-  async depositFromCard(@Body() dto: DepositFromCardDto, @GetUser() currentUser: User) {
+  async depositFromCard(
+    @Body() dto: DepositFromCardDto,
+    @GetUser() currentUser: User,
+  ) {
     // Override user_id with current user from JWT
     dto.user_id = currentUser.id;
     return this.depositsService.depositFromCard(dto);
   }
 
   @Post('from-bank')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Deposit money from saved bank account to wallet',
     description: `
 **PRIVATE ENDPOINT** - Add money to wallet using a saved bank account.
@@ -77,7 +87,7 @@ export class DepositsController {
 - Simulate bank-based deposits
 
 **Note:** This is a simulation - no real bank transfers occur.
-    `
+    `,
   })
   @ApiOkResponse({ description: 'Deposit completed successfully' })
   @ApiBody({ type: DepositFromBankDto })
@@ -97,7 +107,10 @@ export class DepositsController {
     status: 404,
     description: 'Bank account not found or not active',
   })
-  async depositFromBank(@Body() dto: DepositFromBankDto, @GetUser() currentUser: User) {
+  async depositFromBank(
+    @Body() dto: DepositFromBankDto,
+    @GetUser() currentUser: User,
+  ) {
     // Override user_id with current user from JWT
     dto.user_id = currentUser.id;
     return this.depositsService.depositFromBank(dto);

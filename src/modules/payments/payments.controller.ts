@@ -1,5 +1,23 @@
-import { Body, Controller, Post, Get, Param, UseGuards, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiBody, ApiBearerAuth, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiBody,
+  ApiBearerAuth,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
 import { RedeemPaymentDto } from './dto/redeem-payment.dto';
@@ -9,7 +27,7 @@ import {
   SharePaymentDto,
   ScanQrDto,
   RedeemByCodeDto,
-  ValidateCodeDto
+  ValidateCodeDto,
 } from './dto/payment-qr.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
@@ -29,28 +47,47 @@ export class PaymentsController {
   ) {}
 
   private isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
   @Post('request')
-  @ApiOperation({ summary: '🔐 Create a QR/code payment request (expires in ~10 minutes)' })
-  @ApiOkResponse({ description: 'Returns code, qr_id and expiry; safe response' })
+  @ApiOperation({
+    summary: '🔐 Create a QR/code payment request (expires in ~10 minutes)',
+  })
+  @ApiOkResponse({
+    description: 'Returns code, qr_id and expiry; safe response',
+  })
   @ApiBody({ type: CreatePaymentRequestDto })
-  async request(@Body() dto: CreatePaymentRequestDto, @GetUser() currentUser: User) {
+  async request(
+    @Body() dto: CreatePaymentRequestDto,
+    @GetUser() currentUser: User,
+  ) {
     // Override user_id with current user from JWT
     dto.user_id = currentUser.id;
-    return this.paymentsService.createPaymentRequest(dto.user_id, dto.wallet_id, dto.amount, dto.currency ?? 'LPS');
+    return this.paymentsService.createPaymentRequest(
+      dto.user_id,
+      dto.wallet_id,
+      dto.amount,
+      dto.currency ?? 'LPS',
+    );
   }
 
   @Post('redeem')
-  @ApiOperation({ summary: '🔐 Redeem a QR/code payment and transfer between wallets' })
+  @ApiOperation({
+    summary: '🔐 Redeem a QR/code payment and transfer between wallets',
+  })
   @ApiOkResponse({ description: 'Returns safe transaction summary' })
   @ApiBody({ type: RedeemPaymentDto })
   async redeem(@Body() dto: RedeemPaymentDto, @GetUser() currentUser: User) {
     // Override receiver_user_id with current user from JWT
     dto.receiver_user_id = currentUser.id;
-    return this.paymentsService.redeemPayment(dto.qr_id, dto.receiver_user_id, dto.receiver_wallet_id);
+    return this.paymentsService.redeemPayment(
+      dto.qr_id,
+      dto.receiver_user_id,
+      dto.receiver_wallet_id,
+    );
   }
 
   @Post('generate-qr')
@@ -367,7 +404,8 @@ export class PaymentsController {
   @Post('validate-code')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: '🔐 Validate payment code before processing (check expiry, amount, etc.)',
+    summary:
+      '🔐 Validate payment code before processing (check expiry, amount, etc.)',
     description: `
 **PRIVATE ENDPOINT** - Validate payment code without processing the payment.
 

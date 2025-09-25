@@ -39,7 +39,8 @@ class ResetPasswordRequest {
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @MaxLength(128, { message: 'New password must not exceed 128 characters' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
-    message: 'New password must contain at least 8 characters with uppercase, lowercase, number and special character',
+    message:
+      'New password must contain at least 8 characters with uppercase, lowercase, number and special character',
   })
   new_password: string;
 
@@ -60,7 +61,8 @@ export class UsersController {
   ) {}
 
   private isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
@@ -68,7 +70,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🔐 Get single user by ID',
-    description: '**PRIVATE ENDPOINT** - Retrieve a specific user by their ID. Requires valid JWT token for authentication.',
+    description:
+      '**PRIVATE ENDPOINT** - Retrieve a specific user by their ID. Requires valid JWT token for authentication.',
   })
   @ApiParam({
     name: 'id',
@@ -98,11 +101,13 @@ export class UsersController {
   ) {
     // Validate UUID format
     if (!this.isValidUUID(id)) {
-      throw new BadRequestException('Invalid user ID format. Must be a valid UUID.');
+      throw new BadRequestException(
+        'Invalid user ID format. Must be a valid UUID.',
+      );
     }
 
     const user = await this.usersService.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -114,7 +119,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🔐 Get current user profile',
-    description: '**PRIVATE ENDPOINT** - Retrieve the authenticated user\'s profile information. Uses JWT token to identify the user.',
+    description:
+      "**PRIVATE ENDPOINT** - Retrieve the authenticated user's profile information. Uses JWT token to identify the user.",
   })
   @ApiResponse({
     status: 200,
@@ -135,7 +141,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🔐 Get all users',
-    description: '**PRIVATE ENDPOINT** - Retrieve a list of all users. Requires valid JWT token. Admin access might be required in future versions.',
+    description:
+      '**PRIVATE ENDPOINT** - Retrieve a list of all users. Requires valid JWT token. Admin access might be required in future versions.',
   })
   @ApiResponse({
     status: 200,
@@ -145,13 +152,12 @@ export class UsersController {
     status: 401,
     description: 'Unauthorized - invalid or missing JWT token',
   })
-  async getAllUsers(
-    @GetUser() currentUser: User,
-    @Lang() lang?: string,
-  ) {
+  async getAllUsers(@GetUser() currentUser: User, @Lang() lang?: string) {
     const users = await this.usersService.findAll();
-    
-    const sanitizedUsers = users.map(user => this.usersService.sanitizeUser(user));
+
+    const sanitizedUsers = users.map((user) =>
+      this.usersService.sanitizeUser(user),
+    );
 
     return sanitizedUsers;
   }
@@ -160,7 +166,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🔐 User logout',
-    description: '**PRIVATE ENDPOINT** - Logout authenticated user. Requires valid JWT token for authentication.',
+    description:
+      '**PRIVATE ENDPOINT** - Logout authenticated user. Requires valid JWT token for authentication.',
   })
   @ApiResponse({
     status: 200,
@@ -181,7 +188,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🔐 Reset password',
-    description: '**PRIVATE ENDPOINT** - Reset user password using JWT token for user identification. Only requires new password and confirmation. User is identified from the JWT token, so no additional identification needed.',
+    description:
+      '**PRIVATE ENDPOINT** - Reset user password using JWT token for user identification. Only requires new password and confirmation. User is identified from the JWT token, so no additional identification needed.',
   })
   @ApiBody({
     description: 'New password and confirm password',

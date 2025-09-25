@@ -13,7 +13,13 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import { IsOptional, IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 import { PasswordMatch } from '../../common/decorators/password-match.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -47,7 +53,8 @@ class RegisterRequest {
   @MinLength(2, { message: 'First name must be at least 2 characters long' })
   @MaxLength(50, { message: 'First name must not exceed 50 characters' })
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'First name must contain only letters, spaces, hyphens and apostrophes',
+    message:
+      'First name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_first_name: string;
 
@@ -56,7 +63,8 @@ class RegisterRequest {
   @MinLength(2, { message: 'Last name must be at least 2 characters long' })
   @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
   @Matches(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/, {
-    message: 'Last name must contain only letters, spaces, hyphens and apostrophes',
+    message:
+      'Last name must contain only letters, spaces, hyphens and apostrophes',
   })
   user_last_name: string;
 
@@ -69,16 +77,17 @@ class RegisterRequest {
   })
   user_DNI_number: string;
 
-  @ApiProperty({ example: 'SecurePassword123!', required: true })
+  @ApiProperty({ example: 'SecurePassword123', required: true })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password must not exceed 128 characters' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
-    message: 'Password must contain at least 8 characters with uppercase, lowercase, number and special character',
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, {
+    message:
+      'Password must contain at least 8 characters with uppercase, lowercase, and number',
   })
   user_password: string;
 
-  @ApiProperty({ example: 'SecurePassword123!', required: true })
+  @ApiProperty({ example: 'SecurePassword123', required: true })
   @IsString()
   @PasswordMatch('user_password', { message: 'Passwords do not match' })
   confirm_password: string;
@@ -92,7 +101,9 @@ class RegisterRequest {
   @IsOptional()
   @IsString()
   @MaxLength(255, { message: 'Email must not exceed 255 characters' })
-  @Matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: 'Please provide a valid email address' })
+  @Matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, {
+    message: 'Please provide a valid email address',
+  })
   user_email?: string;
 
   @ApiProperty({
@@ -103,7 +114,9 @@ class RegisterRequest {
   @IsOptional()
   @IsString()
   @MaxLength(20, { message: 'Phone number must not exceed 20 characters' })
-  @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Please provide a valid phone number' })
+  @Matches(/^\+?[1-9]\d{1,14}$/, {
+    message: 'Please provide a valid phone number',
+  })
   user_phone_number?: string;
 
   @ApiProperty({
@@ -150,21 +163,21 @@ class ForgotPasswordRequest {
   })
   user_DNI_number: string;
 
-  @ApiProperty({ example: 'NewSecurePassword123!', required: true })
+  @ApiProperty({ example: 'NewSecurePassword123', required: true })
   @IsString()
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @MaxLength(128, { message: 'New password must not exceed 128 characters' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).*$/, {
-    message: 'New password must contain at least 8 characters with uppercase, lowercase, number and special character',
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, {
+    message:
+      'New password must contain at least 8 characters with uppercase, lowercase, and number',
   })
   new_password: string;
 
-  @ApiProperty({ example: 'NewSecurePassword123!', required: true })
+  @ApiProperty({ example: 'NewSecurePassword123', required: true })
   @IsString()
   @PasswordMatch('new_password', { message: 'Passwords do not match' })
   confirm_password: string;
 }
-
 
 @ApiTags('🌐 Authentication')
 @Controller('public/auth')
@@ -289,7 +302,10 @@ export class AuthController {
 
     // If registration failed, throw appropriate HTTP exception
     if (!result.success) {
-      if (result.message.includes('already exists') || result.message.includes('duplicate')) {
+      if (
+        result.message.includes('already exists') ||
+        result.message.includes('duplicate')
+      ) {
         throw new ConflictException(result.message);
       } else {
         throw new BadRequestException(result.message);
@@ -303,7 +319,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: '🌐 User login',
-    description: '**PUBLIC ENDPOINT** - Authenticate user using DNI number and password. Returns JWT token for accessing private endpoints.',
+    description:
+      '**PUBLIC ENDPOINT** - Authenticate user using DNI number and password. Returns JWT token for accessing private endpoints.',
   })
   @ApiBody({
     description: 'User login credentials',
@@ -344,7 +361,6 @@ export class AuthController {
     return result;
   }
 
-
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -372,7 +388,8 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request - validation failed or new password same as current password',
+    description:
+      'Bad request - validation failed or new password same as current password',
   })
   @ApiResponse({
     status: 404,
@@ -384,5 +401,4 @@ export class AuthController {
   ): Promise<StandardResponse> {
     return this.authService.forgotPassword(body, lang);
   }
-
 }

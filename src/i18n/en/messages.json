@@ -56,7 +56,7 @@
     "minLength": "{{field}} must be at least {{min}} characters long",
     "maxLength": "{{field}} must not exceed {{max}} characters",
     "phoneNumber": "Please provide a valid phone number",
-    "strongPassword": "Password must contain at least 8 characters, including uppercase, lowercase, number and special character"
+    "strongPassword": "Password must contain at least 8 characters, including uppercase, lowercase, and numbers"
   },
   "transfers": {
     "wallet_not_found": "Wallet not found",

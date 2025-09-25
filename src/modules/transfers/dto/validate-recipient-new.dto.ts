@@ -1,13 +1,26 @@
-import { IsString, IsUUID, IsOptional, IsNumber, IsBoolean, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsIn,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 // Input DTOs
 export class ValidateRecipientDto {
-  @ApiProperty({ description: 'Recipient identifier (DNI or phone)', example: '0801199012345' })
+  @ApiProperty({
+    description: 'Recipient identifier (DNI or phone)',
+    example: '0801199012345',
+  })
   @IsString()
   identifier: string;
 
-  @ApiPropertyOptional({ description: 'Recipient DNI number', example: '0801199012345' })
+  @ApiPropertyOptional({
+    description: 'Recipient DNI number',
+    example: '0801199012345',
+  })
   @IsOptional()
   @IsString()
   recipient_dni?: string;
@@ -19,15 +32,21 @@ export class ValidateRecipientDto {
 }
 
 export class TransferByDniDto {
-  @ApiProperty({ description: 'Recipient DNI number', example: '0801199012345' })
+  @ApiProperty({
+    description: 'Recipient DNI number',
+    example: '0801199012345',
+  })
   @IsString()
   recipient_dni: string;
 
-  @ApiProperty({ description: 'Transfer amount', example: 100.50 })
+  @ApiProperty({ description: 'Transfer amount', example: 100.5 })
   @IsNumber()
   amount: number;
 
-  @ApiPropertyOptional({ description: 'Transfer description', example: 'Payment for services' })
+  @ApiPropertyOptional({
+    description: 'Transfer description',
+    example: 'Payment for services',
+  })
   @IsOptional()
   @IsString()
   description?: string;
@@ -43,18 +62,27 @@ export class TransferByDniDto {
   @IsUUID()
   sender_user_id?: string;
 
-  @ApiPropertyOptional({ description: 'Sender wallet ID', example: 'uuid-here' })
+  @ApiPropertyOptional({
+    description: 'Sender wallet ID',
+    example: 'uuid-here',
+  })
   @IsOptional()
   @IsUUID()
   sender_wallet_id?: string;
 }
 
 export class TransferConfirmationDto {
-  @ApiProperty({ description: 'Transaction ID to confirm', example: 'uuid-here' })
+  @ApiProperty({
+    description: 'Transaction ID to confirm',
+    example: 'uuid-here',
+  })
   @IsUUID()
   transaction_id: string;
 
-  @ApiPropertyOptional({ description: 'User ID for confirmation', example: 'uuid-here' })
+  @ApiPropertyOptional({
+    description: 'User ID for confirmation',
+    example: 'uuid-here',
+  })
   @IsOptional()
   @IsUUID()
   user_id?: string;
@@ -68,10 +96,16 @@ export class RecipientInfoDto {
   @ApiProperty({ description: 'Recipient username', example: 'juanperez' })
   username: string;
 
-  @ApiProperty({ description: 'Recipient DNI number', example: '0801199012345' })
+  @ApiProperty({
+    description: 'Recipient DNI number',
+    example: '0801199012345',
+  })
   dni_number: string;
 
-  @ApiPropertyOptional({ description: 'Recipient phone number', example: '+50412345678' })
+  @ApiPropertyOptional({
+    description: 'Recipient phone number',
+    example: '+50412345678',
+  })
   phone_number?: string;
 }
 
@@ -111,10 +145,16 @@ export class TransferDetailsDto {
   @ApiProperty({ description: 'Transaction status', example: 'pending' })
   status: string;
 
-  @ApiPropertyOptional({ description: 'Transfer description', example: 'Payment for services' })
+  @ApiPropertyOptional({
+    description: 'Transfer description',
+    example: 'Payment for services',
+  })
   description?: string;
 
-  @ApiProperty({ description: 'Creation timestamp', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Creation timestamp',
+    example: '2024-01-15T10:30:00Z',
+  })
   created_at: string;
 }
 
@@ -125,7 +165,10 @@ export class ValidateRecipientResponseDto {
   @ApiProperty({ description: 'Is recipient valid', example: true })
   is_valid: boolean;
 
-  @ApiProperty({ description: 'Response message', example: 'Recipient validated successfully' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Recipient validated successfully',
+  })
   message: string;
 
   @ApiPropertyOptional({ description: 'Recipient information' })
@@ -139,7 +182,10 @@ export class TransferConfirmationResponseDto {
   @ApiProperty({ description: 'Operation success status', example: true })
   success: boolean;
 
-  @ApiProperty({ description: 'Response message', example: 'Transfer completed successfully' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Transfer completed successfully',
+  })
   message: string;
 
   @ApiProperty({ description: 'Transfer details' })

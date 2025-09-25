@@ -1,4 +1,13 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, Index } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  Index,
+} from 'sequelize-typescript';
 
 export enum WebhookEvent {
   TRANSACTION_COMPLETED = 'transaction.completed',

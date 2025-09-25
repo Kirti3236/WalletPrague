@@ -1,4 +1,13 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, Index } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  Index,
+} from 'sequelize-typescript';
 
 @Table({
   tableName: 'yapague_audit_logs',

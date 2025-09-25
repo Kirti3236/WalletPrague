@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
@@ -19,14 +24,17 @@ import {
   GenerateQrResponseDto,
   PaymentCodeDetailsDto,
   SharePaymentResponseDto,
-  ValidateCodeResponseDto
+  ValidateCodeResponseDto,
 } from './dto/payment-qr.dto';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
 
 function code(n = 4) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return Array.from(
+    { length: n },
+    () => chars[Math.floor(Math.random() * chars.length)],
+  ).join('');
 }
 
 @Injectable()
@@ -47,21 +55,34 @@ export class PaymentsService {
     private readonly responseService: ResponseService,
   ) {}
 
-  async createPaymentRequest(senderUserId: string, senderWalletId: string, amount: string, currency = 'LPS') {
-    const qrPayload = { u: senderUserId, w: senderWalletId, a: amount, c: currency, k: code(4) + '-' + code(4) };
+  async createPaymentRequest(
+    senderUserId: string,
+    senderWalletId: string,
+    amount: string | number,
+    currency = 'LPS',
+  ) {
+    const amountString =
+      typeof amount === 'string' ? amount : amount.toFixed(2);
+    const qrPayload = {
+      u: senderUserId,
+      w: senderWalletId,
+      a: amountString,
+      c: currency,
+      k: code(4) + '-' + code(4),
+    };
     const qr = await QrCode.create({
       id: uuidv4(),
       user_id: senderUserId,
       transaction_id: null,
       qr_type: QrType.PAYMENT_REQUEST,
       qr_data: JSON.stringify(qrPayload),
-      amount,
+      amount: amountString,
       currency,
       status: CommonStatus3.ACTIVE,
       expires_at: new Date(Date.now() + 10 * 60 * 1000),
     } as any);
     return {
-      amount,
+      amount: amountString,
       currency,
       code: qrPayload.k,
       qr_id: qr.id,
@@ -69,19 +90,45 @@ export class PaymentsService {
     };
   }
 
-  async redeemPayment(qrId: string, receiverUserId: string, receiverWalletId: string) {
+  async redeemPayment(
+    qrId: string,
+    receiverUserId: string,
+    receiverWalletId: string,
+  ) {
     return this.sequelize.transaction(async (tx) => {
-      const qr = await QrCode.findByPk(qrId, { transaction: tx, lock: tx.LOCK.UPDATE });
-      if (!qr || qr.status !== CommonStatus3.ACTIVE || (qr.expires_at && qr.expires_at < new Date())) {
+      const qr = await QrCode.findByPk(qrId, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
+      if (
+        !qr ||
+        qr.status !== CommonStatus3.ACTIVE ||
+        (qr.expires_at && qr.expires_at < new Date())
+      ) {
         throw new BadRequestException('invalid_or_expired_qr');
       }
-      const payload = JSON.parse(qr.qr_data) as { u: string; w: string; a: string; c: string };
+      const payload = JSON.parse(qr.qr_data) as {
+        u: string;
+        w: string;
+        a: string;
+        c: string;
+      };
       const amount = parseFloat(payload.a);
-      const senderWallet = await (Wallet as any).findByPk(payload.w, { transaction: tx, lock: tx.LOCK.UPDATE });
-      const receiverWallet = await (Wallet as any).findByPk(receiverWalletId, { transaction: tx, lock: tx.LOCK.UPDATE });
-      if (!senderWallet || !receiverWallet) throw new BadRequestException('wallet_not_found');
-      const senderBal = parseFloat(senderWallet.available_balance as unknown as string);
-      if (senderBal < amount) throw new BadRequestException('insufficient_funds');
+      const senderWallet = await (Wallet as any).findByPk(payload.w, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
+      const receiverWallet = await (Wallet as any).findByPk(receiverWalletId, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
+      if (!senderWallet || !receiverWallet)
+        throw new BadRequestException('wallet_not_found');
+      const senderBal = parseFloat(
+        senderWallet.available_balance as unknown as string,
+      );
+      if (senderBal < amount)
+        throw new BadRequestException('insufficient_funds');
 
       const txn = await (Transaction as any).create(
         {
@@ -128,9 +175,15 @@ export class PaymentsService {
       );
 
       // Update balances
-      senderWallet.available_balance = (senderBal - amount).toFixed(2) as unknown as string;
-      const receiverBal = parseFloat(receiverWallet.available_balance as unknown as string);
-      receiverWallet.available_balance = (receiverBal + amount).toFixed(2) as unknown as string;
+      senderWallet.available_balance = (senderBal - amount).toFixed(
+        2,
+      ) as unknown as string;
+      const receiverBal = parseFloat(
+        receiverWallet.available_balance as unknown as string,
+      );
+      receiverWallet.available_balance = (receiverBal + amount).toFixed(
+        2,
+      ) as unknown as string;
       await senderWallet.save({ transaction: tx });
       await receiverWallet.save({ transaction: tx });
 
@@ -150,9 +203,14 @@ export class PaymentsService {
     });
   }
 
-  async generateQr(dto: GenerateQrDto, lang: string = 'en'): Promise<GenerateQrResponseDto> {
+  async generateQr(
+    dto: GenerateQrDto,
+    lang: string = 'en',
+  ): Promise<GenerateQrResponseDto> {
     try {
       const { user_id, wallet_id, amount, description, currency = 'LPS' } = dto;
+      const amountString =
+        typeof amount === 'string' ? amount : amount.toFixed(2);
 
       if (!user_id) {
         throw new BadRequestException('User ID is required');
@@ -165,7 +223,7 @@ export class PaymentsService {
       }
 
       const wallet = await this.walletModel.findOne({
-        where: { id: wallet_id, user_id }
+        where: { id: wallet_id, user_id },
       });
       if (!wallet) {
         throw new NotFoundException('Wallet not found');
@@ -178,10 +236,10 @@ export class PaymentsService {
       const qrPayload = {
         u: user_id,
         w: wallet_id,
-        a: amount,
+        a: amountString,
         c: currency,
         k: paymentCode,
-        d: description || ''
+        d: description || '',
       };
 
       // Create QR code record
@@ -191,7 +249,7 @@ export class PaymentsService {
         transaction_id: null,
         qr_type: QrType.PAYMENT_REQUEST,
         qr_data: JSON.stringify(qrPayload),
-        amount,
+        amount: amountString,
         currency,
         status: CommonStatus3.ACTIVE,
         expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
@@ -201,20 +259,22 @@ export class PaymentsService {
         qr_id: qr.id,
         code: paymentCode,
         qr_data: JSON.stringify(qrPayload),
-        amount,
+        amount: amountString,
         currency,
         description,
         expires_at: qr.expires_at || new Date(),
-        created_at: qr.createdAt
+        created_at: qr.createdAt,
       };
-
     } catch (error) {
       this.logger.error(`Error generating QR: ${error.message}`, error.stack);
       throw error;
     }
   }
 
-  async getPaymentCodeDetails(dto: GetPaymentCodeDto, lang: string = 'en'): Promise<PaymentCodeDetailsDto> {
+  async getPaymentCodeDetails(
+    dto: GetPaymentCodeDto,
+    lang: string = 'en',
+  ): Promise<PaymentCodeDetailsDto> {
     try {
       const { code: paymentCode, user_id } = dto;
 
@@ -222,24 +282,35 @@ export class PaymentsService {
       const qr = await this.qrCodeModel.findOne({
         where: {
           qr_data: {
-            [Op.like]: `%"k":"${paymentCode}"%`
+            [Op.like]: `%"k":"${paymentCode}"%`,
           },
           status: {
-            [Op.in]: [CommonStatus3.ACTIVE, CommonStatus3.USED, CommonStatus3.EXPIRED]
-          }
+            [Op.in]: [
+              CommonStatus3.ACTIVE,
+              CommonStatus3.USED,
+              CommonStatus3.EXPIRED,
+            ],
+          },
         },
         include: [
           {
             model: User,
             as: 'user',
-            attributes: ['id', 'user_first_name', 'user_last_name', 'user_name'],
-            required: true
-          }
-        ]
+            attributes: [
+              'id',
+              'user_first_name',
+              'user_last_name',
+              'user_name',
+            ],
+            required: true,
+          },
+        ],
       });
 
       if (!qr) {
-        throw new NotFoundException(this.getTranslatedMessage('payments.payment_code_not_found', lang));
+        throw new NotFoundException(
+          this.getTranslatedMessage('payments.payment_code_not_found', lang),
+        );
       }
 
       const qrData = JSON.parse(qr.qr_data);
@@ -257,25 +328,30 @@ export class PaymentsService {
         is_valid: isValid,
         sender: {
           name: `${(qr as any).user?.user_first_name || ''} ${(qr as any).user?.user_last_name || ''}`.trim(),
-          username: (qr as any).user?.user_name || ''
+          username: (qr as any).user?.user_name || '',
         },
         expires_at: qr.expires_at || new Date(),
-        created_at: qr.createdAt
+        created_at: qr.createdAt,
       };
-
     } catch (error) {
-      this.logger.error(`Error getting payment code details: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error getting payment code details: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async sharePayment(dto: SharePaymentDto, lang: string = 'en'): Promise<SharePaymentResponseDto> {
+  async sharePayment(
+    dto: SharePaymentDto,
+    lang: string = 'en',
+  ): Promise<SharePaymentResponseDto> {
     try {
       const { qr_id, user_id, share_method = 'link' } = dto;
 
       // Find QR code
       const qr = await this.qrCodeModel.findOne({
-        where: { id: qr_id, user_id }
+        where: { id: qr_id, user_id },
       });
 
       if (!qr) {
@@ -313,10 +389,9 @@ export class PaymentsService {
           amount: qr.amount || '0.00',
           currency: qr.currency || 'LPS',
           description: qrData.d || '',
-          code: qrData.k
-        }
+          code: qrData.k,
+        },
       };
-
     } catch (error) {
       this.logger.error(`Error sharing payment: ${error.message}`, error.stack);
       throw error;
@@ -336,25 +411,32 @@ export class PaymentsService {
         qrPayload = JSON.parse(qr_data);
       } catch {
         // If not JSON, treat as payment code
-        return await this.redeemByCode({
-          code: qr_data,
-          receiver_user_id: scanner_user_id as string,
-          receiver_wallet_id: scanner_wallet_id
-        }, lang);
+        return await this.redeemByCode(
+          {
+            code: qr_data,
+            receiver_user_id: scanner_user_id,
+            receiver_wallet_id: scanner_wallet_id,
+          },
+          lang,
+        );
       }
 
       // Validate QR payload structure
       if (!qrPayload.k || !qrPayload.u || !qrPayload.w || !qrPayload.a) {
-        throw new BadRequestException(this.getTranslatedMessage('payments.invalid_qr_format', lang));
+        throw new BadRequestException(
+          this.getTranslatedMessage('payments.invalid_qr_format', lang),
+        );
       }
 
       // Use existing redeem logic
-      return await this.redeemByCode({
-        code: qrPayload.k,
-        receiver_user_id: scanner_user_id as string,
-        receiver_wallet_id: scanner_wallet_id
-      }, lang);
-
+      return await this.redeemByCode(
+        {
+          code: qrPayload.k,
+          receiver_user_id: scanner_user_id,
+          receiver_wallet_id: scanner_wallet_id,
+        },
+        lang,
+      );
     } catch (error) {
       this.logger.error(`Error scanning QR: ${error.message}`, error.stack);
       throw error;
@@ -365,25 +447,69 @@ export class PaymentsService {
     try {
       const { code: paymentCode, receiver_user_id, receiver_wallet_id } = dto;
 
-      // Find the QR code
+      // Find QR code by payment code
       const qr = await this.qrCodeModel.findOne({
-        where: { qr_data: paymentCode, status: 'active' }
+        where: {
+          qr_data: {
+            [Op.like]: `%"k":"${paymentCode}"%`,
+          },
+          status: CommonStatus3.ACTIVE,
+        },
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['user_first_name', 'user_last_name'],
+            required: true,
+          },
+        ],
       });
 
       if (!qr) {
-        throw new NotFoundException(this.getTranslatedMessage('payments.payment_code_not_found_or_expired', lang));
+        throw new NotFoundException(
+          this.getTranslatedMessage(
+            'payments.payment_code_not_found_or_expired',
+            lang,
+          ),
+        );
+      }
+
+      // Check if QR code is expired
+      const isExpired = qr.expires_at ? new Date() > qr.expires_at : false;
+      if (isExpired) {
+        throw new BadRequestException(
+          this.getTranslatedMessage('payments.payment_code_expired', lang),
+        );
+      }
+
+      // Check if QR code is already used
+      const isUsed = qr.status === CommonStatus3.USED;
+      if (isUsed) {
+        throw new BadRequestException(
+          this.getTranslatedMessage('payments.payment_code_already_used', lang),
+        );
       }
 
       // Use existing redeem logic
-      return await this.createPaymentRequest(receiver_user_id, receiver_wallet_id, qr.amount?.toString() || '0', qr.currency || 'HNL');
-
+      return await this.createPaymentRequest(
+        receiver_user_id,
+        receiver_wallet_id,
+        qr.amount?.toString() || '0',
+        qr.currency || 'HNL',
+      );
     } catch (error) {
-      this.logger.error(`Error redeeming by code: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error redeeming by code: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async validateCode(dto: ValidateCodeDto, lang: string = 'en'): Promise<ValidateCodeResponseDto> {
+  async validateCode(
+    dto: ValidateCodeDto,
+    lang: string = 'en',
+  ): Promise<ValidateCodeResponseDto> {
     try {
       const { code: paymentCode, user_id } = dto;
 
@@ -391,23 +517,23 @@ export class PaymentsService {
       const qr = await this.qrCodeModel.findOne({
         where: {
           qr_data: {
-            [Op.like]: `%"k":"${paymentCode}"%`
-          }
+            [Op.like]: `%"k":"${paymentCode}"%`,
+          },
         },
         include: [
           {
             model: User,
             as: 'user',
             attributes: ['user_first_name', 'user_last_name'],
-            required: true
-          }
-        ]
+            required: true,
+          },
+        ],
       });
 
       if (!qr) {
         return {
           is_valid: false,
-          message: 'Payment code not found'
+          message: 'Payment code not found',
         };
       }
 
@@ -420,7 +546,7 @@ export class PaymentsService {
           is_valid: false,
           message: 'Payment code has already been used',
           status: qr.status,
-          is_expired: false
+          is_expired: false,
         };
       }
 
@@ -429,7 +555,7 @@ export class PaymentsService {
           is_valid: false,
           message: 'Payment code has expired',
           status: qr.status,
-          is_expired: true
+          is_expired: true,
         };
       }
 
@@ -438,7 +564,7 @@ export class PaymentsService {
           is_valid: false,
           message: 'Payment code is not active',
           status: qr.status,
-          is_expired: isExpired
+          is_expired: isExpired,
         };
       }
 
@@ -453,11 +579,11 @@ export class PaymentsService {
           amount: qr.amount || '0.00',
           currency: qr.currency || 'LPS',
           description: qrData.d || '',
-          sender_name: `${(qr as any).user?.user_first_name || ''} ${(qr as any).user?.user_last_name || ''}`.trim(),
-          expires_at: qr.expires_at || new Date()
-        }
+          sender_name:
+            `${(qr as any).user?.user_first_name || ''} ${(qr as any).user?.user_last_name || ''}`.trim(),
+          expires_at: qr.expires_at || new Date(),
+        },
       };
-
     } catch (error) {
       this.logger.error(`Error validating code: ${error.message}`, error.stack);
       throw error;
@@ -467,7 +593,11 @@ export class PaymentsService {
   /**
    * Get translated message using i18n service with fallback
    */
-  private getTranslatedMessage(key: string, lang: string = 'en', params?: any): string {
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
     try {
       return this.i18n.t(`messages.${key}`, { lang, args: params });
     } catch (error) {

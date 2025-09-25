@@ -1,4 +1,17 @@
-import { Table, Column, DataType, Model, PrimaryKey, Default, AllowNull, ForeignKey, Index, BeforeUpdate, AfterSave, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  Index,
+  BeforeUpdate,
+  AfterSave,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { User } from './user.model';
 import { writeAudit } from '../common/utils/audit.util';
 
@@ -64,7 +77,11 @@ export class Wallet extends Model<Wallet> {
   declare monthly_limit?: string;
 
   // Associations
-  @BelongsTo(() => User, { foreignKey: 'user_id', onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @BelongsTo(() => User, {
+    foreignKey: 'user_id',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   declare user?: User;
 
   @BeforeUpdate
@@ -75,6 +92,10 @@ export class Wallet extends Model<Wallet> {
   @AfterSave
   static logAudit(instance: Wallet, _options: any) {
     const { id, status, available_balance, currency } = instance as any;
-    void writeAudit('wallet', id, 'update', null, { status, available_balance, currency });
+    void writeAudit('wallet', id, 'update', null, {
+      status,
+      available_balance,
+      currency,
+    });
   }
 }
