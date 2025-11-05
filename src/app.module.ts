@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { I18nModule } from 'nestjs-i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -20,7 +21,23 @@ import { BanksModule } from './modules/banks/banks.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
+import { StatementsModule } from './modules/statements/statements.module';
+import { ReconciliationModule } from './modules/reconciliation/reconciliation.module';
+import { RefundsModule } from './modules/refunds/refunds.module';
+import { AMLAlertsModule } from './modules/aml-alerts/aml-alerts.module';
+import { RiskModule } from './modules/risk/risk.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { CommonModule } from './modules/common/common.module';
+import { DisputesModule } from './modules/disputes/disputes.module';
+import { FeesModule } from './modules/fees/fees.module';
+import { SettlementsModule } from './modules/settlements/settlements.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { SeederService } from './seeds/seeder.service';
+import { IdempotencyKey } from './models/idempotency-key.model';
+import { IdempotencyKeyService } from './common/services/idempotency-key.service';
+import { IdempotencyCleanupService } from './common/services/idempotency-cleanup.service';
+import { IdempotentInterceptor } from './common/decorators/idempotent.decorator';
 
 @Module({
   imports: [
@@ -51,6 +68,9 @@ import { SeederService } from './seeds/seeder.service';
       inject: [ConfigService],
     }),
 
+    // Register IdempotencyKey model
+    SequelizeModule.forFeature([IdempotencyKey]),
+
     // Rate limiting (simplified for faster startup)
     ThrottlerModule.forRoot([
       {
@@ -58,6 +78,9 @@ import { SeederService } from './seeds/seeder.service';
         limit: 100, // 100 requests per minute
       },
     ]),
+
+    // Schedule module for background tasks
+    ScheduleModule.forRoot(),
 
     // Internationalization
     I18nModule.forRoot(i18nConfig),
@@ -73,15 +96,37 @@ import { SeederService } from './seeds/seeder.service';
     PaymentMethodsModule,
     TransactionsModule,
     DepositsModule,
+    StatementsModule,
+    ReconciliationModule,
+    RefundsModule,
+    
+    // New Deliverable 3 modules
+    CommonModule,
+    AMLAlertsModule,
+    RiskModule,
+    ReportsModule,
+    DashboardModule,
+    
+    // New modules
+    DisputesModule,
+    FeesModule,
+    SettlementsModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     ResponseService,
     SeederService,
+    IdempotencyKeyService,
+    IdempotencyCleanupService,
     {
       provide: 'APP_FILTER',
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: IdempotentInterceptor,
     },
   ],
 })

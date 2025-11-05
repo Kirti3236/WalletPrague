@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -11,6 +11,8 @@ import { DepositsService } from './deposits.service';
 import { DepositFromCardDto, DepositFromBankDto } from './dto/deposit.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
+// ✅ PHASE 2: Import Idempotent decorator
+import { Idempotent } from '../../common/decorators/idempotent.decorator';
 import { User } from '../../models/user.model';
 
 @ApiTags('🔐 Deposits')
@@ -21,6 +23,9 @@ export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
   @Post('from-card')
+  @HttpCode(HttpStatus.OK)
+  // ✅ PHASE 2: Add Idempotent decorator for retry safety
+  @Idempotent()
   @ApiOperation({
     summary: 'Deposit money from saved card to wallet',
     description: `
@@ -32,6 +37,7 @@ export class DepositsController {
 - Automatic fee calculation
 - Double-entry ledger recording
 - Real-time balance update
+- Idempotent: Safe to retry with same Idempotency-Key header
 
 **Use Cases:**
 - Top up wallet from credit/debit card
@@ -69,6 +75,9 @@ export class DepositsController {
   }
 
   @Post('from-bank')
+  @HttpCode(HttpStatus.OK)
+  // ✅ PHASE 2: Add Idempotent decorator for retry safety
+  @Idempotent()
   @ApiOperation({
     summary: 'Deposit money from saved bank account to wallet',
     description: `
@@ -80,13 +89,14 @@ export class DepositsController {
 - Automatic fee calculation
 - Double-entry ledger recording
 - Real-time balance update
+- Idempotent: Safe to retry with same Idempotency-Key header
 
 **Use Cases:**
-- Top up wallet from bank account
-- Add funds via ACH/bank transfer
+- Top up wallet from linked bank account
+- Add funds for payments and transfers
 - Simulate bank-based deposits
 
-**Note:** This is a simulation - no real bank transfers occur.
+**Note:** This is a simulation - no real payment processing occurs.
     `,
   })
   @ApiOkResponse({ description: 'Deposit completed successfully' })
@@ -97,7 +107,7 @@ export class DepositsController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request - invalid parameters or bank account not found',
+    description: 'Bad request - invalid parameters or account not found',
   })
   @ApiResponse({
     status: 401,

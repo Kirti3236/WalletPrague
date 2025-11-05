@@ -25,6 +25,13 @@ export enum WalletStatus {
   tableName: 'yapague_wallets',
   underscored: true,
   timestamps: true,
+  indexes: [
+    {
+      name: 'wallet_user_currency_uq',
+      unique: true,
+      fields: ['user_id', 'currency'],
+    },
+  ],
 })
 export class Wallet extends Model<Wallet> {
   @PrimaryKey
@@ -34,7 +41,6 @@ export class Wallet extends Model<Wallet> {
 
   @AllowNull(false)
   @ForeignKey(() => User)
-  @Index({ name: 'wallet_user_currency_uq', unique: true })
   @Column({ type: DataType.UUID })
   declare user_id: string;
 
@@ -44,7 +50,6 @@ export class Wallet extends Model<Wallet> {
 
   @AllowNull(false)
   @Default('HNL')
-  @Index({ name: 'wallet_user_currency_uq', unique: true })
   @Column({ type: DataType.STRING(3) })
   declare currency: string; // ISO code
 

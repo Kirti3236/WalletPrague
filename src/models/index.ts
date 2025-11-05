@@ -18,6 +18,19 @@ import { BankLocation } from './bank-location.model';
 import { TxnStatus } from './txn-status.model';
 import { DisputeStatusCatalog } from './dispute-status.model';
 import { FeePolicy } from './fee-policy.model';
+import { AMLAlert } from './aml-alert.model';
+import { BankStatement, BankStatementLine } from './bank-statement.model';
+import { ChartOfAccounts } from './chart-of-accounts.model';
+import { GeneralLedger } from './general-ledger.model';
+import { IdempotencyKey } from './idempotency-key.model';
+import { Journal } from './journal.model';
+import { JournalEntry } from './journal-entry.model';
+import { LimitCounterDaily } from './limit-counter-daily.model';
+import { LimitCounterMonthly } from './limit-counter-monthly.model';
+import { LimitPolicy } from './limit-policy.model';
+import { RefundRequest } from './refund-request.model';
+import { Restriction } from './restriction.model';
+import { UserLimit } from './user-limit.model';
 
 export const models = [
   User,
@@ -37,4 +50,18 @@ export const models = [
   TxnStatus,
   DisputeStatusCatalog,
   FeePolicy,
+  AMLAlert,
+  BankStatement,
+  BankStatementLine,
+  ChartOfAccounts,
+  GeneralLedger,
+  IdempotencyKey,
+  Journal,
+  JournalEntry,
+  LimitCounterDaily,
+  LimitCounterMonthly,
+  LimitPolicy,
+  RefundRequest,
+  Restriction,
+  UserLimit,
 ];

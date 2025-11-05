@@ -29,6 +29,8 @@ import {
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Lang } from '../../common/decorators/lang.decorator';
+// ✅ PHASE 2: Import Idempotent decorator
+import { Idempotent } from '../../common/decorators/idempotent.decorator';
 import { User } from '../../models/user.model';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -127,6 +129,8 @@ export class TransfersController {
 
   @Post('by-dni')
   @HttpCode(HttpStatus.OK)
+  // ✅ PHASE 2: Add Idempotent decorator for retry safety
+  @Idempotent()
   @ApiOperation({
     summary: '🔐 Enhanced P2P transfer using only recipient DNI',
     description: `
@@ -138,6 +142,7 @@ export class TransfersController {
 - Built-in recipient validation
 - Fee calculation and deduction
 - Double-entry ledger recording
+- Idempotent: Safe to retry with same Idempotency-Key header
 
 **Use Cases:**
 - Simple transfers without knowing wallet IDs

@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -18,6 +19,7 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
+import { I18nService } from 'nestjs-i18n';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
 import { RedeemPaymentDto } from './dto/redeem-payment.dto';
@@ -32,6 +34,8 @@ import {
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Lang } from '../../common/decorators/lang.decorator';
+// ✅ PHASE 2: Import Idempotent decorator
+import { Idempotent } from '../../common/decorators/idempotent.decorator';
 import { User } from '../../models/user.model';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
@@ -41,7 +45,10 @@ import { StatusCode } from '../../common/constants/status-codes';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class PaymentsController {
+  private readonly logger = new Logger(PaymentsController.name);
+
   constructor(
+    private readonly i18n: I18nService,
     private readonly paymentsService: PaymentsService,
     private readonly responseService: ResponseService,
   ) {}
@@ -75,8 +82,26 @@ export class PaymentsController {
   }
 
   @Post('redeem')
+  @HttpCode(HttpStatus.OK)
+  // ✅ PHASE 2: Add Idempotent decorator for retry safety
+  @Idempotent()
   @ApiOperation({
     summary: '🔐 Redeem a QR/code payment and transfer between wallets',
+    description: `
+**PRIVATE ENDPOINT** - Redeem a QR code payment and execute the fund transfer.
+
+**Features:**
+- Redeem QR/payment codes
+- Transfer funds from payer to receiver
+- Automatic wallet balance updates
+- Ledger entry recording
+- Idempotent: Safe to retry with same Idempotency-Key header
+
+**Use Cases:**
+- Pay via scanned QR code
+- Complete payment code redemption
+- Finalize merchant transactions
+    `,
   })
   @ApiOkResponse({ description: 'Returns safe transaction summary' })
   @ApiBody({ type: RedeemPaymentDto })
@@ -199,7 +224,9 @@ export class PaymentsController {
     try {
       // Validate code format
       if (!/^[A-Z0-9-]+$/.test(code) || code.length < 8 || code.length > 20) {
-        throw new BadRequestException('Invalid payment code format');
+        throw new BadRequestException(
+          this.getTranslatedMessage('payments.invalid_qr_format', lang),
+        );
       }
 
       const result = await this.paymentsService.getPaymentCodeDetails(
@@ -455,6 +482,19 @@ export class PaymentsController {
       );
     } catch (error) {
       throw error;
+    }
+  }
+
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
+    try {
+      return this.i18n.t(`messages.${key}`, { lang, args: params });
+    } catch (error) {
+      this.logger.warn(`Translation not found for key: ${key}, lang: ${lang}`);
+      return key;
     }
   }
 }

@@ -51,13 +51,16 @@ async function bootstrap() {
 
     // Get API version from configuration and ensure it's just the number
     const apiVersionNumber = configService.get('app.apiVersion') || '1';
+    
+    // Ensure apiVersionNumber is just the number (remove 'v' if present)
+    const cleanVersion = apiVersionNumber.replace(/^v/i, '');
 
-    const apiVersion = `v${apiVersionNumber}`; // Create full version string for display
+    const apiVersion = `v${cleanVersion}`; // Create full version string for display
 
     // API versioning (NestJS adds 'v' automatically to the number)
     app.enableVersioning({
       type: VersioningType.URI,
-      defaultVersion: apiVersionNumber, // Use just '1', NestJS will make it 'v1'
+      defaultVersion: cleanVersion, // Use just '1', NestJS will make it 'v1'
     });
 
     // Global pipes
@@ -134,7 +137,7 @@ The API follows a clean approach with **public** and **private** route categorie
         `,
         )
         .setVersion('1.0')
-        .addServer(`http://localhost:${port}`, 'Development server')
+        .addServer(`http://localhost:${port}/${apiVersion}`, 'Development server')
         .addBearerAuth(
           {
             type: 'http',
@@ -168,7 +171,12 @@ The API follows a clean approach with **public** and **private** route categorie
         .addTag('banks', 'Public bank directory lookups')
         .build();
 
-      const document = SwaggerModule.createDocument(app, config);
+      // Create Swagger document with proper version handling
+      // NestJS versioning already adds /v1/ prefix to routes, so we don't need to add it again
+      const document = SwaggerModule.createDocument(app, config, {
+        operationIdFactory: (controllerKey: string, methodKey: string) =>
+          methodKey,
+      });
       SwaggerModule.setup(
         configService.get('swagger.path') || 'docs',
         app,

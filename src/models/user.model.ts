@@ -56,7 +56,6 @@ export class User extends Model<User> {
   @Column({
     type: DataType.STRING(50),
     allowNull: true,
-    unique: true,
     field: 'user_name',
   })
   declare user_name: string;
@@ -75,7 +74,6 @@ export class User extends Model<User> {
   @Column({
     type: DataType.STRING(20),
     allowNull: false,
-    unique: true,
     field: 'user_DNI_number',
   })
   declare user_DNI_number: string;

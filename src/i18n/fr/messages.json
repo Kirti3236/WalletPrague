@@ -56,5 +56,115 @@
     "maxLength": "{{field}} ne doit pas dépasser {{max}} caractères",
     "phoneNumber": "Veuillez fournir un numéro de téléphone valide",
     "strongPassword": "Le mot de passe doit contenir au moins 8 caractères, incluant majuscules, minuscules et chiffres"
+  },
+  "transfers": {
+    "wallet_not_found": "Portefeuille non trouvé",
+    "insufficient_funds": "Fonds insuffisants pour ce transfert",
+    "sender_not_found": "Expéditeur non trouvé",
+    "recipient_not_found": "Destinataire non trouvé",
+    "transfer_not_found": "Transfert non trouvé",
+    "self_transfer_not_allowed": "Vous ne pouvez pas transférer à vous-même",
+    "recipient_inactive": "Le compte du destinataire n'est pas actif",
+    "no_active_wallets": "Le destinataire n'a pas de portefeuilles actifs",
+    "no_wallet_for_currency": "Le destinataire n'a pas de portefeuille {{currency}} actif",
+    "invalid_transfer_id": "Format d'ID de transfert invalide. Doit être un UUID valide",
+    "recipient_validation_failed": "Échec de la validation du destinataire",
+    "transfer_success": "Transfert effectué avec succès",
+    "recipient_validated": "Destinataire validé avec succès",
+    "transfer_details_retrieved": "Détails du transfert récupérés avec succès"
+  },
+  "payments": {
+    "payment_code_not_found": "Code de paiement non trouvé",
+    "payment_code_not_found_or_expired": "Code de paiement non trouvé ou expiré",
+    "invalid_qr_format": "Format de code QR invalide",
+    "qr_generated": "Code QR généré avec succès",
+    "payment_processed": "Paiement traité avec succès"
+  },
+  "accounting": {
+    "debit_account_not_found": "Compte de débit non trouvé ou inactif",
+    "credit_account_not_found": "Compte de crédit non trouvé ou inactif",
+    "amount_must_be_positive": "Le montant doit être supérieur à zéro",
+    "journal_not_found": "Journal non trouvé ou inactif",
+    "journal_entry_not_found": "Écriture de journal non trouvée",
+    "entry_already_reversed": "Écriture déjà annulée",
+    "account_not_found": "Compte avec ID {{id}} non trouvé",
+    "account_number_exists": "Le numéro de compte {{accountNumber}} existe déjà",
+    "journal_code_exists": "Le code de journal {{journalCode}} existe déjà",
+    "journal_posted_success": "Journal comptabilisé avec succès",
+    "entries_reversed_success": "{{count}} écritures de journal annulées"
+  },
+  "deposits": {
+    "wallet_not_found": "Portefeuille non trouvé",
+    "invalid_amount": "Montant de dépôt invalide",
+    "deposit_created": "Dépôt créé avec succès",
+    "deposit_failed": "Dépôt échoué"
+  },
+  "withdrawals": {
+    "wallet_not_found": "Portefeuille non trouvé",
+    "insufficient_balance": "Solde insuffisant pour le retrait",
+    "invalid_amount": "Montant de retrait invalide",
+    "withdrawal_created": "Retrait créé avec succès",
+    "withdrawal_failed": "Retrait échoué"
+  },
+  "refunds": {
+    "transaction_not_found": "Transaction non trouvée",
+    "refund_not_allowed": "Remboursement non autorisé pour cette transaction",
+    "refund_created": "Remboursement créé avec succès",
+    "refund_failed": "Remboursement échoué"
+  },
+  "aml": {
+    "alert_created": "Alerte AML créée avec succès",
+    "alert_not_found": "Alerte AML non trouvée",
+    "status_updated": "Statut de l'alerte AML mis à jour avec succès",
+    "user_status_retrieved": "Statut AML de l'utilisateur récupéré avec succès"
+  },
+  "restrictions": {
+    "restriction_created": "Restriction créée avec succès",
+    "restriction_removed": "Restriction supprimée avec succès",
+    "restrictions_retrieved": "Restrictions de l'utilisateur récupérées avec succès"
+  },
+  "risk": {
+    "assessment_created": "Évaluation des risques créée avec succès",
+    "assessment_not_found": "Évaluation des risques non trouvée",
+    "assessments_retrieved": "Évaluations des risques récupérées avec succès"
+  },
+  "limits": {
+    "limit_not_found": "Limite non trouvée",
+    "limit_created": "Limite créée avec succès",
+    "limit_updated": "Limite mise à jour avec succès",
+    "limit_deleted": "Limite supprimée avec succès",
+    "limits_retrieved": "Limites récupérées avec succès"
+  },
+  "reports": {
+    "report_generated": "Rapport généré avec succès",
+    "invalid_date_range": "Plage de dates invalide",
+    "no_data_found": "Aucune donnée trouvée pour les critères spécifiés"
+  },
+  "statements": {
+    "statement_generated": "Relevé généré avec succès",
+    "statement_not_found": "Relevé non trouvé"
+  },
+  "reconciliation": {
+    "import_success": "Relevé bancaire importé avec succès",
+    "export_success": "Grand livre exporté avec succès",
+    "reconciliation_success": "Rapprochement terminé avec succès",
+    "file_invalid": "Format de fichier invalide"
+  },
+  "transactions": {
+    "transaction_not_found": "Transaction non trouvée",
+    "transaction_created": "Transaction créée avec succès",
+    "history_retrieved": "Historique des transactions récupéré avec succès"
+  },
+  "wallets": {
+    "wallet_not_found": "Portefeuille non trouvé",
+    "wallet_created": "Portefeuille créé avec succès",
+    "balance_retrieved": "Solde récupéré avec succès"
+  },
+  "dashboard": {
+    "data_retrieved": "Données du tableau de bord récupérées avec succès"
+  },
+  "banks": {
+    "banks_retrieved": "Banques à proximité récupérées avec succès",
+    "bank_not_found": "Banque non trouvée"
   }
 }

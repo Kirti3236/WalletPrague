@@ -377,4 +377,81 @@ export class TransactionsController {
       throw error;
     }
   }
+
+  /**
+   * GET /v1/private/transactions/:id/status - Get transaction status
+   */
+  @Get(':id/status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '🔐 Get transaction status',
+    description: `
+**PRIVATE ENDPOINT** - Get the status of a specific transaction.
+
+**Features:**
+- Transaction status information
+- Status history (if available)
+- Quick status check without full transaction details
+
+**Use Cases:**
+- Check transaction processing status
+- Monitor transaction state
+- Status polling for async operations
+    `,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Transaction ID (UUID)',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction status retrieved successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid transaction ID format',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found or access denied',
+  })
+  async getTransactionStatus(
+    @Param('id') transactionId: string,
+    @GetUser() currentUser: User,
+    @Lang() lang?: string,
+  ) {
+    try {
+      // Validate UUID format
+      if (!this.isValidUUID(transactionId)) {
+        throw new BadRequestException(
+          'Invalid transaction ID format. Must be a valid UUID.',
+        );
+      }
+
+      const transaction = await this.transactionsService.getTransactionDetails(
+        transactionId,
+        currentUser.id,
+        lang,
+      );
+
+      // Return only status information
+      return this.responseService.success(
+        {
+          id: transaction.id,
+          status: transaction.status,
+          processed_at: transaction.processed_at,
+        },
+        StatusCode.SUCCESS,
+        undefined,
+        lang,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
 }

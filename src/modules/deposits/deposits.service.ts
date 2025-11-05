@@ -2,9 +2,11 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { I18nService } from 'nestjs-i18n';
 import { v4 as uuidv4 } from 'uuid';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { Wallet } from '../../models/wallet.model';
@@ -16,13 +18,23 @@ import { Ledger, LedgerEntryType } from '../../models/ledger.model';
 import { FeePolicy } from '../../models/fee-policy.model';
 import { assertLedgerBalanced } from '../common/ledger-balance.guard';
 import { DepositFromCardDto, DepositFromBankDto } from './dto/deposit.dto';
+// ✅ PHASE 2 IMPORTS
+import { LimitValidationService } from '../common/services/limit-validation.service';
+import { AccountingService } from '../common/services/accounting.service';
+import { LimitExceededException } from '../../common/exceptions/app.exception';
 
 @Injectable()
 export class DepositsService {
+  private readonly logger = new Logger(DepositsService.name);
+
   constructor(
+    private readonly i18n: I18nService,
     @InjectModel(PaymentMethod)
     private readonly paymentMethodModel: typeof PaymentMethod,
     private readonly sequelize: Sequelize,
+    // ✅ PHASE 2 SERVICES
+    private readonly limitValidationService: LimitValidationService,
+    private readonly accountingService: AccountingService,
   ) {}
 
   async depositFromCard(dto: DepositFromCardDto) {
@@ -34,7 +46,7 @@ export class DepositsService {
       });
       if (!wallet || wallet.user_id !== dto.user_id) {
         throw new BadRequestException(
-          'Wallet not found or does not belong to user',
+          this.getTranslatedMessage('deposits.wallet_not_found'),
         );
       }
 
@@ -50,15 +62,33 @@ export class DepositsService {
       });
 
       if (!paymentMethod) {
-        throw new NotFoundException('Card not found or not active');
+        throw new NotFoundException(
+          this.getTranslatedMessage('deposits.wallet_not_found'),
+        );
       }
 
       const amount =
         typeof dto.amount === 'string' ? parseFloat(dto.amount) : dto.amount;
       if (amount <= 0) {
-        throw new BadRequestException('Amount must be greater than 0');
+        throw new BadRequestException(
+          this.getTranslatedMessage('deposits.invalid_amount'),
+        );
       }
       const amountString = amount.toFixed(2);
+
+      // ✅ PHASE 2: Validate limits before deposit
+      const limitCheck = await this.limitValidationService.validateTransaction(
+        dto.user_id,
+        amount,
+      );
+      
+      if (!limitCheck.allowed) {
+        throw new LimitExceededException(
+          'Deposit Amount',
+          amount,
+          100000,
+        );
+      }
 
       // Get deposit fee policy (if any)
       const policy = await FeePolicy.findByPk('deposit_fee_card', {
@@ -101,6 +131,27 @@ export class DepositsService {
         { transaction: tx },
       );
 
+      // ✅ PHASE 2: Create double-entry journal entries
+      try {
+        await this.accountingService.createJournalEntry(
+          {
+            journal_id: 'general',
+            entry_date: new Date(),
+            description: `Card deposit from *${paymentMethod.last4}`,
+            debit_account_id: 'cash_account', // Placeholder
+            credit_account_id: wallet.id,
+            amount: amount,
+            transaction_id: txn.id,
+            transaction_type: 'CARD_DEPOSIT',
+          },
+          dto.user_id,
+        );
+      } catch (accountingError) {
+        this.logger.warn(
+          `Failed to create journal entry for deposit ${txn.id}: ${accountingError.message}`,
+        );
+      }
+
       // Update wallet balance
       const currentBalance = parseFloat(
         wallet.available_balance as unknown as string,
@@ -139,7 +190,7 @@ export class DepositsService {
       });
       if (!wallet || wallet.user_id !== dto.user_id) {
         throw new BadRequestException(
-          'Wallet not found or does not belong to user',
+          this.getTranslatedMessage('deposits.wallet_not_found'),
         );
       }
 
@@ -155,15 +206,33 @@ export class DepositsService {
       });
 
       if (!paymentMethod) {
-        throw new NotFoundException('Bank account not found or not active');
+        throw new NotFoundException(
+          this.getTranslatedMessage('deposits.wallet_not_found'),
+        );
       }
 
       const amount =
         typeof dto.amount === 'string' ? parseFloat(dto.amount) : dto.amount;
       if (amount <= 0) {
-        throw new BadRequestException('Amount must be greater than 0');
+        throw new BadRequestException(
+          this.getTranslatedMessage('deposits.invalid_amount'),
+        );
       }
       const amountString = amount.toFixed(2);
+
+      // ✅ PHASE 2: Validate limits before deposit
+      const limitCheck = await this.limitValidationService.validateTransaction(
+        dto.user_id,
+        amount,
+      );
+      
+      if (!limitCheck.allowed) {
+        throw new LimitExceededException(
+          'Deposit Amount',
+          amount,
+          100000,
+        );
+      }
 
       // Get deposit fee policy (if any)
       const policy = await FeePolicy.findByPk('deposit_fee_bank', {
@@ -206,6 +275,27 @@ export class DepositsService {
         { transaction: tx },
       );
 
+      // ✅ PHASE 2: Create double-entry journal entries
+      try {
+        await this.accountingService.createJournalEntry(
+          {
+            journal_id: 'general',
+            entry_date: new Date(),
+            description: `Bank deposit from ${paymentMethod.bank_name}`,
+            debit_account_id: 'cash_account', // Placeholder
+            credit_account_id: wallet.id,
+            amount: amount,
+            transaction_id: txn.id,
+            transaction_type: 'BANK_DEPOSIT',
+          },
+          dto.user_id,
+        );
+      } catch (accountingError) {
+        this.logger.warn(
+          `Failed to create journal entry for bank deposit ${txn.id}: ${accountingError.message}`,
+        );
+      }
+
       // Update wallet balance
       const currentBalance = parseFloat(
         wallet.available_balance as unknown as string,
@@ -233,5 +323,21 @@ export class DepositsService {
         new_balance: wallet.available_balance,
       };
     });
+  }
+
+  /**
+   * Get translated message using i18n service with fallback
+   */
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
+    try {
+      return this.i18n.t(`messages.${key}`, { lang, args: params });
+    } catch (error) {
+      this.logger.warn(`Translation not found for key: ${key}, lang: ${lang}`);
+      return key; // Fallback to key if translation fails
+    }
   }
 }

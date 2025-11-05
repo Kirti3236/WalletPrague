@@ -16,7 +16,10 @@ export const getDatabaseConfig = (
     password: configService.get('database.password'),
     database: configService.get('database.name'),
     models: models as any,
-    synchronize: configService.get('database.synchronize'),
+    autoLoadModels: true,
+    // Auto-sync database schema on startup (initial phase - data loss acceptable)
+    // alter: true will add new tables/columns without dropping existing ones
+    sync: { alter: true },
     logging: dbLogging
       ? (sql: string) => {
           console.log(`🗄️  [DB Query]: ${sql}`);

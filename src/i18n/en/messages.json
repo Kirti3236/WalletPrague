@@ -80,5 +80,92 @@
     "invalid_qr_format": "Invalid QR code format",
     "qr_generated": "QR code generated successfully",
     "payment_processed": "Payment processed successfully"
+  },
+  "accounting": {
+    "debit_account_not_found": "Debit account not found or inactive",
+    "credit_account_not_found": "Credit account not found or inactive",
+    "amount_must_be_positive": "Amount must be greater than zero",
+    "journal_not_found": "Journal not found or inactive",
+    "journal_entry_not_found": "Journal entry not found",
+    "entry_already_reversed": "Entry already reversed",
+    "account_not_found": "Account with ID {{id}} not found",
+    "account_number_exists": "Account number {{accountNumber}} already exists",
+    "journal_code_exists": "Journal code {{journalCode}} already exists",
+    "journal_posted_success": "Journal posted successfully",
+    "entries_reversed_success": "Reversed {{count}} journal entries"
+  },
+  "deposits": {
+    "wallet_not_found": "Wallet not found",
+    "invalid_amount": "Invalid deposit amount",
+    "deposit_created": "Deposit created successfully",
+    "deposit_failed": "Deposit failed"
+  },
+  "withdrawals": {
+    "wallet_not_found": "Wallet not found",
+    "insufficient_balance": "Insufficient balance for withdrawal",
+    "invalid_amount": "Invalid withdrawal amount",
+    "withdrawal_created": "Withdrawal created successfully",
+    "withdrawal_failed": "Withdrawal failed"
+  },
+  "refunds": {
+    "transaction_not_found": "Transaction not found",
+    "refund_not_allowed": "Refund not allowed for this transaction",
+    "refund_created": "Refund created successfully",
+    "refund_failed": "Refund failed"
+  },
+  "aml": {
+    "alert_created": "AML alert created successfully",
+    "alert_not_found": "AML alert not found",
+    "status_updated": "AML alert status updated successfully",
+    "user_status_retrieved": "User AML status retrieved successfully"
+  },
+  "restrictions": {
+    "restriction_created": "Restriction created successfully",
+    "restriction_removed": "Restriction removed successfully",
+    "restrictions_retrieved": "User restrictions retrieved successfully"
+  },
+  "risk": {
+    "assessment_created": "Risk assessment created successfully",
+    "assessment_not_found": "Risk assessment not found",
+    "assessments_retrieved": "Risk assessments retrieved successfully"
+  },
+  "limits": {
+    "limit_not_found": "Limit not found",
+    "limit_created": "Limit created successfully",
+    "limit_updated": "Limit updated successfully",
+    "limit_deleted": "Limit deleted successfully",
+    "limits_retrieved": "Limits retrieved successfully"
+  },
+  "reports": {
+    "report_generated": "Report generated successfully",
+    "invalid_date_range": "Invalid date range",
+    "no_data_found": "No data found for the specified criteria"
+  },
+  "statements": {
+    "statement_generated": "Statement generated successfully",
+    "statement_not_found": "Statement not found"
+  },
+  "reconciliation": {
+    "import_success": "Bank statement imported successfully",
+    "export_success": "Ledger exported successfully",
+    "reconciliation_success": "Reconciliation completed successfully",
+    "file_invalid": "Invalid file format"
+  },
+  "transactions": {
+    "transaction_not_found": "Transaction not found",
+    "transaction_created": "Transaction created successfully",
+    "history_retrieved": "Transaction history retrieved successfully"
+  },
+  "wallets": {
+    "wallet_not_found": "Wallet not found",
+    "wallet_created": "Wallet created successfully",
+    "balance_retrieved": "Balance retrieved successfully"
+  },
+  "dashboard": {
+    "data_retrieved": "Dashboard data retrieved successfully"
+  },
+  "banks": {
+    "banks_retrieved": "Nearby banks retrieved successfully",
+    "bank_not_found": "Bank not found"
   }
 }

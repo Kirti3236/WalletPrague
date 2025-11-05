@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { I18nService } from 'nestjs-i18n';
 import { Op, WhereOptions } from 'sequelize';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { User } from '../../models/user.model';
@@ -25,6 +26,7 @@ export class TransactionsService {
   private readonly logger = new Logger(TransactionsService.name);
 
   constructor(
+    private readonly i18n: I18nService,
     @InjectModel(Transaction)
     private transactionModel: typeof Transaction,
     @InjectModel(User)
@@ -54,7 +56,9 @@ export class TransactionsService {
       // Verify user exists
       const user = await this.userModel.findByPk(user_id);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(
+          this.getTranslatedMessage('transactions.transaction_not_found'),
+        );
       }
 
       // Build where conditions
@@ -181,7 +185,9 @@ export class TransactionsService {
       // Verify user exists
       const user = await this.userModel.findByPk(user_id);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(
+          this.getTranslatedMessage('transactions.transaction_not_found'),
+        );
       }
 
       // Build search conditions
@@ -336,7 +342,9 @@ export class TransactionsService {
       });
 
       if (!transaction) {
-        throw new NotFoundException('Transaction not found');
+        throw new NotFoundException(
+          this.getTranslatedMessage('transactions.transaction_not_found'),
+        );
       }
 
       // Transform detailed transaction
@@ -451,5 +459,18 @@ export class TransactionsService {
       total_sent: totalOutgoing.toFixed(2),
       net_balance: (totalIncoming - totalOutgoing).toFixed(2),
     };
+  }
+
+  private getTranslatedMessage(
+    key: string,
+    lang: string = 'en',
+    params?: any,
+  ): string {
+    try {
+      return this.i18n.t(`messages.${key}`, { lang, args: params });
+    } catch (error) {
+      this.logger.warn(`Translation not found for key: ${key}, lang: ${lang}`);
+      return key;
+    }
   }
 }

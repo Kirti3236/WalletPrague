@@ -25,6 +25,10 @@ import {
 } from './dto/validate-recipient.dto';
 import { ResponseService } from '../../common/services/response.service';
 import { StatusCode } from '../../common/constants/status-codes';
+// ✅ PHASE 2 IMPORTS
+import { LimitValidationService } from '../common/services/limit-validation.service';
+import { AccountingService } from '../common/services/accounting.service';
+import { InsufficientBalanceException, LimitExceededException } from '../../common/exceptions/app.exception';
 
 @Injectable()
 export class TransfersService {
@@ -40,6 +44,9 @@ export class TransfersService {
     @InjectModel(Transaction)
     private transactionModel: typeof Transaction,
     private readonly responseService: ResponseService,
+    // ✅ PHASE 2 SERVICES
+    private readonly limitValidationService: LimitValidationService,
+    private readonly accountingService: AccountingService,
   ) {}
 
   async p2pByDni(
@@ -56,6 +63,21 @@ export class TransfersService {
     const fixedFee = parseFloat(
       (policy?.amount as unknown as string) || '0.50',
     );
+    
+    // ✅ PHASE 2: Validate limits before transfer
+    const limitCheck = await this.limitValidationService.validateTransaction(
+      senderUserId,
+      amountNum,
+    );
+    
+    if (!limitCheck.allowed) {
+      throw new LimitExceededException(
+        'Transfer Amount',
+        amountNum,
+        100000, // Max transfer limit
+      );
+    }
+
     return this.sequelize.transaction(async (tx) => {
       const senderWallet = await (Wallet as any).findByPk(senderWalletId, {
         transaction: tx,
@@ -75,8 +97,10 @@ export class TransfersService {
         senderWallet.available_balance as unknown as string,
       );
       if (senderBal < amt) {
-        throw new BadRequestException(
-          this.getTranslatedMessage('transfers.insufficient_funds'),
+        // ✅ PHASE 2: Use standardized exception
+        throw new InsufficientBalanceException(
+          senderBal,
+          amt,
         );
       }
 
@@ -134,6 +158,27 @@ export class TransfersService {
         ],
         { transaction: tx },
       );
+
+      // ✅ PHASE 2: Create double-entry journal entries
+      try {
+        await this.accountingService.createJournalEntry(
+          {
+            journal_id: 'general', // Use general journal
+            entry_date: new Date(),
+            description: `P2P Transfer: ${description || 'Transferencia P2P'}`,
+            debit_account_id: senderWallet.id,
+            credit_account_id: receiverWallet.id,
+            amount: amountNum,
+            transaction_id: txn.id,
+            transaction_type: 'P2P_TRANSFER',
+          },
+          senderUserId,
+        );
+      } catch (accountingError) {
+        this.logger.warn(
+          `Failed to create journal entry for transaction ${txn.id}: ${accountingError.message}`,
+        );
+      }
 
       // Update balances
       senderWallet.available_balance = (senderBal - amt).toFixed(

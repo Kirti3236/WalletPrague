@@ -81,5 +81,92 @@
     "invalid_qr_format": "Formato de código QR inválido",
     "qr_generated": "Código QR generado exitosamente",
     "payment_processed": "Pago procesado exitosamente"
+  },
+  "accounting": {
+    "debit_account_not_found": "Cuenta de débito no encontrada o inactiva",
+    "credit_account_not_found": "Cuenta de crédito no encontrada o inactiva",
+    "amount_must_be_positive": "El monto debe ser mayor que cero",
+    "journal_not_found": "Diario no encontrado o inactivo",
+    "journal_entry_not_found": "Asiento contable no encontrado",
+    "entry_already_reversed": "Asiento ya revertido",
+    "account_not_found": "Cuenta con ID {{id}} no encontrada",
+    "account_number_exists": "El número de cuenta {{accountNumber}} ya existe",
+    "journal_code_exists": "El código de diario {{journalCode}} ya existe",
+    "journal_posted_success": "Diario contabilizado exitosamente",
+    "entries_reversed_success": "{{count}} asientos contables revertidos"
+  },
+  "deposits": {
+    "wallet_not_found": "Billetera no encontrada",
+    "invalid_amount": "Monto de depósito inválido",
+    "deposit_created": "Depósito creado exitosamente",
+    "deposit_failed": "Depósito fallido"
+  },
+  "withdrawals": {
+    "wallet_not_found": "Billetera no encontrada",
+    "insufficient_balance": "Saldo insuficiente para el retiro",
+    "invalid_amount": "Monto de retiro inválido",
+    "withdrawal_created": "Retiro creado exitosamente",
+    "withdrawal_failed": "Retiro fallido"
+  },
+  "refunds": {
+    "transaction_not_found": "Transacción no encontrada",
+    "refund_not_allowed": "Reembolso no permitido para esta transacción",
+    "refund_created": "Reembolso creado exitosamente",
+    "refund_failed": "Reembolso fallido"
+  },
+  "aml": {
+    "alert_created": "Alerta AML creada exitosamente",
+    "alert_not_found": "Alerta AML no encontrada",
+    "status_updated": "Estado de alerta AML actualizado exitosamente",
+    "user_status_retrieved": "Estado AML del usuario obtenido exitosamente"
+  },
+  "restrictions": {
+    "restriction_created": "Restricción creada exitosamente",
+    "restriction_removed": "Restricción eliminada exitosamente",
+    "restrictions_retrieved": "Restricciones del usuario obtenidas exitosamente"
+  },
+  "risk": {
+    "assessment_created": "Evaluación de riesgo creada exitosamente",
+    "assessment_not_found": "Evaluación de riesgo no encontrada",
+    "assessments_retrieved": "Evaluaciones de riesgo obtenidas exitosamente"
+  },
+  "limits": {
+    "limit_not_found": "Límite no encontrado",
+    "limit_created": "Límite creado exitosamente",
+    "limit_updated": "Límite actualizado exitosamente",
+    "limit_deleted": "Límite eliminado exitosamente",
+    "limits_retrieved": "Límites obtenidos exitosamente"
+  },
+  "reports": {
+    "report_generated": "Reporte generado exitosamente",
+    "invalid_date_range": "Rango de fechas inválido",
+    "no_data_found": "No se encontraron datos para los criterios especificados"
+  },
+  "statements": {
+    "statement_generated": "Estado de cuenta generado exitosamente",
+    "statement_not_found": "Estado de cuenta no encontrado"
+  },
+  "reconciliation": {
+    "import_success": "Estado bancario importado exitosamente",
+    "export_success": "Libro mayor exportado exitosamente",
+    "reconciliation_success": "Conciliación completada exitosamente",
+    "file_invalid": "Formato de archivo inválido"
+  },
+  "transactions": {
+    "transaction_not_found": "Transacción no encontrada",
+    "transaction_created": "Transacción creada exitosamente",
+    "history_retrieved": "Historial de transacciones obtenido exitosamente"
+  },
+  "wallets": {
+    "wallet_not_found": "Billetera no encontrada",
+    "wallet_created": "Billetera creada exitosamente",
+    "balance_retrieved": "Saldo obtenido exitosamente"
+  },
+  "dashboard": {
+    "data_retrieved": "Datos del tablero obtenidos exitosamente"
+  },
+  "banks": {
+    "banks_retrieved": "Bancos cercanos obtenidos exitosamente",
+    "bank_not_found": "Banco no encontrado"
   }
 }
