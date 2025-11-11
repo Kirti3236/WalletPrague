@@ -9,7 +9,7 @@ import * as path from 'path';
 export const i18nConfig: I18nOptions = {
   fallbackLanguage: 'en',
   loaderOptions: {
-    path: path.join(__dirname, '../i18n/'),
+    path: path.join(__dirname, '../../i18n/'),
     watch: false, // Disable file watching to prevent crashes
   },
   resolvers: [

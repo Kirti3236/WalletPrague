@@ -33,6 +33,7 @@ import { DisputesModule } from './modules/disputes/disputes.module';
 import { FeesModule } from './modules/fees/fees.module';
 import { SettlementsModule } from './modules/settlements/settlements.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { RestrictionsModule } from './modules/restrictions/restrictions.module';
 import { SeederService } from './seeds/seeder.service';
 import { IdempotencyKey } from './models/idempotency-key.model';
 import { IdempotencyKeyService } from './common/services/idempotency-key.service';
@@ -112,6 +113,7 @@ import { IdempotentInterceptor } from './common/decorators/idempotent.decorator'
     FeesModule,
     SettlementsModule,
     WebhooksModule,
+    RestrictionsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -114,9 +114,9 @@ export class AuditLog extends Model {
   declare reason: string;
 
   @Column({
-    type: DataType.STRING(15),
+    type: DataType.STRING(45),
     allowNull: true,
-    comment: 'Client IP address',
+    comment: 'Client IP address (supports IPv4 and IPv6)',
   })
   declare ip_address: string;
 

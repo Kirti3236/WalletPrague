@@ -29,7 +29,7 @@ import {
   CheckLimitDto,
 } from '../dtos/limit-policy.dto';
 
-@Controller('limits')
+@Controller('private/limits')
 @ApiTags('💰 User Limits & Risk Management')
 @UseInterceptors(TransformInterceptor)
 export class LimitsController {

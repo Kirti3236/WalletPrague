@@ -11,10 +11,10 @@ import { join } from 'path';
 import { getConnectionToken } from '@nestjs/sequelize';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
+import { AppModule } from './src/app.module';
 
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { LoggingInterceptor } from './src/common/interceptors/logging.interceptor';
+import { TransformInterceptor } from './src/common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   try {
@@ -168,7 +168,31 @@ The API follows a clean approach with **public** and **private** route categorie
         .addTag('🔐 Withdrawals', 'Withdraw funds (mock)')
         .addTag('🔐 Transfers', 'Peer-to-peer transfers')
         .addTag('🔐 Transactions', 'Transaction history and search')
+        .addTag('📊 Transaction Status', 'Transaction status and catalog endpoints')
+        .addTag('📊 Admin Transaction Status', 'Admin transaction status management')
         .addTag('banks', 'Public bank directory lookups')
+        .addTag('🔐 Audit Logs & Compliance', 'Admin audit logs and compliance tracking')
+        .addTag('🔐 Personal Audit Trail', 'User personal audit trail')
+        .addTag('📊 Accounting & Double-Entry Bookkeeping', 'Double-entry accounting system')
+        .addTag('💼 Disputes & Chargebacks', 'User dispute management')
+        .addTag('💼 Admin Disputes', 'Admin dispute management')
+        .addTag('🔔 Webhooks', 'Webhook management and configuration')
+        .addTag('💸 Settlements', 'Settlement management')
+        .addTag('💰 Fees', 'Fee management')
+        .addTag('💰 Admin Fee Management', 'Admin fee policy management')
+        .addTag('🔄 Bank Reconciliation', 'Bank reconciliation operations')
+        .addTag('🏦 Bank Reconciliation', 'Bank reconciliation management')
+        .addTag('💸 Refund Management', 'Refund request management')
+        .addTag('💰 Admin Limit Management', 'Admin limit policy management')
+        .addTag('💰 User Account Limits', 'User account limit checks')
+        .addTag('💰 User Limits & Risk Management', 'User limits and risk management')
+        .addTag('Risk Management', 'Risk evaluation and management')
+        .addTag('AML/Fraud Alerts', 'AML and fraud alert management')
+        .addTag('🛡️ User AML Status', 'User AML status checks')
+        .addTag('Dashboard', 'Dashboard metrics and analytics')
+        .addTag('Reports', 'Financial and compliance reports')
+        .addTag('📋 Statements', 'User statements and exports')
+        .addTag('🔒 Restrictions', 'User restrictions management')
         .build();
 
       // Create Swagger document with proper version handling

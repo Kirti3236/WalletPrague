@@ -386,9 +386,10 @@ export class AuthService {
       user_role: user.user_role,
     };
 
+    const expiresIn = this.configService.get<string>('jwt.expiresIn') || '15m';
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.expiresIn'),
+      expiresIn: expiresIn as any,
     });
   }
 
