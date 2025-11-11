@@ -137,7 +137,7 @@ The API follows a clean approach with **public** and **private** route categorie
         `,
         )
         .setVersion('1.0')
-        .addServer(`http://localhost:${port}/${apiVersion}`, 'Development server')
+        .addServer(`http://localhost:${port}`, 'Development server')
         .addBearerAuth(
           {
             type: 'http',
@@ -200,6 +200,7 @@ The API follows a clean approach with **public** and **private** route categorie
       const document = SwaggerModule.createDocument(app, config, {
         operationIdFactory: (controllerKey: string, methodKey: string) =>
           methodKey,
+        ignoreGlobalPrefix: false, // Keep global prefix (version prefix) in paths
       });
       SwaggerModule.setup(
         configService.get('swagger.path') || 'docs',
