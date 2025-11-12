@@ -12,12 +12,11 @@ import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class GenerateQrDto {
   @ApiProperty({
-    description: 'User ID generating the QR code',
+    description: 'User ID generating the QR code (automatically set from JWT token for security)',
     format: 'uuid',
     required: false,
   })
   @IsOptional()
-  @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id?: string;
 
   @ApiProperty({
@@ -93,12 +92,11 @@ export class SharePaymentDto {
   qr_id: string;
 
   @ApiProperty({
-    description: 'User ID sharing the payment',
+    description: 'User ID sharing the payment (automatically set from JWT token for security)',
     format: 'uuid',
     required: false,
   })
   @IsOptional()
-  @IsUUID(4, { message: 'User ID must be a valid UUID' })
   user_id?: string;
 
   @ApiProperty({
@@ -124,12 +122,11 @@ export class ScanQrDto {
   qr_data: string;
 
   @ApiProperty({
-    description: 'User ID scanning the QR',
+    description: 'User ID scanning the QR (automatically set from JWT token for security - this is the payer)',
     format: 'uuid',
     required: false,
   })
   @IsOptional()
-  @IsUUID(4, { message: 'User ID must be a valid UUID' })
   scanner_user_id?: string;
 
   @ApiProperty({
@@ -158,12 +155,12 @@ export class RedeemByCodeDto {
   code: string;
 
   @ApiProperty({
-    description: 'Receiver user ID',
+    description: 'Receiver user ID (automatically set from JWT token for security - this is the payer)',
     format: 'uuid',
-    required: true,
+    required: false,
   })
-  @IsUUID(4, { message: 'Receiver user ID must be a valid UUID' })
-  receiver_user_id: string;
+  @IsOptional()
+  receiver_user_id?: string;
 
   @ApiProperty({
     description: 'Receiver wallet ID',
@@ -191,12 +188,12 @@ export class ValidateCodeDto {
   code: string;
 
   @ApiProperty({
-    description: 'User ID validating the code',
+    description: 'User ID validating the code (automatically set from JWT token for security)',
     format: 'uuid',
-    required: true,
+    required: false,
   })
-  @IsUUID(4, { message: 'User ID must be a valid UUID' })
-  user_id: string;
+  @IsOptional()
+  user_id?: string;
 }
 
 // Response DTOs

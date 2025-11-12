@@ -5,10 +5,12 @@ import { IsAmount } from '../../../common/validators/amount.validator';
 export class DepositFromCardDto {
   @ApiProperty({
     format: 'uuid',
-    description: 'User ID (will be overridden by JWT)',
+    description: 'User ID (optional - defaults to authenticated user from JWT token)',
+    required: false,
   })
+  @IsOptional()
   @IsUUID()
-  user_id: string;
+  user_id?: string;
 
   @ApiProperty({ format: 'uuid', description: 'Wallet ID to deposit into' })
   @IsUUID()
@@ -44,10 +46,12 @@ export class DepositFromCardDto {
 export class DepositFromBankDto {
   @ApiProperty({
     format: 'uuid',
-    description: 'User ID (will be overridden by JWT)',
+    description: 'User ID (optional - defaults to authenticated user from JWT token)',
+    required: false,
   })
+  @IsOptional()
   @IsUUID()
-  user_id: string;
+  user_id?: string;
 
   @ApiProperty({ format: 'uuid', description: 'Wallet ID to deposit into' })
   @IsUUID()

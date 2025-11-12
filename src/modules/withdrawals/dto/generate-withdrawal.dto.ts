@@ -3,9 +3,13 @@ import { IsUUID, IsString, IsOptional, IsIn } from 'class-validator';
 import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class GenerateWithdrawalDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
-  user_id: string;
+  @ApiProperty({ 
+    format: 'uuid',
+    description: 'User ID (optional - defaults to authenticated user from JWT token)',
+    required: false,
+  })
+  @IsOptional()
+  user_id?: string;
 
   @ApiProperty({ format: 'uuid' })
   @IsUUID()

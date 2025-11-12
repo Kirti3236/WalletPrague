@@ -111,7 +111,7 @@ export class TransfersController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override sender_user_id with current user
+      // SECURITY: Always use authenticated user from JWT token as the sender
       dto.sender_user_id = currentUser.id;
 
       const result = await this.transfersService.validateRecipient(dto, lang);
@@ -173,7 +173,7 @@ export class TransfersController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override sender identifiers with current user
+      // SECURITY: Always use authenticated user from JWT token as the sender
       dto.sender_user_id = currentUser.id;
       if (!dto.sender_wallet_id) {
         // Best effort: use the user's default LPS wallet if sender_wallet_id not provided
@@ -277,9 +277,11 @@ export class TransfersController {
   @ApiOperation({ summary: 'Execute DNI-based P2P transfer with fixed fee' })
   @ApiOkResponse({ description: 'Returns safe transaction summary' })
   @ApiBody({ type: P2PTransferDto })
-  async p2p(@Body() dto: P2PTransferDto) {
+  async p2p(@Body() dto: P2PTransferDto, @GetUser() currentUser: User) {
+    // SECURITY: Always use authenticated user from JWT token as the sender
+    dto.sender_user_id = currentUser.id;
     return this.transfersService.p2pByDni(
-      dto.sender_user_id,
+      dto.sender_user_id!,
       dto.sender_wallet_id,
       dto.receiver_user_id,
       dto.receiver_wallet_id,

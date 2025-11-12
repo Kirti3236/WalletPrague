@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsUUID } from 'class-validator';
 
 export class AddCardDto {
   @ApiProperty({
-    description: 'User ID (overridden from JWT)',
+    description: 'User ID (optional - defaults to authenticated user from JWT token)',
     example: 'ac6b6a56-7c3a-4b61-9fb0-4f7df0f9fa21',
+    required: false,
   })
-  user_id: string;
+  @IsOptional()
+  user_id?: string;
 
   @ApiProperty({ description: 'Card brand', example: 'VISA' })
   brand: string;
@@ -39,10 +42,12 @@ export class AddCardDto {
 
 export class AddBankAccountDto {
   @ApiProperty({
-    description: 'User ID (overridden from JWT)',
+    description: 'User ID (optional - defaults to authenticated user from JWT token)',
     example: 'ac6b6a56-7c3a-4b61-9fb0-4f7df0f9fa21',
+    required: false,
   })
-  user_id: string;
+  @IsOptional()
+  user_id?: string;
 
   @ApiProperty({ description: 'Bank name', example: 'Banco de Centro' })
   bank_name: string;

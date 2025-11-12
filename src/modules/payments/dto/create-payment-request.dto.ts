@@ -3,9 +3,13 @@ import { IsUUID, IsOptional, IsIn } from 'class-validator';
 import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class CreatePaymentRequestDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
-  user_id: string;
+  @ApiProperty({ 
+    format: 'uuid',
+    description: 'User ID (automatically set from JWT token for security)',
+    required: false,
+  })
+  @IsOptional()
+  user_id?: string;
 
   @ApiProperty({ format: 'uuid' })
   @IsUUID()

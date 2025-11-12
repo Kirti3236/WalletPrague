@@ -33,8 +33,10 @@ export class PaymentMethodsController {
   @ApiOperation({ summary: 'Add a static card (mock, no PAN/CVV stored)' })
   @ApiBody({ type: AddCardDto })
   async addCard(@Body() dto: AddCardDto, @GetUser() currentUser: User) {
-    // Always override user_id from JWT to avoid client-side spoofing
+    // Use provided user_id if present, otherwise default to JWT token's user_id
+    if (!dto.user_id) {
     dto.user_id = currentUser.id;
+    }
     return this.service.addStaticCard(dto as any);
   }
 
@@ -47,8 +49,10 @@ export class PaymentMethodsController {
     @Body() dto: AddBankAccountDto,
     @GetUser() currentUser: User,
   ) {
-    // Always override user_id from JWT to avoid client-side spoofing
+    // Use provided user_id if present, otherwise default to JWT token's user_id
+    if (!dto.user_id) {
     dto.user_id = currentUser.id;
+    }
     return this.service.addBankAccount(dto as any);
   }
 

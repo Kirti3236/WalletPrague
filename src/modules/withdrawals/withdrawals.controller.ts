@@ -51,8 +51,10 @@ export class WithdrawalsController {
     @Body() dto: GenerateWithdrawalDto,
     @GetUser() currentUser: User,
   ) {
-    // Override user_id with current user from JWT
+    // Use provided user_id if present, otherwise default to JWT token's user_id
+    if (!dto.user_id) {
     dto.user_id = currentUser.id;
+    }
     const res = await this.withdrawalsService.generateWithdrawal(
       dto.user_id,
       dto.wallet_id,

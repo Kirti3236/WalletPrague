@@ -69,9 +69,12 @@ export class DepositsController {
     @Body() dto: DepositFromCardDto,
     @GetUser() currentUser: User,
   ) {
-    // Override user_id with current user from JWT
+    // Use provided user_id if present, otherwise default to JWT token's user_id
+    if (!dto.user_id) {
     dto.user_id = currentUser.id;
-    return this.depositsService.depositFromCard(dto);
+    }
+    // At this point, user_id is guaranteed to be set
+    return this.depositsService.depositFromCard(dto as Required<DepositFromCardDto>);
   }
 
   @Post('from-bank')
@@ -121,8 +124,11 @@ export class DepositsController {
     @Body() dto: DepositFromBankDto,
     @GetUser() currentUser: User,
   ) {
-    // Override user_id with current user from JWT
+    // Use provided user_id if present, otherwise default to JWT token's user_id
+    if (!dto.user_id) {
     dto.user_id = currentUser.id;
-    return this.depositsService.depositFromBank(dto);
+    }
+    // At this point, user_id is guaranteed to be set
+    return this.depositsService.depositFromBank(dto as Required<DepositFromBankDto>);
   }
 }

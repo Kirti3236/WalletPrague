@@ -37,7 +37,7 @@ export class DepositsService {
     private readonly accountingService: AccountingService,
   ) {}
 
-  async depositFromCard(dto: DepositFromCardDto) {
+  async depositFromCard(dto: Required<DepositFromCardDto>) {
     return this.sequelize.transaction(async (tx) => {
       // Validate wallet belongs to user
       const wallet = await (Wallet as any).findByPk(dto.wallet_id, {
@@ -181,7 +181,7 @@ export class DepositsService {
     });
   }
 
-  async depositFromBank(dto: DepositFromBankDto) {
+  async depositFromBank(dto: Required<DepositFromBankDto>) {
     return this.sequelize.transaction(async (tx) => {
       // Validate wallet belongs to user
       const wallet = await (Wallet as any).findByPk(dto.wallet_id, {

@@ -3,9 +3,13 @@ import { IsUUID, IsOptional, IsIn } from 'class-validator';
 import { IsAmount } from '../../../common/validators/amount.validator';
 
 export class P2PTransferDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
-  sender_user_id: string;
+  @ApiProperty({ 
+    format: 'uuid',
+    description: 'Sender User ID (automatically set from JWT token for security)',
+    required: false,
+  })
+  @IsOptional()
+  sender_user_id?: string;
 
   @ApiProperty({ format: 'uuid' })
   @IsUUID()

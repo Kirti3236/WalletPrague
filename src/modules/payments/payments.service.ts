@@ -503,7 +503,7 @@ export class PaymentsService {
     }
   }
 
-  async redeemByCode(dto: RedeemByCodeDto, lang: string = 'en'): Promise<any> {
+  async redeemByCode(dto: Required<RedeemByCodeDto>, lang: string = 'en'): Promise<any> {
     try {
       const { code: paymentCode, receiver_user_id, receiver_wallet_id } = dto;
 

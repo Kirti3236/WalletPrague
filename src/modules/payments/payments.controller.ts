@@ -71,7 +71,7 @@ export class PaymentsController {
     @Body() dto: CreatePaymentRequestDto,
     @GetUser() currentUser: User,
   ) {
-    // Override user_id with current user from JWT
+    // SECURITY: Always use authenticated user from JWT token as the requester
     dto.user_id = currentUser.id;
     return this.paymentsService.createPaymentRequest(
       dto.user_id,
@@ -106,11 +106,11 @@ export class PaymentsController {
   @ApiOkResponse({ description: 'Returns safe transaction summary' })
   @ApiBody({ type: RedeemPaymentDto })
   async redeem(@Body() dto: RedeemPaymentDto, @GetUser() currentUser: User) {
-    // Override receiver_user_id with current user from JWT
+    // SECURITY: Always use authenticated user from JWT token as the payer
     dto.receiver_user_id = currentUser.id;
     return this.paymentsService.redeemPayment(
       dto.qr_id,
-      dto.receiver_user_id,
+      dto.receiver_user_id!,
       dto.receiver_wallet_id,
     );
   }
@@ -159,7 +159,7 @@ export class PaymentsController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override user_id with current user
+      // SECURITY: Always use authenticated user from JWT token
       dto.user_id = currentUser.id;
 
       const result = await this.paymentsService.generateQr(dto, lang);
@@ -292,7 +292,7 @@ export class PaymentsController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override user_id with current user
+      // SECURITY: Always use authenticated user from JWT token
       dto.user_id = currentUser.id;
 
       const result = await this.paymentsService.sharePayment(dto, lang);
@@ -352,7 +352,7 @@ export class PaymentsController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override scanner_user_id with current user
+      // SECURITY: Always use authenticated user from JWT token as the scanner/payer
       dto.scanner_user_id = currentUser.id;
 
       const result = await this.paymentsService.scanQr(dto, lang);
@@ -412,10 +412,10 @@ export class PaymentsController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override receiver_user_id with current user
+      // SECURITY: Always use authenticated user from JWT token as the payer
       dto.receiver_user_id = currentUser.id;
 
-      const result = await this.paymentsService.redeemByCode(dto, lang);
+      const result = await this.paymentsService.redeemByCode(dto as Required<RedeemByCodeDto>, lang);
 
       return this.responseService.success(
         result,
@@ -469,7 +469,7 @@ export class PaymentsController {
     @Lang() lang?: string,
   ) {
     try {
-      // Override user_id with current user
+      // SECURITY: Always use authenticated user from JWT token
       dto.user_id = currentUser.id;
 
       const result = await this.paymentsService.validateCode(dto, lang);
