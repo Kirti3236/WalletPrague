@@ -83,10 +83,20 @@ export class DepositsService {
       );
       
       if (!limitCheck.allowed) {
+        // Handle case where user has no policy assigned
+        if (limitCheck.reason?.includes('no limit policy') || limitCheck.reason?.includes('policy not found')) {
+          throw new BadRequestException(
+            limitCheck.reason || 'User limit policy not configured. Please contact support.',
+          );
+        }
+        
+        // Handle actual limit exceeded cases
+        const limit = limitCheck.exceeded_limit || 0;
+        const limitType = limitCheck.exceeded_limit_type || 'transaction';
         throw new LimitExceededException(
-          'Deposit Amount',
+          `Deposit ${limitType === 'transaction' ? 'Amount' : limitType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
           amount,
-          100000,
+          limit,
         );
       }
 
@@ -227,10 +237,20 @@ export class DepositsService {
       );
       
       if (!limitCheck.allowed) {
+        // Handle case where user has no policy assigned
+        if (limitCheck.reason?.includes('no limit policy') || limitCheck.reason?.includes('policy not found')) {
+          throw new BadRequestException(
+            limitCheck.reason || 'User limit policy not configured. Please contact support.',
+          );
+        }
+        
+        // Handle actual limit exceeded cases
+        const limit = limitCheck.exceeded_limit || 0;
+        const limitType = limitCheck.exceeded_limit_type || 'transaction';
         throw new LimitExceededException(
-          'Deposit Amount',
+          `Deposit ${limitType === 'transaction' ? 'Amount' : limitType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
           amount,
-          100000,
+          limit,
         );
       }
 

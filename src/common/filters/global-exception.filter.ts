@@ -10,6 +10,7 @@ import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { randomUUID } from 'crypto';
 import { ApiException } from '../exceptions/api.exception';
+import { AppException } from '../exceptions/app.exception';
 import { ResponseService } from '../services/response.service';
 import { StatusCode } from '../constants/status-codes';
 
@@ -30,7 +31,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     let errorResponse: any;
 
-    if (exception instanceof ApiException) {
+    if (exception instanceof AppException) {
+      // Handle AppException and its subclasses (LimitExceededException, etc.)
+      // Use the AppException's built-in response format
+      errorResponse = exception.toResponse();
+    } else if (exception instanceof ApiException) {
       // Handle custom API exceptions
       errorResponse = this.responseService.error(
         exception.statusCode,
@@ -77,12 +82,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     // Log the error with trace ID
+    const traceId = errorResponse.traceId || randomUUID();
+    const statusCode = errorResponse.status || errorResponse.statusCode || 500;
+    const errorCode = errorResponse.code || errorResponse.errorCode || 'UNKNOWN';
+    const message = errorResponse.message || 'Internal server error';
+    
     this.logger.error(
-      `${request.method} ${request.url} - ${errorResponse.status} ${errorResponse.code}: ${errorResponse.message}`,
-      `TraceId: ${errorResponse.traceId}`,
+      `${request.method} ${request.url} - ${statusCode} ${errorCode}: ${message}`,
+      `TraceId: ${traceId}`,
     );
 
-    response.status(errorResponse.status).json(errorResponse);
+    response.status(statusCode).json(errorResponse);
   }
 
   private mapHttpStatusToStatusCode(status: number): StatusCode {

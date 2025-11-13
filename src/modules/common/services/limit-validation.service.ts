@@ -2,12 +2,15 @@ import { Injectable, Inject, BadRequestException, Logger } from '@nestjs/common'
 import { getModelToken } from '@nestjs/sequelize';
 import { I18nService } from 'nestjs-i18n';
 import { UserLimit } from '../../../models/user-limit.model';
+import { LimitPolicy } from '../../../models/limit-policy.model';
 import { LimitPoliciesService } from './limit-policies.service';
 import { LimitCountersService } from './limit-counters.service';
 
 interface LimitCheckResult {
   allowed: boolean;
   reason?: string;
+  exceeded_limit?: number;
+  exceeded_limit_type?: 'transaction' | 'daily_amount' | 'daily_count' | 'monthly_amount' | 'monthly_count';
   remaining_daily_amount?: number;
   remaining_daily_count?: number;
   remaining_monthly_amount?: number;
@@ -37,18 +40,24 @@ export class LimitValidationService {
       // Get user's limit policy
       const userLimit = await this.userLimitModel.findOne({
         where: { user_id: userId },
-        include: [{ association: 'policy' }],
+        include: [{ model: LimitPolicy }],
       });
-
+       
       if (!userLimit) {
         return {
           allowed: false,
           reason: 'User has no limit policy assigned',
         };
       }
-
+      
       const policy = userLimit.policy;
-
+      if (!policy) {
+        return {
+          allowed: false,
+          reason: 'User limit policy not found or not properly loaded',
+        };
+      }
+      
       if (!policy.is_active) {
         return {
           allowed: false,
@@ -61,6 +70,8 @@ export class LimitValidationService {
         return {
           allowed: false,
           reason: `Transaction amount (${amount}) exceeds maximum (${policy.max_transaction_amount})`,
+          exceeded_limit: policy.max_transaction_amount,
+          exceeded_limit_type: 'transaction',
           remaining_daily_amount: policy.max_daily_amount,
           remaining_daily_count: policy.max_daily_count,
           remaining_monthly_amount: policy.max_monthly_amount,
@@ -77,6 +88,8 @@ export class LimitValidationService {
         return {
           allowed: false,
           reason: `Daily amount limit exceeded. Current: ${counters.daily_amount_used}, Limit: ${policy.max_daily_amount}`,
+          exceeded_limit: policy.max_daily_amount,
+          exceeded_limit_type: 'daily_amount',
           remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
           remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
@@ -89,6 +102,8 @@ export class LimitValidationService {
         return {
           allowed: false,
           reason: `Daily transaction count limit exceeded (${policy.max_daily_count})`,
+          exceeded_limit: policy.max_daily_count,
+          exceeded_limit_type: 'daily_count',
           remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
           remaining_daily_count: 0,
           remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
@@ -102,6 +117,8 @@ export class LimitValidationService {
         return {
           allowed: false,
           reason: `Monthly amount limit exceeded. Current: ${counters.monthly_amount_used}, Limit: ${policy.max_monthly_amount}`,
+          exceeded_limit: policy.max_monthly_amount,
+          exceeded_limit_type: 'monthly_amount',
           remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
           remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
@@ -114,6 +131,8 @@ export class LimitValidationService {
         return {
           allowed: false,
           reason: `Monthly transaction count limit exceeded (${policy.max_monthly_count})`,
+          exceeded_limit: policy.max_monthly_count,
+          exceeded_limit_type: 'monthly_count',
           remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
           remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
@@ -145,7 +164,7 @@ export class LimitValidationService {
   async getUserLimitStatus(userId: string) {
     const userLimit = await this.userLimitModel.findOne({
       where: { user_id: userId },
-      include: [{ association: 'policy' }],
+      include: [{ model: LimitPolicy }],
     });
 
     if (!userLimit) {
@@ -156,6 +175,13 @@ export class LimitValidationService {
     }
 
     const policy = userLimit.policy;
+    if (!policy) {
+      return {
+        has_policy: false,
+        message: 'User limit policy not found or not properly loaded',
+      };
+    }
+
     const counters = await this.limitCountersService.getCounterState(userId);
 
     return {
