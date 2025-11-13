@@ -3,6 +3,7 @@ import { Currency } from '../models/currency.model';
 import { TxnStatus } from '../models/txn-status.model';
 import { DisputeStatusCatalog } from '../models/dispute-status.model';
 import { FeePolicy } from '../models/fee-policy.model';
+import { LimitPolicy } from '../models/limit-policy.model';
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../models/user.model';
 import { Wallet } from '../models/wallet.model';
@@ -19,6 +20,7 @@ export class SeederService implements OnModuleInit {
       await this.seedTxnStatuses();
       await this.seedDisputeStatuses();
       await this.seedFeePolicies();
+      await this.seedLimitPolicies();
       await this.ensureDefaultWallets();
       await this.tryDedupeUsers();
       this.logger.log('✅ Database seed completed');
@@ -135,6 +137,65 @@ export class SeederService implements OnModuleInit {
         } as any);
       }
     }
+  }
+
+  private async seedLimitPolicies() {
+    const existingCount = await LimitPolicy.count();
+    
+    if (existingCount > 0) {
+      this.logger.log('Limit policies already seeded');
+      return; // Already seeded
+    }
+
+    const defaultPolicies = [
+      {
+        policy_code: 'standard',
+        policy_name: 'Standard User',
+        max_transaction_amount: 5000,
+        max_daily_amount: 20000,
+        max_monthly_amount: 100000,
+        max_daily_count: 10,
+        max_monthly_count: 100,
+        is_active: true,
+        description: 'Standard user limits for regular P2P transfers',
+      },
+      {
+        policy_code: 'premium',
+        policy_name: 'Premium User',
+        max_transaction_amount: 15000,
+        max_daily_amount: 75000,
+        max_monthly_amount: 500000,
+        max_daily_count: 25,
+        max_monthly_count: 300,
+        is_active: true,
+        description: 'Premium user with higher transaction limits',
+      },
+      {
+        policy_code: 'vip',
+        policy_name: 'VIP User',
+        max_transaction_amount: 50000,
+        max_daily_amount: 250000,
+        max_monthly_amount: 2000000,
+        max_daily_count: 100,
+        max_monthly_count: 1000,
+        is_active: true,
+        description: 'VIP user with maximum limits',
+      },
+      {
+        policy_code: 'restricted',
+        policy_name: 'Restricted User',
+        max_transaction_amount: 1000,
+        max_daily_amount: 5000,
+        max_monthly_amount: 20000,
+        max_daily_count: 5,
+        max_monthly_count: 50,
+        is_active: true,
+        description: 'Restricted user with lower limits for risk management',
+      },
+    ];
+
+    await LimitPolicy.bulkCreate(defaultPolicies as any);
+    this.logger.log('✅ Default limit policies seeded (standard, premium, vip, restricted)');
   }
 
   /**
