@@ -20,14 +20,14 @@ export class LimitPolicy extends Model {
     allowNull: false,
     unique: true,
   })
-  policy_code: string;
+  declare policy_code: string;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: false,
     comment: 'Human-readable policy name',
   })
-  policy_name: string;
+  declare policy_name: string;
 
   @Column({
     type: DataType.DECIMAL(15, 2),
@@ -35,7 +35,7 @@ export class LimitPolicy extends Model {
     defaultValue: 5000.00,
     comment: 'Maximum amount per single transaction',
   })
-  max_transaction_amount: number;
+  declare max_transaction_amount: number;
 
   @Column({
     type: DataType.DECIMAL(15, 2),
@@ -43,7 +43,7 @@ export class LimitPolicy extends Model {
     defaultValue: 20000.00,
     comment: 'Maximum total amount per day',
   })
-  max_daily_amount: number;
+  declare max_daily_amount: number;
 
   @Column({
     type: DataType.DECIMAL(15, 2),
@@ -51,7 +51,7 @@ export class LimitPolicy extends Model {
     defaultValue: 100000.00,
     comment: 'Maximum total amount per month',
   })
-  max_monthly_amount: number;
+  declare max_monthly_amount: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -59,7 +59,7 @@ export class LimitPolicy extends Model {
     defaultValue: 10,
     comment: 'Maximum number of transactions per day',
   })
-  max_daily_count: number;
+  declare max_daily_count: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -67,7 +67,7 @@ export class LimitPolicy extends Model {
     defaultValue: 100,
     comment: 'Maximum number of transactions per month',
   })
-  max_monthly_count: number;
+  declare max_monthly_count: number;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -75,14 +75,14 @@ export class LimitPolicy extends Model {
     defaultValue: true,
     comment: 'Is this policy active and assignable to users',
   })
-  is_active: boolean;
+  declare is_active: boolean;
 
   @Column({
     type: DataType.TEXT,
     allowNull: true,
     comment: 'Description of the policy',
   })
-  description: string;
+  declare description: string;
 
   @ForeignKey(() => User)
   @Column({
@@ -90,27 +90,27 @@ export class LimitPolicy extends Model {
     allowNull: true,
     comment: 'User who created this policy',
   })
-  created_by: string;
+  declare created_by: string;
 
   @BelongsTo(() => User, 'created_by')
-  creator: User;
+  declare creator: User;
 
   @HasMany(() => UserLimit, 'policy_id')
-  user_limits: UserLimit[];
+  declare user_limits: UserLimit[];
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
     defaultValue: DataType.NOW,
   })
-  created_at: Date;
+  declare created_at: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
     defaultValue: DataType.NOW,
   })
-  updated_at: Date;
+  declare updated_at: Date;
 }
 
 // Note: Indexes should be created in database migrations

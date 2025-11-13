@@ -28,7 +28,17 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    const hasRole = requiredRoles.some((role) => user.role === role);
+    // Check user_role field (from User model) or role field (from JWT payload)
+    // Handle both Sequelize model field names and potential variations
+    const userRole = user.user_role || user.role || (user as any).userRole || (user as any).UserRole;
+    
+
+    if (!userRole) {
+      console.error('[RolesGuard] No role found in user object:', Object.keys(user));
+      throw new ForbiddenException('User role not found');
+    }
+    
+    const hasRole = requiredRoles.some((role) => userRole === role);
 
     if (!hasRole) {
       throw new ForbiddenException('Insufficient permissions');

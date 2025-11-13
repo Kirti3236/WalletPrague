@@ -37,21 +37,33 @@ export class LimitValidationService {
     amount: number,
   ): Promise<LimitCheckResult> {
     try {
-      // Get user's limit policy
+      // Get user's limit policy - use raw query to get policy_id reliably
+      let policyId: string | null = null;
+      
+      // Try with raw=true first (returns plain object)
       const userLimit = await this.userLimitModel.findOne({
         where: { user_id: userId },
-        include: [{ model: LimitPolicy }],
+        attributes: ['policy_id'],
+        raw: true, // Get plain object
       });
-       
-      if (!userLimit) {
+      
+      if (userLimit) {
+        policyId = (userLimit as any)?.policy_id;
+      }
+      
+      if (!policyId) {
+        this.logger.warn(`No user limit found for user ${userId}`);
         return {
           allowed: false,
           reason: 'User has no limit policy assigned',
         };
       }
       
-      const policy = userLimit.policy;
+      // Fetch policy
+      const policy = await this.limitPoliciesService.getPolicyById(policyId);
+      
       if (!policy) {
+        this.logger.warn(`Policy not found for user ${userId}, policy_id: ${policyId}`);
         return {
           allowed: false,
           reason: 'User limit policy not found or not properly loaded',
@@ -66,15 +78,20 @@ export class LimitValidationService {
       }
 
       // Check transaction amount limit
-      if (amount > policy.max_transaction_amount) {
+      // Convert DECIMAL fields from strings to numbers
+      const maxTransactionAmount = typeof policy.max_transaction_amount === 'string' 
+        ? parseFloat(policy.max_transaction_amount) 
+        : policy.max_transaction_amount;
+      
+      if (amount > maxTransactionAmount) {
         return {
           allowed: false,
-          reason: `Transaction amount (${amount}) exceeds maximum (${policy.max_transaction_amount})`,
-          exceeded_limit: policy.max_transaction_amount,
+          reason: `Transaction amount (${amount}) exceeds maximum (${maxTransactionAmount})`,
+          exceeded_limit: maxTransactionAmount,
           exceeded_limit_type: 'transaction',
-          remaining_daily_amount: policy.max_daily_amount,
+          remaining_daily_amount: typeof policy.max_daily_amount === 'string' ? parseFloat(policy.max_daily_amount) : policy.max_daily_amount,
           remaining_daily_count: policy.max_daily_count,
-          remaining_monthly_amount: policy.max_monthly_amount,
+          remaining_monthly_amount: typeof policy.max_monthly_amount === 'string' ? parseFloat(policy.max_monthly_amount) : policy.max_monthly_amount,
           remaining_monthly_count: policy.max_monthly_count,
         };
       }
@@ -83,16 +100,19 @@ export class LimitValidationService {
       const counters = await this.limitCountersService.getCounterState(userId);
 
       // Check daily amount limit
+      const maxDailyAmount = typeof policy.max_daily_amount === 'string' ? parseFloat(policy.max_daily_amount) : policy.max_daily_amount;
+      const maxMonthlyAmount = typeof policy.max_monthly_amount === 'string' ? parseFloat(policy.max_monthly_amount) : policy.max_monthly_amount;
+      
       const newDailyAmount = counters.daily_amount_used + amount;
-      if (newDailyAmount > policy.max_daily_amount) {
+      if (newDailyAmount > maxDailyAmount) {
         return {
           allowed: false,
-          reason: `Daily amount limit exceeded. Current: ${counters.daily_amount_used}, Limit: ${policy.max_daily_amount}`,
-          exceeded_limit: policy.max_daily_amount,
+          reason: `Daily amount limit exceeded. Current: ${counters.daily_amount_used}, Limit: ${maxDailyAmount}`,
+          exceeded_limit: maxDailyAmount,
           exceeded_limit_type: 'daily_amount',
-          remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
+          remaining_daily_amount: Math.max(0, maxDailyAmount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
-          remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
+          remaining_monthly_amount: Math.max(0, maxMonthlyAmount - counters.monthly_amount_used),
           remaining_monthly_count: Math.max(0, policy.max_monthly_count - counters.monthly_count_used),
         };
       }
@@ -104,24 +124,24 @@ export class LimitValidationService {
           reason: `Daily transaction count limit exceeded (${policy.max_daily_count})`,
           exceeded_limit: policy.max_daily_count,
           exceeded_limit_type: 'daily_count',
-          remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
+          remaining_daily_amount: Math.max(0, maxDailyAmount - counters.daily_amount_used),
           remaining_daily_count: 0,
-          remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
+          remaining_monthly_amount: Math.max(0, maxMonthlyAmount - counters.monthly_amount_used),
           remaining_monthly_count: Math.max(0, policy.max_monthly_count - counters.monthly_count_used),
         };
       }
 
       // Check monthly amount limit
       const newMonthlyAmount = counters.monthly_amount_used + amount;
-      if (newMonthlyAmount > policy.max_monthly_amount) {
+      if (newMonthlyAmount > maxMonthlyAmount) {
         return {
           allowed: false,
-          reason: `Monthly amount limit exceeded. Current: ${counters.monthly_amount_used}, Limit: ${policy.max_monthly_amount}`,
-          exceeded_limit: policy.max_monthly_amount,
+          reason: `Monthly amount limit exceeded. Current: ${counters.monthly_amount_used}, Limit: ${maxMonthlyAmount}`,
+          exceeded_limit: maxMonthlyAmount,
           exceeded_limit_type: 'monthly_amount',
-          remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
+          remaining_daily_amount: Math.max(0, maxDailyAmount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
-          remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
+          remaining_monthly_amount: Math.max(0, maxMonthlyAmount - counters.monthly_amount_used),
           remaining_monthly_count: Math.max(0, policy.max_monthly_count - counters.monthly_count_used),
         };
       }
@@ -133,9 +153,9 @@ export class LimitValidationService {
           reason: `Monthly transaction count limit exceeded (${policy.max_monthly_count})`,
           exceeded_limit: policy.max_monthly_count,
           exceeded_limit_type: 'monthly_count',
-          remaining_daily_amount: Math.max(0, policy.max_daily_amount - counters.daily_amount_used),
+          remaining_daily_amount: Math.max(0, maxDailyAmount - counters.daily_amount_used),
           remaining_daily_count: Math.max(0, policy.max_daily_count - counters.daily_count_used),
-          remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - counters.monthly_amount_used),
+          remaining_monthly_amount: Math.max(0, maxMonthlyAmount - counters.monthly_amount_used),
           remaining_monthly_count: 0,
         };
       }
@@ -143,9 +163,9 @@ export class LimitValidationService {
       // All checks passed
       return {
         allowed: true,
-        remaining_daily_amount: Math.max(0, policy.max_daily_amount - newDailyAmount),
+        remaining_daily_amount: Math.max(0, maxDailyAmount - newDailyAmount),
         remaining_daily_count: Math.max(0, policy.max_daily_count - (counters.daily_count_used + 1)),
-        remaining_monthly_amount: Math.max(0, policy.max_monthly_amount - newMonthlyAmount),
+        remaining_monthly_amount: Math.max(0, maxMonthlyAmount - newMonthlyAmount),
         remaining_monthly_count: Math.max(0, policy.max_monthly_count - (counters.monthly_count_used + 1)),
       };
     } catch (error) {
@@ -164,7 +184,6 @@ export class LimitValidationService {
   async getUserLimitStatus(userId: string) {
     const userLimit = await this.userLimitModel.findOne({
       where: { user_id: userId },
-      include: [{ model: LimitPolicy }],
     });
 
     if (!userLimit) {
@@ -174,8 +193,14 @@ export class LimitValidationService {
       };
     }
 
-    const policy = userLimit.policy;
+    // Fetch policy separately (more reliable than include)
+    let policy: LimitPolicy | null = null;
+    if (userLimit.policy_id) {
+      policy = await this.limitPoliciesService.getPolicyById(userLimit.policy_id);
+    }
+    
     if (!policy) {
+      this.logger.warn(`Policy not found for user ${userId}, policy_id: ${userLimit.policy_id}`);
       return {
         has_policy: false,
         message: 'User limit policy not found or not properly loaded',
