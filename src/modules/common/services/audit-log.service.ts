@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import * as crypto from 'crypto';
 import { Op } from 'sequelize';
 import { AuditLog, AuditAction } from '../../../models/audit-log.model';
+import { User } from '../../../models/user.model';
 
 interface AuditLogDto {
   user_id?: string;
@@ -153,18 +154,28 @@ export class AuditLogService {
   }
 
   /**
-   * Get audit logs for a specific user
+   * Get audit logs for a specific user (or all users if userId is 'all')
    */
   async getUserAuditLogs(
     userId: string,
     limit: number = 100,
     offset: number = 0,
   ): Promise<{ logs: AuditLog[]; total: number }> {
+    const whereClause = userId === 'all' || !userId ? {} : { user_id: userId };
+    
     const { rows, count } = await this.auditLogModel.findAndCountAll({
-      where: { user_id: userId },
+      where: whereClause,
       order: [['created_at', 'DESC']],
       limit,
       offset,
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'user_first_name', 'user_last_name', 'user_email'],
+          required: false,
+        },
+      ],
     });
 
     return { logs: rows, total: count };
