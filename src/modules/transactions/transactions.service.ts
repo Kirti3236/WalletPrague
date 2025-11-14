@@ -295,12 +295,18 @@ export class TransactionsService {
     lang: string = 'en',
   ): Promise<any> {
     try {
+      // Build where clause - admin can see any transaction
+      const whereClause: any = { id: transactionId };
+      if (userId !== 'admin') {
+        whereClause[Op.or] = [
+          { sender_user_id: userId },
+          { receiver_user_id: userId },
+        ];
+      }
+
       // Find transaction
       const transaction = await this.transactionModel.findOne({
-        where: {
-          id: transactionId,
-          [Op.or]: [{ sender_user_id: userId }, { receiver_user_id: userId }],
-        },
+        where: whereClause,
         include: [
           {
             model: User,

@@ -78,7 +78,10 @@ export class AMLAlertsService {
   }
 
   async reviewAlert(id: string, userId: string, dto: ReviewAMLAlertDto) {
-    const alert = await this.amlAlertModel.findByPk(id);
+    const alert = await this.amlAlertModel.findOne({
+      where: { id },
+      raw: false,
+    });
 
     if (!alert) {
       throw new NotFoundException(
@@ -86,9 +89,12 @@ export class AMLAlertsService {
       );
     }
 
-    if (alert.status !== AlertStatus.PENDING) {
+    // Get raw data to debug
+    const rawAlert = alert.get({ plain: true }) as any;
+    
+    if (!rawAlert.status || rawAlert.status !== 'pending') {
       throw new BadRequestException(
-        this.getTranslatedMessage('aml.alert_not_found'),
+        `Cannot review alert with status: ${rawAlert.status}. Only pending alerts can be reviewed.`,
       );
     }
 

@@ -18,9 +18,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Lang } from '../../common/decorators/lang.decorator';
-import { User } from '../../models/user.model';
+import { User, UserRole } from '../../models/user.model';
 import { TransactionsService } from './transactions.service';
 import {
   TransactionHistoryDto,
@@ -437,6 +439,74 @@ export class TransactionsController {
           status: transaction.status,
           processed_at: transaction.processed_at,
         },
+        StatusCode.SUCCESS,
+        undefined,
+        lang,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+}
+
+// Admin Transactions Controller
+@ApiTags('📊 Admin Transactions')
+@Controller('private/admin/transactions')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth('JWT-auth')
+export class AdminTransactionsController {
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private readonly responseService: ResponseService,
+  ) {}
+
+  @Get()
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'List all transactions (Admin)',
+    description: 'Admin: Get all transactions across all users with filters',
+  })
+  @ApiResponse({ status: 200, description: 'Transactions retrieved successfully' })
+  async getAllTransactions(
+    @Query() dto: TransactionHistoryDto,
+    @Lang() lang?: string,
+  ) {
+    try {
+      // Get all transactions without user restriction for admin
+      const result = await this.transactionsService.getTransactionHistory(
+        dto,
+        undefined, // No user filter for admin
+      );
+      return this.responseService.success(
+        result,
+        StatusCode.SUCCESS,
+        undefined,
+        lang,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get(':id')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get transaction details (Admin)',
+    description: 'Admin: Get detailed information about any transaction',
+  })
+  @ApiResponse({ status: 200, description: 'Transaction details retrieved' })
+  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  async getTransactionDetails(
+    @Param('id') transactionId: string,
+    @Lang() lang?: string,
+  ) {
+    try {
+      // Admin can view any transaction without userId restriction
+      const transaction = await this.transactionsService.getTransactionDetails(transactionId, 'admin', lang);
+      return this.responseService.success(
+        transaction,
         StatusCode.SUCCESS,
         undefined,
         lang,
