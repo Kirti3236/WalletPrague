@@ -53,7 +53,7 @@ export class WithdrawalsController {
   ) {
     // Use provided user_id if present, otherwise default to JWT token's user_id
     if (!dto.user_id) {
-    dto.user_id = currentUser.id;
+      dto.user_id = currentUser.id;
     }
     const res = await this.withdrawalsService.generateWithdrawal(
       dto.user_id,
@@ -61,6 +61,10 @@ export class WithdrawalsController {
       dto.amount,
       dto.currency ?? 'LPS',
     );
-    return res;
+    return {
+      success: true,
+      message: 'Withdrawal code generated successfully',
+      data: res,
+    };
   }
 }

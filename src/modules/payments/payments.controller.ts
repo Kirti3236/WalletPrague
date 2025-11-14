@@ -73,12 +73,17 @@ export class PaymentsController {
   ) {
     // SECURITY: Always use authenticated user from JWT token as the requester
     dto.user_id = currentUser.id;
-    return this.paymentsService.createPaymentRequest(
+    const result = await this.paymentsService.createPaymentRequest(
       dto.user_id,
       dto.wallet_id,
       dto.amount,
       dto.currency ?? 'LPS',
     );
+    return {
+      success: true,
+      message: 'Payment request created successfully',
+      data: result,
+    };
   }
 
   @Post('redeem')
@@ -108,11 +113,16 @@ export class PaymentsController {
   async redeem(@Body() dto: RedeemPaymentDto, @GetUser() currentUser: User) {
     // SECURITY: Always use authenticated user from JWT token as the payer
     dto.receiver_user_id = currentUser.id;
-    return this.paymentsService.redeemPayment(
+    const result = await this.paymentsService.redeemPayment(
       dto.qr_id,
       dto.receiver_user_id!,
       dto.receiver_wallet_id,
     );
+    return {
+      success: true,
+      message: 'Payment redeemed successfully',
+      data: result,
+    };
   }
 
   @Post('generate-qr')
@@ -237,12 +247,9 @@ export class PaymentsController {
         lang,
       );
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // For GET requests, TransformInterceptor will wrap the response
+      // Return raw data to avoid double-nesting
+      return result;
     } catch (error) {
       throw error;
     }

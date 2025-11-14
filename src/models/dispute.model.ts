@@ -40,10 +40,24 @@ export class Dispute extends Model<Dispute> {
   @Column({ type: DataType.UUID, allowNull: false })
   declare transaction_id: string;
 
+  @BelongsTo(() => Transaction, {
+    foreignKey: 'transaction_id',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  declare transaction?: Transaction;
+
   @ForeignKey(() => User)
   @Index
   @Column({ type: DataType.UUID, allowNull: false })
   declare user_id: string;
+
+  @BelongsTo(() => User, {
+    foreignKey: 'user_id',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  declare user?: User;
 
   @AllowNull(false)
   @Column({ type: DataType.ENUM(...Object.values(DisputeType)) })

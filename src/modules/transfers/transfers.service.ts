@@ -215,6 +215,14 @@ export class TransfersService {
       // Use identifier as the primary field, fallback to recipient_dni for backward compatibility
       const recipientDni = identifier || recipient_dni;
 
+      // Validate that at least one identifier is provided
+      if (!recipientDni) {
+        throw new BadRequestException(
+          this.getTranslatedMessage('transfers.recipient_identifier_required', lang) || 
+          'Recipient identifier (DNI) is required',
+        );
+      }
+
       // Check if sender exists
       const sender = await this.userModel.findByPk(sender_user_id);
       if (!sender) {
@@ -383,7 +391,7 @@ export class TransfersService {
   async getTransferConfirmation(
     dto: TransferConfirmationDto,
     lang: string = 'en',
-  ): Promise<TransferConfirmationResponseDto> {
+  ): Promise<any> {
     try {
       const { transaction_id, user_id } = dto;
 
@@ -438,22 +446,23 @@ export class TransfersService {
         );
       }
 
+      // Return transfer details directly for GET endpoint
+      // The controller will handle wrapping
       return {
-        success: true,
-        message: this.getTranslatedMessage(
-          'transfers.transfer_details_retrieved',
-          lang,
-        ),
-        transfer: {
-          id: transaction.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          currency: transaction.currency,
-          status: transaction.status,
-          description: transaction.description,
-          created_at:
-            transaction.createdAt?.toISOString() || new Date().toISOString(),
-        },
+        transaction_id: transaction.id,
+        type: transaction.type,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status,
+        description: transaction.description,
+        sender_name: (transaction as any).senderUser?.user_first_name 
+          ? `${(transaction as any).senderUser.user_first_name} ${(transaction as any).senderUser.user_last_name}`.trim()
+          : 'Unknown',
+        recipient_name: (transaction as any).receiverUser?.user_first_name
+          ? `${(transaction as any).receiverUser.user_first_name} ${(transaction as any).receiverUser.user_last_name}`.trim()
+          : 'Unknown',
+        created_at:
+          transaction.createdAt?.toISOString() || new Date().toISOString(),
       };
     } catch (error) {
       this.logger.error(

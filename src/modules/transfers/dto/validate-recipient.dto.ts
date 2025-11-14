@@ -15,13 +15,14 @@ export class ValidateRecipientDto {
   @ApiProperty({
     description: 'Recipient identifier (DNI or phone)',
     example: '0801199012345',
+    required: false,
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  identifier: string;
+  identifier?: string;
 
   @ApiPropertyOptional({
-    description: 'Recipient DNI number',
+    description: 'Recipient DNI number (alternative to identifier)',
     example: '0801199012345',
   })
   @IsOptional()

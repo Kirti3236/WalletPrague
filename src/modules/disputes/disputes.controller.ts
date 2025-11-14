@@ -70,7 +70,9 @@ export class UserDisputesController {
     @Lang() lang?: string,
   ) {
     const result = await this.disputesService.getUserDisputes(user.id, query);
-    return this.responseService.success(result, StatusCode.SUCCESS, undefined, lang);
+    // For GET requests, TransformInterceptor will wrap the response
+    // Return raw data to avoid double-nesting
+    return result;
   }
 
   /**
@@ -90,7 +92,9 @@ export class UserDisputesController {
     @Lang() lang?: string,
   ) {
     const dispute = await this.disputesService.getDisputeById(disputeId, user.id);
-    return this.responseService.success(dispute, StatusCode.SUCCESS, undefined, lang);
+    // For GET requests, TransformInterceptor will wrap the response
+    // Return raw data to avoid double-nesting
+    return dispute;
   }
 }
 

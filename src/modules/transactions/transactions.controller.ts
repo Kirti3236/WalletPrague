@@ -192,12 +192,9 @@ export class TransactionsController {
         lang,
       );
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // For GET requests, TransformInterceptor will wrap the response
+      // Return raw data to avoid double-nesting
+      return result;
     } catch (error) {
       throw error;
     }
@@ -294,12 +291,9 @@ export class TransactionsController {
         lang,
       );
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // For GET requests, TransformInterceptor will wrap the response
+      // Return raw data to avoid double-nesting
+      return result;
     } catch (error) {
       throw error;
     }
@@ -367,12 +361,9 @@ export class TransactionsController {
         lang,
       );
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // For GET requests, TransformInterceptor will wrap the response
+      // Return raw data to avoid double-nesting
+      return result;
     } catch (error) {
       throw error;
     }

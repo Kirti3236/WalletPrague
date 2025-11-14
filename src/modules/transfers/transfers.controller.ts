@@ -116,12 +116,12 @@ export class TransfersController {
 
       const result = await this.transfersService.validateRecipient(dto, lang);
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // Wrap for POST requests to ensure consistent format
+      return {
+        success: true,
+        message: 'Recipient validation completed',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -262,12 +262,9 @@ export class TransfersController {
         lang,
       );
 
-      return this.responseService.success(
-        result,
-        StatusCode.SUCCESS,
-        undefined,
-        lang,
-      );
+      // For GET requests, TransformInterceptor will wrap the response
+      // Return raw data to avoid double-nesting
+      return result;
     } catch (error) {
       throw error;
     }
@@ -280,7 +277,7 @@ export class TransfersController {
   async p2p(@Body() dto: P2PTransferDto, @GetUser() currentUser: User) {
     // SECURITY: Always use authenticated user from JWT token as the sender
     dto.sender_user_id = currentUser.id;
-    return this.transfersService.p2pByDni(
+    const result = await this.transfersService.p2pByDni(
       dto.sender_user_id!,
       dto.sender_wallet_id,
       dto.receiver_user_id,
@@ -289,5 +286,10 @@ export class TransfersController {
       dto.description,
       dto.currency ?? 'LPS',
     );
+    return {
+      success: true,
+      message: 'P2P transfer completed successfully',
+      data: result,
+    };
   }
 }
