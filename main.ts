@@ -95,9 +95,13 @@ async function bootstrap() {
     );
 
     const port = configService.get('app.port') || 3000;
+    // Get base URL from config (falls back to localhost for development)
+    const baseUrl = configService.get('app.baseUrl') || `http://localhost:${port}`;
+    const isProduction = configService.get('app.nodeEnv') === 'production';
 
     // Swagger documentation
     if (configService.get('swagger.enabled')) {
+      
       const config = new DocumentBuilder()
         .setTitle('YaPague! Payment Management System API')
         .setDescription(
@@ -137,7 +141,7 @@ The API follows a clean approach with **public** and **private** route categorie
         `,
         )
         .setVersion('1.0')
-        .addServer(`http://localhost:${port}`, 'Development server')
+        .addServer(baseUrl, isProduction ? 'Production server' : 'Server')
         .addBearerAuth(
           {
             type: 'http',
@@ -227,8 +231,6 @@ The API follows a clean approach with **public** and **private** route categorie
     // Start the server
     await app.listen(port);
 
-    // Get base URL from config (falls back to localhost for development)
-    const baseUrl = configService.get('app.baseUrl') || `http://localhost:${port}`;
     const swaggerPath = configService.get('swagger.path') || 'docs';
 
     console.log(`🚀 YaPague! Server started.`);
