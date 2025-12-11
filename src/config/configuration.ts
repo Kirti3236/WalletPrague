@@ -7,6 +7,7 @@ export const configValidationSchema = Joi.object({
     .default('development'),
   PORT: Joi.number().default(3000),
   API_VERSION: Joi.string().required(),
+  BASE_URL: Joi.string().uri().optional(),
 
   // Database
   DB_HOST: Joi.string().required(),

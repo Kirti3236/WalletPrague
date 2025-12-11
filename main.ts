@@ -227,17 +227,15 @@ The API follows a clean approach with **public** and **private** route categorie
     // Start the server
     await app.listen(port);
 
+    // Get base URL from config (falls back to localhost for development)
+    const baseUrl = configService.get('app.baseUrl') || `http://localhost:${port}`;
+    const swaggerPath = configService.get('swagger.path') || 'docs';
+
     console.log(`🚀 YaPague! Server started.`);
-    console.log(`🌐 Server: http://localhost:${port}`);
-    console.log(
-      `📚 Swagger: http://localhost:${port}/${configService.get('swagger.path') || 'docs'}`,
-    );
-    console.log(
-      `🔑 Public routes: http://localhost:${port}/${apiVersion}/public/*`,
-    );
-    console.log(
-      `🔒 Private routes: http://localhost:${port}/${apiVersion}/private/*`,
-    );
+    console.log(`🌐 Server: ${baseUrl}`);
+    console.log(`📚 Swagger: ${baseUrl}/${swaggerPath}`);
+    console.log(`🔑 Public routes: ${baseUrl}/${apiVersion}/public/*`);
+    console.log(`🔒 Private routes: ${baseUrl}/${apiVersion}/private/*`);
 
     // Test database connection
     try {
