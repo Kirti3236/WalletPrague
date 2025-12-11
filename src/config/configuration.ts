@@ -26,8 +26,42 @@ export const configValidationSchema = Joi.object({
   // Security
   BCRYPT_ROUNDS: Joi.number().min(10).max(15).default(12),
   SESSION_SECRET: Joi.string().min(32).required(),
-  ENCRYPTION_KEY: Joi.string().length(32).required(),
-  ENCRYPTION_IV: Joi.string().length(16).required(),
+  ENCRYPTION_KEY: Joi.string().custom((value, helpers) => {
+    // Allow raw 32-character string
+    if (value.length === 32) {
+      return value;
+    }
+    // Allow base64-encoded string that decodes to 32 bytes
+    try {
+      const decoded = Buffer.from(value, 'base64');
+      if (decoded.length === 32) {
+        return value;
+      }
+    } catch (e) {
+      // Not valid base64, will fail validation below
+    }
+    return helpers.error('string.encryptionKey');
+  }, 'encryption key validation').required().messages({
+    'string.encryptionKey': 'ENCRYPTION_KEY must be 32 characters or base64-encoded 32 bytes',
+  }),
+  ENCRYPTION_IV: Joi.string().custom((value, helpers) => {
+    // Allow raw 16-character string
+    if (value.length === 16) {
+      return value;
+    }
+    // Allow base64-encoded string that decodes to 16 bytes
+    try {
+      const decoded = Buffer.from(value, 'base64');
+      if (decoded.length === 16) {
+        return value;
+      }
+    } catch (e) {
+      // Not valid base64, will fail validation below
+    }
+    return helpers.error('string.encryptionIv');
+  }, 'encryption IV validation').required().messages({
+    'string.encryptionIv': 'ENCRYPTION_IV must be 16 characters or base64-encoded 16 bytes',
+  }),
 
   // Rate Limiting
   RATE_LIMIT_TTL: Joi.number().default(60),
