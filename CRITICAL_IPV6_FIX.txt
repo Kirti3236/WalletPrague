@@ -1,0 +1,137 @@
+================================================================================
+  CRITICAL: IPv6 Connection Issue - Alternative Solutions
+================================================================================
+
+PROBLEM:
+- Supabase hostname resolves to IPv6 address
+- Render's network doesn't support IPv6 connections
+- Both port 5432 and 6543 are failing with IPv6
+
+ERROR: "connect ENETUNREACH 2600:1f13:838:6e0d:eb50:56b0:bc5c:7375:6543"
+
+================================================================================
+SOLUTION 1: Use Supabase IPv4-Only Connection String (RECOMMENDED)
+================================================================================
+
+Supabase provides IPv4-only connection strings. Try this:
+
+1. Go to Supabase Dashboard → Settings → Database
+2. Look for "Connection string" section
+3. Find "IPv4" or "Direct connection" option
+4. Some Supabase projects have separate IPv4 endpoints
+
+OR
+
+Try using the pooler with IPv4:
+- Connection pooling → Session mode → Look for IPv4 option
+- Use that hostname instead
+
+================================================================================
+SOLUTION 2: Use Connection URI Instead of Separate Fields
+================================================================================
+
+Instead of separate DB_HOST, DB_PORT, etc., use a connection URI:
+
+1. In Supabase, get the full connection string:
+   postgresql://postgres:[PASSWORD]@db.klnbdurpeojayizubunc.supabase.co:6543/postgres
+
+2. In Render, add this as ONE variable:
+   DATABASE_URL = postgresql://postgres:[PASSWORD]@db.klnbdurpeojayizubunc.supabase.co:6543/postgres
+
+3. Update your code to use DATABASE_URL if available
+
+This sometimes forces IPv4 resolution.
+
+================================================================================
+SOLUTION 3: Check Supabase Project Region
+================================================================================
+
+1. Go to Supabase Dashboard → Settings → General
+2. Check your project's region
+3. Some regions might have IPv6-only endpoints
+4. Consider creating a new project in a different region (if possible)
+5. Or contact Supabase support about IPv4 endpoint
+
+================================================================================
+SOLUTION 4: Use Supabase REST API Instead (Temporary Workaround)
+================================================================================
+
+If database connection keeps failing, you could:
+1. Use Supabase REST API for some operations
+2. But this requires significant code changes
+3. Not recommended unless absolutely necessary
+
+================================================================================
+SOLUTION 5: Contact Supabase Support
+================================================================================
+
+This is a known issue with some Supabase projects:
+1. Go to Supabase Dashboard → Support
+2. Ask for IPv4-only connection endpoint
+3. Or ask how to force IPv4 connections
+4. They may provide a different hostname
+
+================================================================================
+SOLUTION 6: Try Different Supabase Connection Method
+================================================================================
+
+In Supabase Dashboard → Settings → Database:
+
+1. Look for "Connection modes" or "Connection types"
+2. Try "Transaction mode" instead of "Session mode"
+3. Or try "Direct connection" instead of "Pooler"
+4. Different modes might use different network paths
+
+================================================================================
+IMMEDIATE ACTION ITEMS
+================================================================================
+
+1. ✅ Check Supabase Dashboard for IPv4 connection option
+2. ✅ Try using full connection URI (DATABASE_URL)
+3. ✅ Verify Supabase project is in a region that supports IPv4
+4. ✅ Contact Supabase support if needed
+5. ✅ Consider using Neon instead (they have better IPv4 support)
+
+================================================================================
+ALTERNATIVE: Switch to Neon Database
+================================================================================
+
+If Supabase continues to have IPv6 issues, consider Neon:
+
+1. Neon has better IPv4 support
+2. Free tier: 3GB (more than Supabase's 500MB)
+3. Similar PostgreSQL setup
+4. Usually resolves to IPv4 by default
+
+Steps:
+1. Create Neon account: https://neon.tech
+2. Create new project
+3. Get connection string
+4. Update DB_HOST, DB_PORT, etc. in Render
+5. Migrate data if needed
+
+================================================================================
+CHECKLIST
+================================================================================
+
+[ ] Checked Supabase for IPv4-only connection option
+[ ] Tried using full connection URI (DATABASE_URL)
+[ ] Verified project region supports IPv4
+[ ] Contacted Supabase support
+[ ] Considered switching to Neon as alternative
+
+================================================================================
+MOST LIKELY SOLUTION
+================================================================================
+
+The issue is that Supabase's hostname is resolving to IPv6 first.
+
+Try this:
+1. In Supabase Dashboard, look for "Connection string" with IPv4 option
+2. OR use the full connection URI format
+3. OR contact Supabase support for IPv4 endpoint
+
+If none work, consider switching to Neon database (better IPv4 support).
+
+================================================================================
+

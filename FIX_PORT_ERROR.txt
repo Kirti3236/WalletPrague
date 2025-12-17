@@ -1,0 +1,110 @@
+================================================================================
+  FIXED: PORT Validation Error
+================================================================================
+
+ERROR YOU GOT:
+"Config validation error: "PORT" must be a number"
+
+CAUSE:
+- Render automatically sets PORT as a string (e.g., "10000")
+- Your Joi validation expected a number
+- Validation failed because string ≠ number
+
+SOLUTION APPLIED:
+✅ Updated configuration.ts to accept PORT as both string and number
+✅ PORT will now be automatically converted to a number
+✅ Also fixed other number fields (DB_PORT, BCRYPT_ROUNDS, etc.)
+
+================================================================================
+WHAT TO DO NOW
+================================================================================
+
+1. COMMIT AND PUSH THE FIX:
+   - The fix is in: src/config/configuration.ts
+   - Commit the changes
+   - Push to GitHub
+   - Render will automatically redeploy
+
+2. REMOVE PORT FROM RENDER ENVIRONMENT VARIABLES (IMPORTANT!):
+   - Go to Render Dashboard → Your Service → Environment
+   - If you added PORT as an environment variable, DELETE it
+   - Render sets PORT automatically - you don't need to add it
+   - Having PORT in env vars can cause conflicts
+
+3. WAIT FOR REDEPLOY:
+   - Render will detect the new commit
+   - It will rebuild and redeploy automatically
+   - Check the logs - the error should be gone
+
+================================================================================
+QUICK STEPS
+================================================================================
+
+1. Git add, commit, push:
+   git add src/config/configuration.ts
+   git commit -m "fix: allow PORT to be string or number for Render compatibility"
+   git push
+
+2. In Render Dashboard:
+   - Go to Environment Variables
+   - Delete PORT if it exists
+   - Save changes
+
+3. Wait for deployment:
+   - Check build logs
+   - Error should be resolved
+
+================================================================================
+WHY THIS HAPPENED
+================================================================================
+
+Environment variables are ALWAYS strings in Node.js:
+- process.env.PORT = "10000" (string)
+- But Joi expected: 10000 (number)
+
+Render sets PORT automatically as a string, so we need to:
+- Accept string values
+- Convert them to numbers
+- Or make them optional
+
+The fix allows both string and number, and converts strings to numbers.
+
+================================================================================
+OTHER FIELDS FIXED
+================================================================================
+
+Also made these optional to prevent similar issues:
+- DB_PORT
+- BCRYPT_ROUNDS
+- RATE_LIMIT_TTL
+- RATE_LIMIT_LIMIT
+- LOG_RETENTION_DAYS
+- TRANSACTION_RETENTION_DAYS
+- SESSION_RETENTION_DAYS
+
+These will now work even if set as strings in environment variables.
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After redeploy, check logs for:
+✅ No "PORT must be a number" error
+✅ Application starts successfully
+✅ "Application is running on port..." message
+
+If you still see errors, check:
+- All required environment variables are set
+- No typos in variable names
+- Database credentials are correct
+
+================================================================================
+END OF FIX GUIDE
+================================================================================
+
+The code is fixed! Just commit, push, and remove PORT from Render env vars.
+
+Good luck! 🚀
+
+================================================================================
+

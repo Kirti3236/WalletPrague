@@ -1,0 +1,354 @@
+================================================================================
+  COMPLETE ENVIRONMENT VARIABLES LIST
+  Add These to Render.com Environment Variables Section
+================================================================================
+
+Based on your code configuration, here are ALL the environment variables you need.
+
+Add them ONE BY ONE in the Render Environment Variables section.
+
+================================================================================
+HOW TO ADD VARIABLES IN RENDER
+================================================================================
+
+1. In the "NAME_OF_VARIABLE" field → Enter the variable name
+2. In the "value" field → Enter the actual value
+3. Click "Add Environment Variable" to add another one
+4. Repeat for all variables below
+
+================================================================================
+REQUIRED VARIABLES (Add These First)
+================================================================================
+
+GROUP 1: APPLICATION SETTINGS
+-----------------------------
+NAME: NODE_ENV
+VALUE: production
+
+NAME: PORT
+VALUE: (leave empty - Render sets this automatically)
+
+NAME: API_VERSION
+VALUE: v1
+
+NAME: BASE_URL
+VALUE: https://yapague-backend.onrender.com
+(Replace "yapague-backend" with YOUR actual service name)
+
+GROUP 2: DATABASE (Supabase)
+-----------------------------
+
+OPTION A: Use Connection String (RECOMMENDED - Bypasses DNS Issues)
+--------------------------------------------------------------------
+NAME: DATABASE_URL
+VALUE: postgresql://postgres:[PASSWORD]@db.klnbdurpeojayizubunc.supabase.co:6543/postgres
+(Get this from Supabase Dashboard → Settings → Database → Connection string)
+(Replace [PASSWORD] with your actual Supabase database password)
+(Use port 6543 for connection pooler OR 5432 for direct connection)
+
+If you use DATABASE_URL, you DON'T need to set DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME separately.
+
+OR
+
+OPTION B: Use Separate Variables
+----------------------------------
+NAME: DB_HOST
+VALUE: [Your Supabase Host]
+Example: db.klnbdurpeojayizubunc.supabase.co
+(Just hostname, no https:// or port)
+
+NAME: DB_PORT
+VALUE: 6543
+(Use 6543 for connection pooler OR 5432 for direct connection)
+
+NAME: DB_USERNAME
+VALUE: postgres
+(Usually "postgres" for Supabase)
+
+NAME: DB_PASSWORD
+VALUE: [Your Supabase Database Password]
+(This is the password you created when setting up Supabase project)
+
+NAME: DB_NAME
+VALUE: postgres
+(Usually "postgres" for Supabase)
+
+REQUIRED FOR BOTH OPTIONS:
+NAME: DB_SYNC
+VALUE: true
+(Set to "false" in production if you don't want auto-sync)
+
+NAME: DB_LOGGING
+VALUE: false
+(Set to "true" if you want to see SQL queries in logs)
+
+GROUP 3: JWT & SECURITY (Generate These!)
+------------------------------------------
+⚠️  IMPORTANT: Generate these secrets first using terminal:
+
+Run these commands to generate secrets:
+openssl rand -base64 32    # For JWT_SECRET
+openssl rand -base64 32    # For JWT_REFRESH_SECRET
+openssl rand -base64 32    # For SESSION_SECRET
+openssl rand -base64 32    # For ENCRYPTION_KEY
+openssl rand -base64 16    # For ENCRYPTION_IV
+
+Then add:
+
+NAME: JWT_SECRET
+VALUE: [Generated secret - 32+ characters]
+
+NAME: JWT_EXPIRES_IN
+VALUE: 15m
+
+NAME: JWT_REFRESH_SECRET
+VALUE: [Generated secret - 32+ characters]
+
+NAME: JWT_REFRESH_EXPIRES_IN
+VALUE: 7d
+
+NAME: SESSION_SECRET
+VALUE: [Generated secret - 32+ characters]
+
+NAME: ENCRYPTION_KEY
+VALUE: [Generated secret - exactly 32 characters]
+
+NAME: ENCRYPTION_IV
+VALUE: [Generated secret - exactly 16 characters]
+
+NAME: BCRYPT_ROUNDS
+VALUE: 12
+
+GROUP 4: FILE STORAGE (Cloudinary)
+-----------------------------------
+NAME: CLOUDINARY_CLOUD_NAME
+VALUE: [Your Cloudinary Cloud Name]
+Example: dxyz1234
+
+NAME: CLOUDINARY_API_KEY
+VALUE: [Your Cloudinary API Key]
+Example: 123456789012345
+
+NAME: CLOUDINARY_API_SECRET
+VALUE: [Your Cloudinary API Secret]
+Example: abcdefghijklmnopqrstuvwxyz
+⚠️  Keep this secret!
+
+GROUP 5: EMAIL SERVICE (Choose ONE Option)
+--------------------------------------------
+
+OPTION A: GMAIL SMTP
+---------------------
+NAME: SMTP_HOST
+VALUE: smtp.gmail.com
+
+NAME: SMTP_PORT
+VALUE: 587
+
+NAME: SMTP_USER
+VALUE: [Client's Gmail Address]
+Example: client@gmail.com
+
+NAME: SMTP_PASS
+VALUE: [Gmail App Password]
+Example: abcdefghijklmnop
+(16 characters, no spaces)
+
+OR
+
+OPTION B: SENDGRID
+-------------------
+NAME: SENDGRID_API_KEY
+VALUE: [Your SendGrid API Key]
+Example: SG.abcdefghijklmnopqrstuvwxyz
+(Starts with "SG.")
+
+NAME: SENDGRID_FROM_EMAIL
+VALUE: [Your SendGrid Email]
+Example: client@example.com
+
+================================================================================
+OPTIONAL VARIABLES (Add These Too)
+================================================================================
+
+GROUP 6: CORS SETTINGS
+----------------------
+NAME: CORS_ORIGIN
+VALUE: *
+(Use * for development, change to specific domain in production)
+Example for production: https://yourfrontend.com
+
+NAME: CORS_CREDENTIALS
+VALUE: true
+
+GROUP 7: RATE LIMITING
+----------------------
+NAME: RATE_LIMIT_TTL
+VALUE: 60
+
+NAME: RATE_LIMIT_LIMIT
+VALUE: 100
+
+GROUP 8: LOGGING
+----------------
+NAME: LOG_LEVEL
+VALUE: info
+(Options: error, warn, info, debug, verbose)
+
+NAME: LOG_FILE_PATH
+VALUE: ./logs
+
+NAME: LOG_RETENTION_DAYS
+VALUE: 90
+
+GROUP 9: RETENTION SETTINGS
+---------------------------
+NAME: TRANSACTION_RETENTION_DAYS
+VALUE: 2555
+
+NAME: SESSION_RETENTION_DAYS
+VALUE: 30
+
+GROUP 10: SWAGGER DOCUMENTATION
+--------------------------------
+NAME: SWAGGER_ENABLED
+VALUE: true
+(Set to "false" in production)
+
+NAME: SWAGGER_PATH
+VALUE: docs
+
+GROUP 11: EXTERNAL SERVICES (Optional)
+---------------------------------------
+NAME: WEBHOOK_SECRET
+VALUE: (optional - leave empty if not using webhooks)
+
+NAME: NOTIFICATION_SERVICE_URL
+VALUE: (optional - leave empty if not using)
+
+NAME: APP_BASE_URL
+VALUE: https://yapague-backend.onrender.com
+(Used in payments service - same as BASE_URL)
+
+================================================================================
+QUICK CHECKLIST - ALL VARIABLES
+================================================================================
+
+Copy and check off as you add:
+
+APPLICATION:
+[ ] NODE_ENV
+[ ] PORT (leave empty)
+[ ] API_VERSION
+[ ] BASE_URL
+[ ] APP_BASE_URL
+
+DATABASE:
+[ ] DB_HOST
+[ ] DB_PORT
+[ ] DB_USERNAME
+[ ] DB_PASSWORD
+[ ] DB_NAME
+[ ] DB_SYNC
+[ ] DB_LOGGING
+
+JWT & SECURITY:
+[ ] JWT_SECRET
+[ ] JWT_EXPIRES_IN
+[ ] JWT_REFRESH_SECRET
+[ ] JWT_REFRESH_EXPIRES_IN
+[ ] SESSION_SECRET
+[ ] ENCRYPTION_KEY
+[ ] ENCRYPTION_IV
+[ ] BCRYPT_ROUNDS
+
+FILE STORAGE:
+[ ] CLOUDINARY_CLOUD_NAME
+[ ] CLOUDINARY_API_KEY
+[ ] CLOUDINARY_API_SECRET
+
+EMAIL (Choose one set):
+[ ] SMTP_HOST (if Gmail)
+[ ] SMTP_PORT (if Gmail)
+[ ] SMTP_USER (if Gmail)
+[ ] SMTP_PASS (if Gmail)
+OR
+[ ] SENDGRID_API_KEY (if SendGrid)
+[ ] SENDGRID_FROM_EMAIL (if SendGrid)
+
+CORS:
+[ ] CORS_ORIGIN
+[ ] CORS_CREDENTIALS
+
+RATE LIMITING:
+[ ] RATE_LIMIT_TTL
+[ ] RATE_LIMIT_LIMIT
+
+LOGGING:
+[ ] LOG_LEVEL
+[ ] LOG_FILE_PATH
+[ ] LOG_RETENTION_DAYS
+
+RETENTION:
+[ ] TRANSACTION_RETENTION_DAYS
+[ ] SESSION_RETENTION_DAYS
+
+SWAGGER:
+[ ] SWAGGER_ENABLED
+[ ] SWAGGER_PATH
+
+OPTIONAL:
+[ ] WEBHOOK_SECRET (optional)
+[ ] NOTIFICATION_SERVICE_URL (optional)
+
+TOTAL: ~30-35 environment variables
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. ⚠️  Generate JWT secrets FIRST before adding them
+2. ⚠️  Get Supabase credentials from Supabase dashboard
+3. ⚠️  Get Cloudinary credentials from Cloudinary dashboard
+4. ⚠️  Choose EITHER Gmail SMTP OR SendGrid (not both)
+5. ⚠️  Replace "yapague-backend" in BASE_URL with your actual service name
+6. ⚠️  Double-check all values for typos
+7. ⚠️  No extra spaces in variable names or values
+
+================================================================================
+STEP-BY-STEP PROCESS
+================================================================================
+
+1. Generate JWT secrets (run openssl commands)
+2. Get Supabase connection details
+3. Get Cloudinary credentials
+4. Get Email credentials (Gmail or SendGrid)
+5. Add all variables one by one in Render
+6. Double-check everything
+7. Then click "Create Web Service"
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If variable not working:
+- Check spelling (case-sensitive!)
+- Verify no extra spaces
+- Check value is correct
+- Restart service after adding variables
+
+If build fails:
+- Check all REQUIRED variables are added
+- Verify JWT secrets are long enough (32+ chars)
+- Check database credentials are correct
+
+================================================================================
+END OF VARIABLES LIST
+================================================================================
+
+Add all these variables BEFORE clicking "Create Web Service"!
+
+Good luck! 🚀
+
+================================================================================
+

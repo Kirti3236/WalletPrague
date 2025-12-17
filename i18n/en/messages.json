@@ -1,0 +1,171 @@
+{
+  "success": {
+    "general": "Operation completed successfully",
+    "created": "Resource created successfully",
+    "updated": "Resource updated successfully",
+    "deleted": "Resource deleted successfully"
+  },
+  "error": {
+    "badRequest": "Bad request",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "notFound": "Resource not found",
+    "conflict": "Resource conflict",
+    "validationError": "Validation failed",
+    "internalServerError": "Internal server error",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "databaseError": "Database operation failed"
+  },
+  "auth": {
+    "invalid_credentials": "Invalid credentials",
+    "account_not_active": "Account is not active",
+    "registration_success": "User registered successfully",
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "password_reset_sent": "If the email exists, a password reset link has been sent",
+    "password_reset_success": "Password has been reset successfully",
+    "invalid_expired_token": "Invalid or expired token",
+    "tokenExpired": "Token has expired",
+    "invalidToken": "Invalid token provided",
+    "sessionExpired": "Session has expired",
+    "accountLocked": "Account is locked",
+    "accountInactive": "Account is not active",
+    "emailAlreadyExists": "User with this email already exists",
+    "phoneAlreadyExists": "User with this phone number already exists",
+    "documentAlreadyExists": "User with this document number already exists",
+    "registrationSuccess": "User registered successfully",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "tokenRefreshed": "Token refreshed successfully",
+    "sessionNotFound": "Session not found",
+    "passwordResetRequested": "If the email exists, a password reset link has been sent",
+    "usernameGenerated": "Username generated successfully"
+  },
+  "validation": {
+    "required_fields_missing": "Missing required fields",
+    "passwords_do_not_match": "Passwords do not match",
+    "email_already_exists": "Email already exists",
+    "phone_already_exists": "Phone number already exists",
+    "document_already_exists": "Document number already exists",
+    "dni_password_required": "DNI number and password are required",
+    "email_required": "Email is required",
+    "dni_required": "DNI number is required",
+    "token_password_required": "Token and new password are required",
+    "required": "{{field}} is required",
+    "email": "Please provide a valid email address",
+    "minLength": "{{field}} must be at least {{min}} characters long",
+    "maxLength": "{{field}} must not exceed {{max}} characters",
+    "phoneNumber": "Please provide a valid phone number",
+    "strongPassword": "Password must contain at least 8 characters, including uppercase, lowercase, and numbers"
+  },
+  "transfers": {
+    "wallet_not_found": "Wallet not found",
+    "insufficient_funds": "Insufficient funds for this transfer",
+    "sender_not_found": "Sender not found",
+    "recipient_not_found": "Recipient not found",
+    "transfer_not_found": "Transfer not found",
+    "self_transfer_not_allowed": "Cannot transfer to yourself",
+    "recipient_inactive": "Recipient account is not active",
+    "no_active_wallets": "Recipient has no active wallets",
+    "no_wallet_for_currency": "Recipient does not have an active {{currency}} wallet",
+    "invalid_transfer_id": "Invalid transfer ID format. Must be a valid UUID",
+    "recipient_validation_failed": "Recipient validation failed",
+    "transfer_success": "Transfer completed successfully",
+    "recipient_validated": "Recipient validated successfully",
+    "transfer_details_retrieved": "Transfer details retrieved successfully"
+  },
+  "payments": {
+    "payment_code_not_found": "Payment code not found",
+    "payment_code_not_found_or_expired": "Payment code not found or expired",
+    "invalid_qr_format": "Invalid QR code format",
+    "qr_generated": "QR code generated successfully",
+    "payment_processed": "Payment processed successfully"
+  },
+  "accounting": {
+    "debit_account_not_found": "Debit account not found or inactive",
+    "credit_account_not_found": "Credit account not found or inactive",
+    "amount_must_be_positive": "Amount must be greater than zero",
+    "journal_not_found": "Journal not found or inactive",
+    "journal_entry_not_found": "Journal entry not found",
+    "entry_already_reversed": "Entry already reversed",
+    "account_not_found": "Account with ID {{id}} not found",
+    "account_number_exists": "Account number {{accountNumber}} already exists",
+    "journal_code_exists": "Journal code {{journalCode}} already exists",
+    "journal_posted_success": "Journal posted successfully",
+    "entries_reversed_success": "Reversed {{count}} journal entries"
+  },
+  "deposits": {
+    "wallet_not_found": "Wallet not found",
+    "invalid_amount": "Invalid deposit amount",
+    "deposit_created": "Deposit created successfully",
+    "deposit_failed": "Deposit failed"
+  },
+  "withdrawals": {
+    "wallet_not_found": "Wallet not found",
+    "insufficient_balance": "Insufficient balance for withdrawal",
+    "invalid_amount": "Invalid withdrawal amount",
+    "withdrawal_created": "Withdrawal created successfully",
+    "withdrawal_failed": "Withdrawal failed"
+  },
+  "refunds": {
+    "transaction_not_found": "Transaction not found",
+    "refund_not_allowed": "Refund not allowed for this transaction",
+    "refund_created": "Refund created successfully",
+    "refund_failed": "Refund failed"
+  },
+  "aml": {
+    "alert_created": "AML alert created successfully",
+    "alert_not_found": "AML alert not found",
+    "status_updated": "AML alert status updated successfully",
+    "user_status_retrieved": "User AML status retrieved successfully"
+  },
+  "restrictions": {
+    "restriction_created": "Restriction created successfully",
+    "restriction_removed": "Restriction removed successfully",
+    "restrictions_retrieved": "User restrictions retrieved successfully"
+  },
+  "risk": {
+    "assessment_created": "Risk assessment created successfully",
+    "assessment_not_found": "Risk assessment not found",
+    "assessments_retrieved": "Risk assessments retrieved successfully"
+  },
+  "limits": {
+    "limit_not_found": "Limit not found",
+    "limit_created": "Limit created successfully",
+    "limit_updated": "Limit updated successfully",
+    "limit_deleted": "Limit deleted successfully",
+    "limits_retrieved": "Limits retrieved successfully"
+  },
+  "reports": {
+    "report_generated": "Report generated successfully",
+    "invalid_date_range": "Invalid date range",
+    "no_data_found": "No data found for the specified criteria"
+  },
+  "statements": {
+    "statement_generated": "Statement generated successfully",
+    "statement_not_found": "Statement not found"
+  },
+  "reconciliation": {
+    "import_success": "Bank statement imported successfully",
+    "export_success": "Ledger exported successfully",
+    "reconciliation_success": "Reconciliation completed successfully",
+    "file_invalid": "Invalid file format"
+  },
+  "transactions": {
+    "transaction_not_found": "Transaction not found",
+    "transaction_created": "Transaction created successfully",
+    "history_retrieved": "Transaction history retrieved successfully"
+  },
+  "wallets": {
+    "wallet_not_found": "Wallet not found",
+    "wallet_created": "Wallet created successfully",
+    "balance_retrieved": "Balance retrieved successfully"
+  },
+  "dashboard": {
+    "data_retrieved": "Dashboard data retrieved successfully"
+  },
+  "banks": {
+    "banks_retrieved": "Nearby banks retrieved successfully",
+    "bank_not_found": "Bank not found"
+  }
+}

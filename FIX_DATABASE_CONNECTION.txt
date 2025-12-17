@@ -1,0 +1,150 @@
+================================================================================
+  FIX DATABASE CONNECTION ERROR
+  Supabase Connection Issue
+================================================================================
+
+ERROR YOU GOT:
+"SequelizeConnectionError: connect ENETUNREACH 2600:1f13:838:6e0d:eb50:56b0:bc5c:7375:5432"
+
+CAUSE:
+- Trying to connect via IPv6 address
+- Supabase host might be resolving to IPv6
+- SSL might not be properly configured
+- DB_HOST format might be incorrect
+
+================================================================================
+SOLUTIONS (Try in Order)
+================================================================================
+
+SOLUTION 1: Verify DB_HOST Format in Render
+-------------------------------------------
+1. Go to Render Dashboard → Your Service → Environment
+2. Check DB_HOST value:
+   ✅ CORRECT: db.xyz123.supabase.co
+   ✅ CORRECT: xyz123.supabase.co
+   ❌ WRONG: https://db.xyz123.supabase.co
+   ❌ WRONG: db.xyz123.supabase.co:5432
+   ❌ WRONG: postgresql://postgres:pass@db.xyz123.supabase.co
+
+3. DB_HOST should be ONLY the hostname:
+   - No https://
+   - No :5432
+   - No postgresql:// prefix
+   - Just: db.xyz123.supabase.co
+
+SOLUTION 2: Use Supabase Connection Pooler (Recommended)
+----------------------------------------------------------
+Supabase provides a connection pooler that works better with Render.
+
+1. Go to Supabase Dashboard → Settings → Database
+2. Look for "Connection pooling" section
+3. Copy the "Session mode" connection string
+4. Extract the host from it:
+   - Format: db.xyz123.supabase.co
+   - Port: 6543 (for pooler) OR 5432 (for direct)
+   - Use pooler port 6543 for better connection handling
+
+5. Update in Render:
+   DB_HOST = db.xyz123.supabase.co
+   DB_PORT = 6543 (if using pooler) OR 5432 (if direct)
+
+SOLUTION 3: Verify All Database Credentials
+---------------------------------------------
+Double-check in Render Environment Variables:
+
+[ ] DB_HOST = db.xyz123.supabase.co (just hostname, no protocol/port)
+[ ] DB_PORT = 5432 (or 6543 if using pooler)
+[ ] DB_USERNAME = postgres
+[ ] DB_PASSWORD = [Your actual Supabase password]
+[ ] DB_NAME = postgres
+
+SOLUTION 4: Check Supabase Network Settings
+--------------------------------------------
+1. Go to Supabase Dashboard → Settings → Database
+2. Check "Network Restrictions"
+3. Make sure it allows connections from anywhere (0.0.0.0/0)
+   OR add Render's IP ranges if restricted
+
+SOLUTION 5: Use Direct Connection String Format
+-------------------------------------------------
+If still not working, try using the full connection string format:
+
+1. In Supabase, get the "Connection string" (URI format)
+2. It looks like: postgresql://postgres:[PASSWORD]@db.xyz123.supabase.co:5432/postgres
+3. Extract each part:
+   - Host: db.xyz123.supabase.co
+   - Port: 5432
+   - User: postgres
+   - Password: [from connection string]
+   - Database: postgres
+
+================================================================================
+QUICK CHECKLIST
+================================================================================
+
+Verify in Render Environment Variables:
+
+[ ] DB_HOST format is correct (just hostname)
+[ ] DB_PORT is 5432 (or 6543 for pooler)
+[ ] DB_USERNAME is "postgres"
+[ ] DB_PASSWORD is correct (no extra spaces)
+[ ] DB_NAME is "postgres"
+[ ] NODE_ENV is "production" (enables SSL)
+
+================================================================================
+COMMON MISTAKES
+================================================================================
+
+❌ DB_HOST = "https://db.xyz123.supabase.co"
+✅ DB_HOST = "db.xyz123.supabase.co"
+
+❌ DB_HOST = "db.xyz123.supabase.co:5432"
+✅ DB_HOST = "db.xyz123.supabase.co"
+
+❌ DB_HOST = "postgresql://postgres:pass@db.xyz123.supabase.co"
+✅ DB_HOST = "db.xyz123.supabase.co"
+
+❌ DB_PASSWORD has extra spaces
+✅ DB_PASSWORD has no spaces
+
+❌ Using IPv6 address directly
+✅ Use hostname (Supabase will resolve correctly)
+
+================================================================================
+TEST CONNECTION
+================================================================================
+
+After fixing, the logs should show:
+✅ "Database connection established"
+✅ "Application is running"
+✅ No more "ENETUNREACH" errors
+
+If still failing:
+1. Check Supabase project is active
+2. Verify password is correct
+3. Try resetting database password in Supabase
+4. Check Supabase status page for outages
+
+================================================================================
+ALTERNATIVE: Use Supabase Connection Pooler
+================================================================================
+
+The pooler is more reliable for serverless/cloud deployments:
+
+1. In Supabase Dashboard → Settings → Database
+2. Find "Connection pooling" → "Session mode"
+3. Use port 6543 instead of 5432
+4. Update DB_PORT in Render to 6543
+
+This often resolves IPv6/connection issues.
+
+================================================================================
+END OF FIX GUIDE
+================================================================================
+
+Most likely issue: DB_HOST format is wrong or missing SSL.
+
+Check DB_HOST first - it should be just the hostname!
+
+================================================================================
+

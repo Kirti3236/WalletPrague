@@ -1,0 +1,104 @@
+================================================================================
+  FIX IPv6 CONNECTION ERROR
+  Supabase Database Connection Issue
+================================================================================
+
+ERROR: "connect ENETUNREACH 2600:1f13:838:6e0d:eb50:56b0:bc5c:7375:5432"
+
+PROBLEM:
+- Supabase hostname is resolving to IPv6 address
+- Render/Node.js can't connect via IPv6
+- Need to force IPv4 connection
+
+SOLUTION 1: Use Supabase Connection Pooler (RECOMMENDED)
+=========================================================
+
+The connection pooler handles IPv4/IPv6 better and is more reliable.
+
+1. Go to Supabase Dashboard → Settings → Database
+2. Find "Connection pooling" section
+3. Look for "Session mode" connection string
+4. The host will be the same: db.klnbdurpeojayizubunc.supabase.co
+5. But use port 6543 instead of 5432
+
+Update in Render:
+-----------------
+DB_HOST = db.klnbdurpeojayizubunc.supabase.co (same)
+DB_PORT = 6543 (change from 5432 to 6543)
+
+This often fixes IPv6 connection issues!
+
+SOLUTION 2: Verify All Variables Are Set Correctly
+====================================================
+
+Double-check in Render Environment Variables:
+
+[ ] DB_HOST = db.klnbdurpeojayizubunc.supabase.co ✅ (you have this)
+[ ] DB_PORT = 5432 (or 6543 if using pooler)
+[ ] DB_USERNAME = postgres
+[ ] DB_PASSWORD = [Your password - you confirmed this is correct]
+[ ] DB_NAME = postgres
+[ ] NODE_ENV = production (this enables SSL)
+
+SOLUTION 3: Check Supabase Project Status
+==========================================
+
+1. Go to Supabase Dashboard
+2. Check if your project is "Active" (not paused)
+3. Free tier projects can pause after inactivity
+4. If paused, click "Restore" to wake it up
+
+SOLUTION 4: Try Direct Connection with IPv4
+============================================
+
+If pooler doesn't work, try these steps:
+
+1. In Supabase → Settings → Database
+2. Find "Connection string" (not pooler)
+3. Make sure you're using the "Direct connection" not "Pooler"
+4. Copy the host (should be same: db.klnbdurpeojayizubunc.supabase.co)
+5. Use port 5432
+
+SOLUTION 5: Reset Database Password
+====================================
+
+Sometimes password issues can cause connection failures:
+
+1. Go to Supabase → Settings → Database
+2. Click "Reset database password"
+3. Set a new password
+4. Update DB_PASSWORD in Render with the new password
+5. Redeploy
+
+================================================================================
+QUICK FIX - TRY THIS FIRST
+================================================================================
+
+1. Change DB_PORT from 5432 to 6543 (use connection pooler)
+2. Save in Render
+3. Service will restart automatically
+4. Check logs - should connect now
+
+The pooler (port 6543) is specifically designed for cloud/serverless deployments
+and handles network issues better than direct connections.
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After applying fix, check logs for:
+✅ "Database connection established"
+✅ "Application is running"
+✅ No more "ENETUNREACH" errors
+✅ No more IPv6 address in error messages
+
+================================================================================
+END OF FIX GUIDE
+================================================================================
+
+Most likely solution: Use connection pooler (port 6543) instead of direct (5432)
+
+Try changing DB_PORT to 6543 first - this fixes most IPv6 issues!
+
+================================================================================
+

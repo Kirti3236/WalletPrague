@@ -1,0 +1,139 @@
+================================================================================
+  QUICK CHECKLIST - Create All Accounts
+  Using Client's Email & Password
+================================================================================
+
+CLIENT PROVIDES:
+☐ Email: _____________________________
+☐ Password: _____________________________
+
+================================================================================
+STEP 1: RENDER.COM (3-5 min)
+================================================================================
+[ ] Go to https://render.com
+[ ] Click "Sign Up"
+[ ] Sign up with GitHub OR Email (use client's email)
+[ ] Verify email (check client's inbox)
+[ ] Save: Email, Password, Username
+
+SAVED:
+☐ Render Email: _____________________________
+☐ Render Password: _____________________________
+
+================================================================================
+STEP 2: SUPABASE (5-7 min)
+================================================================================
+[ ] Go to https://supabase.com
+[ ] Click "Start your project"
+[ ] Sign up with GitHub OR Email (use client's email)
+[ ] Verify email (check client's inbox)
+[ ] Click "New Project"
+[ ] Fill in:
+    - Project Name: yapague-db
+    - Database Password: CREATE STRONG PASSWORD (SAVE THIS!)
+    - Region: Choose closest
+[ ] Wait 2-3 minutes for provisioning
+[ ] Go to Settings → Database
+[ ] Copy Connection String OR get separate values
+
+SAVED:
+☐ Supabase Email: _____________________________
+☐ Supabase Password: _____________________________
+☐ Database Password: _____________________________ ⚠️ SAVE THIS!
+☐ Connection String: postgresql://_____________________________
+☐ OR: Host, Port, Database, Username, Password
+
+================================================================================
+STEP 3: CLOUDINARY (3-5 min)
+================================================================================
+[ ] Go to https://cloudinary.com
+[ ] Click "Sign Up for Free"
+[ ] Fill in: Name, Email (client's), Password
+[ ] Verify email (check client's inbox)
+[ ] Go to Dashboard
+[ ] Copy: Cloud Name, API Key
+[ ] Click "Reveal" to see API Secret
+
+SAVED:
+☐ Cloudinary Email: _____________________________
+☐ Cloudinary Password: _____________________________
+☐ Cloud Name: _____________________________
+☐ API Key: _____________________________
+☐ API Secret: _____________________________ ⚠️ SAVE THIS!
+
+================================================================================
+STEP 4: EMAIL SERVICE (5-10 min)
+================================================================================
+
+CHOOSE ONE:
+
+OPTION A: GMAIL SMTP
+[ ] Go to https://mail.google.com
+[ ] Sign in with client's email & password
+[ ] Go to https://myaccount.google.com
+[ ] Security → Enable 2-Step Verification (if not enabled)
+[ ] Go to https://myaccount.google.com/apppasswords
+[ ] Create App Password:
+    - App: Mail
+    - Device: Other (Custom name: "YaPague API")
+[ ] Copy 16-character password
+
+SAVED:
+☐ Gmail Address: _____________________________
+☐ Gmail Password: _____________________________
+☐ Gmail App Password: _____________________________ ⚠️ SAVE THIS!
+
+OR
+
+OPTION B: SENDGRID
+[ ] Go to https://sendgrid.com
+[ ] Click "Start for Free"
+[ ] Sign up with client's email & password
+[ ] Verify email (check client's inbox)
+[ ] Go to Settings → API Keys
+[ ] Create API Key:
+    - Name: "YaPague API"
+    - Permissions: Full Access OR Mail Send
+[ ] Copy API Key (starts with "SG.")
+
+SAVED:
+☐ SendGrid Email: _____________________________
+☐ SendGrid Password: _____________________________
+☐ SendGrid API Key: SG._____________________________ ⚠️ SAVE THIS!
+
+================================================================================
+STEP 5: UPTIMEROBOT (2-3 min)
+================================================================================
+[ ] Go to https://uptimerobot.com
+[ ] Click "Sign Up"
+[ ] Fill in: Email (client's), Password
+[ ] Verify email (check client's inbox)
+[ ] Access Dashboard
+
+SAVED:
+☐ UptimeRobot Email: _____________________________
+☐ UptimeRobot Password: _____________________________
+
+================================================================================
+FINAL CHECKLIST
+================================================================================
+
+[ ] All 5 accounts created
+[ ] All credentials saved securely
+[ ] Can log into all accounts
+[ ] Database password saved (Supabase)
+[ ] API Secret saved (Cloudinary)
+[ ] Email App Password/API Key saved
+[ ] Credentials NOT in Git/GitHub
+[ ] Backup of credentials created
+
+================================================================================
+READY FOR DEPLOYMENT!
+================================================================================
+
+Total Time: 20-30 minutes
+All accounts: ✅ Created
+Next: Configure and deploy!
+
+================================================================================
+

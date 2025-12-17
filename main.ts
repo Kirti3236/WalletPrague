@@ -30,12 +30,9 @@ async function bootstrap() {
     app.use(helmet());
     app.use(cookieParser());
 
-    // CORS configuration
+    // CORS configuration - Allow all origins
     app.enableCors({
-      origin:
-        configService.get('app.nodeEnv') === 'development'
-          ? true // Allow all origins in development
-          : configService.get('cors.origin') || ['http://localhost:3000'],
+      origin: true, // Allow all origins
       credentials: configService.get('cors.credentials'),
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: [
@@ -51,7 +48,7 @@ async function bootstrap() {
 
     // Get API version from configuration and ensure it's just the number
     const apiVersionNumber = configService.get('app.apiVersion') || '1';
-    
+
     // Ensure apiVersionNumber is just the number (remove 'v' if present)
     const cleanVersion = apiVersionNumber.replace(/^v/i, '');
 
@@ -101,7 +98,7 @@ async function bootstrap() {
 
     // Swagger documentation
     if (configService.get('swagger.enabled')) {
-      
+
       const config = new DocumentBuilder()
         .setTitle('YaPague! Payment Management System API')
         .setDescription(

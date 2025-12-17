@@ -1,0 +1,285 @@
+================================================================================
+  YaPague! Backend API - Base URLs & Endpoints
+  For Frontend Team
+================================================================================
+
+BASE URL (Production):
+----------------------
+https://yapague-backend.onrender.com
+
+BASE URL (Development/Local):
+------------------------------
+http://localhost:3000
+
+================================================================================
+API VERSION
+================================================================================
+
+Current API Version: v1
+
+All API endpoints are prefixed with: /v1/
+
+================================================================================
+ENDPOINT CATEGORIES
+================================================================================
+
+1. PUBLIC ENDPOINTS (No Authentication Required)
+   Base: /v1/public/*
+   
+   Examples:
+   - https://yapague-backend.onrender.com/v1/public/auth/register
+   - https://yapague-backend.onrender.com/v1/public/auth/login
+   - https://yapague-backend.onrender.com/v1/public/auth/forgot-password
+
+2. PRIVATE ENDPOINTS (JWT Authentication Required)
+   Base: /v1/private/*
+   
+   Examples:
+   - https://yapague-backend.onrender.com/v1/private/users/profile
+   - https://yapague-backend.onrender.com/v1/private/wallets/balance
+   - https://yapague-backend.onrender.com/v1/private/transactions
+
+================================================================================
+AUTHENTICATION
+================================================================================
+
+Authentication Type: JWT Bearer Token
+
+How to Authenticate:
+1. Login via: POST /v1/public/auth/login
+2. Receive JWT token in response
+3. Include token in subsequent requests:
+   Header: Authorization: Bearer <your-jwt-token>
+
+Example:
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+================================================================================
+API DOCUMENTATION (Swagger)
+================================================================================
+
+Swagger UI URL:
+https://yapague-backend.onrender.com/docs
+
+Interactive API documentation with:
+- All available endpoints
+- Request/response schemas
+- Try it out functionality
+- Authentication testing
+
+================================================================================
+MAIN API ENDPOINTS
+================================================================================
+
+AUTHENTICATION:
+--------------
+POST   /v1/public/auth/register          - Register new user
+POST   /v1/public/auth/login             - Login user
+POST   /v1/public/auth/forgot-password   - Request password reset
+POST   /v1/public/auth/reset-password    - Reset password with token
+POST   /v1/public/auth/refresh          - Refresh JWT token
+
+USERS (Private):
+---------------
+GET    /v1/private/users/profile         - Get user profile
+PUT    /v1/private/users/profile        - Update user profile
+GET    /v1/private/users/me             - Get current user info
+
+WALLETS (Private):
+------------------
+GET    /v1/private/wallets               - Get user wallets
+GET    /v1/private/wallets/:id          - Get wallet details
+GET    /v1/private/wallets/balance      - Get wallet balance
+
+TRANSACTIONS (Private):
+---------------------
+GET    /v1/private/transactions          - Get transaction history
+GET    /v1/private/transactions/:id     - Get transaction details
+POST   /v1/private/transactions/search  - Search transactions
+
+PAYMENTS (Private):
+------------------
+POST   /v1/private/payments              - Create payment request
+GET    /v1/private/payments              - List payments
+GET    /v1/private/payments/:id         - Get payment details
+
+DEPOSITS (Private):
+------------------
+POST   /v1/private/deposits              - Create deposit
+GET    /v1/private/deposits              - List deposits
+GET    /v1/private/deposits/:id         - Get deposit details
+
+WITHDRAWALS (Private):
+--------------------
+POST   /v1/private/withdrawals           - Create withdrawal
+GET    /v1/private/withdrawals           - List withdrawals
+GET    /v1/private/withdrawals/:id      - Get withdrawal details
+
+TRANSFERS (Private):
+-------------------
+POST   /v1/private/transfers              - Transfer funds
+GET    /v1/private/transfers              - List transfers
+GET    /v1/private/transfers/:id         - Get transfer details
+
+================================================================================
+REQUEST/RESPONSE FORMAT
+================================================================================
+
+Content-Type: application/json
+Accept: application/json
+
+Request Example:
+  POST /v1/public/auth/login
+  Headers:
+    Content-Type: application/json
+  Body:
+    {
+      "email": "user@example.com",
+      "password": "password123"
+    }
+
+Response Example:
+  {
+    "success": true,
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "user": {
+        "id": 1,
+        "email": "user@example.com",
+        "name": "John Doe"
+      }
+    },
+    "message": "Login successful"
+  }
+
+================================================================================
+CORS CONFIGURATION
+================================================================================
+
+Allowed Origins: Configured via CORS_ORIGIN environment variable
+Credentials: Enabled (cookies/auth headers allowed)
+
+For development, you can use:
+- http://localhost:3000
+- http://localhost:3001
+- http://localhost:5173 (Vite default)
+- http://localhost:4200 (Angular default)
+
+For production, update CORS_ORIGIN in Render environment variables.
+
+================================================================================
+ERROR RESPONSES
+================================================================================
+
+Standard Error Format:
+  {
+    "success": false,
+    "message": "Error message",
+    "error": "Error details",
+    "statusCode": 400
+  }
+
+Common Status Codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized (missing/invalid token)
+- 403: Forbidden (insufficient permissions)
+- 404: Not Found
+- 500: Internal Server Error
+
+================================================================================
+RATE LIMITING
+================================================================================
+
+Rate Limits:
+- 100 requests per minute per IP
+- Applies to all endpoints
+
+Rate Limit Headers:
+- X-RateLimit-Limit: Maximum requests allowed
+- X-RateLimit-Remaining: Remaining requests
+- X-RateLimit-Reset: Time when limit resets
+
+================================================================================
+ENVIRONMENT CONFIGURATION
+================================================================================
+
+Production Base URL:
+https://yapague-backend.onrender.com
+
+Development Base URL (for local testing):
+http://localhost:3000
+
+================================================================================
+TESTING ENDPOINTS
+================================================================================
+
+Health Check:
+GET /health (if available)
+
+API Version:
+GET /v1/public/version (if available)
+
+================================================================================
+IMPORTANT NOTES FOR FRONTEND TEAM
+================================================================================
+
+1. Always use HTTPS in production (https://yapague-backend.onrender.com)
+2. Include JWT token in Authorization header for private endpoints
+3. Handle 401 errors by redirecting to login
+4. Use Swagger UI for complete API documentation
+5. All dates are in ISO 8601 format
+6. All monetary values are in the smallest currency unit (cents/pennies)
+7. Pagination is available on list endpoints (check Swagger for details)
+8. Use proper Content-Type headers (application/json)
+
+================================================================================
+SWAGGER DOCUMENTATION
+================================================================================
+
+Full interactive API documentation available at:
+https://yapague-backend.onrender.com/docs
+
+Features:
+- Complete endpoint list
+- Request/response schemas
+- Try it out functionality
+- Authentication testing
+- Model definitions
+
+================================================================================
+SUPPORT & CONTACT
+================================================================================
+
+For API issues or questions:
+1. Check Swagger documentation first: https://yapague-backend.onrender.com/docs
+2. Review error messages in response
+3. Check server logs (if you have access)
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+Base URL:        https://yapague-backend.onrender.com
+API Version:     v1
+Auth Type:       JWT Bearer Token
+Swagger Docs:    https://yapague-backend.onrender.com/docs
+Public Routes:   /v1/public/*
+Private Routes:  /v1/private/*
+
+Example Full URLs:
+- Login:         https://yapague-backend.onrender.com/v1/public/auth/login
+- User Profile:  https://yapague-backend.onrender.com/v1/private/users/profile
+- Wallets:       https://yapague-backend.onrender.com/v1/private/wallets
+- Transactions: https://yapague-backend.onrender.com/v1/private/transactions
+
+================================================================================
+Last Updated: December 2025
+================================================================================
+
+
+
+
+
+

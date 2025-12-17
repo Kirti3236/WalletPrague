@@ -1,0 +1,112 @@
+================================================================================
+  HOW TO FIND YOUR RENDER USERNAME
+================================================================================
+
+There are several places where you can find your Render username:
+
+================================================================================
+METHOD 1: TOP RIGHT CORNER (Easiest)
+================================================================================
+
+1. Look at the TOP RIGHT corner of your Render dashboard
+2. You'll see an icon (usually a letter or avatar)
+3. Click on that icon
+4. A dropdown menu will appear
+5. Your username/email will be displayed there
+6. It might show:
+   - Your email address (if signed up with email)
+   - Your GitHub username (if signed up with GitHub)
+   - Or a display name
+
+================================================================================
+METHOD 2: ACCOUNT SETTINGS
+================================================================================
+
+1. Click on your profile icon (top right)
+2. Click "Account Settings" or "Settings"
+3. Go to "Profile" or "Account" section
+4. Your username/email will be displayed there
+
+================================================================================
+METHOD 3: WORKSPACE NAME
+================================================================================
+
+1. Look at the TOP LEFT of the dashboard
+2. You'll see "My Workspace" or your workspace name
+3. Click on it
+4. Your account information may be displayed there
+
+================================================================================
+METHOD 4: URL BAR (If visible)
+================================================================================
+
+Sometimes the username appears in the URL:
+- https://dashboard.render.com/web/[username]
+- Or in the workspace URL
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+✅ If you signed up with GitHub:
+   - Your Render username is usually your GitHub username
+   - Or the email associated with your GitHub account
+
+✅ If you signed up with Email:
+   - Your Render username is your email address
+   - Or a username you created during signup
+
+✅ Username vs Email:
+   - Render may use your email as the username
+   - Or you may have created a separate username
+   - Both work for identification purposes
+
+================================================================================
+WHAT IF YOU CAN'T FIND IT?
+================================================================================
+
+If you can't find the username:
+
+1. Check the email you used to sign up
+   - That's usually your username/identifier
+
+2. Check your GitHub account (if signed up with GitHub)
+   - Your GitHub username might be your Render username
+
+3. Look at your workspace name
+   - Sometimes the workspace name is the username
+
+4. Contact Render Support
+   - They can help you identify your account
+
+================================================================================
+FOR YOUR CREDENTIALS TEMPLATE
+================================================================================
+
+For the credentials template, you can use:
+
+Username: [Your email address] OR [Your GitHub username]
+OR
+Username: [Whatever is shown in the top right corner]
+
+The most important thing is:
+- You can log in
+- You can access the dashboard
+- You can create services
+
+The exact username format doesn't matter much for deployment purposes.
+
+================================================================================
+QUICK CHECK
+================================================================================
+
+Right now, on your Render dashboard:
+
+1. Look at TOP RIGHT corner → Click the icon → See your name/email
+2. That's your username/identifier!
+
+If you see an email address, that's your username.
+If you see a name, that's your display name (username might be email).
+
+================================================================================
+

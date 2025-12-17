@@ -1,0 +1,170 @@
+================================================================================
+  UPTIMEROBOT SETUP GUIDE
+  Prevent Render Service from Spinning Down
+================================================================================
+
+You're on the UptimeRobot onboarding page. Here's what to do:
+
+================================================================================
+IMPORTANT: DO YOU HAVE YOUR RENDER API URL YET?
+================================================================================
+
+⚠️  BEFORE setting up UptimeRobot, you need:
+   - Your Render service deployed and running
+   - Your Render API URL (e.g., https://yapague-backend.onrender.com)
+
+IF YOU HAVEN'T DEPLOYED TO RENDER YET:
+   → Skip UptimeRobot setup for now
+   → Deploy to Render first (follow RENDER_DEPLOYMENT_STEPS.txt)
+   → Come back to UptimeRobot after deployment
+   → You can close this page and come back later
+
+IF YOU ALREADY HAVE YOUR RENDER URL:
+   → Continue with the setup below
+
+================================================================================
+STEP 1: ON THE CURRENT PAGE (Create Monitor)
+================================================================================
+
+You're on "Step 1 of 4" - "Create your first monitor"
+
+1.1 Monitoring Type
+   - It should already show: "HTTP / website monitoring"
+   - This is CORRECT - leave it as is
+   - Icon shows a browser window with "HTTP://"
+
+1.2 URL to Monitor
+   - In the "URL to monitor" field, enter your Render API URL
+   - Format: https://your-service-name.onrender.com
+   - Example: https://yapague-backend.onrender.com
+   - Make sure it starts with "https://"
+   - Don't add any path (just the root URL)
+
+1.3 Create Monitor
+   - Click the purple "Create monitor" button
+   - This will create your first monitor
+
+================================================================================
+STEP 2: MONITOR SETTINGS (After Creating)
+================================================================================
+
+After clicking "Create monitor", you'll be taken to monitor settings.
+
+2.1 Basic Settings
+   - Friendly Name: "YaPague API" (or any name you prefer)
+   - URL: Should already be filled (your Render URL)
+   - Monitoring Interval: Select "5 minutes" (free tier allows this)
+     * This is IMPORTANT - keeps your service alive!
+
+2.2 Advanced Settings (Optional)
+   - Alert Contacts: Set up email alerts (optional)
+   - Public Status Page: Can enable later if needed
+
+2.3 Save Settings
+   - Click "Save" or "Update Monitor"
+
+================================================================================
+STEP 3: VERIFY MONITOR IS WORKING
+================================================================================
+
+3.1 Check Monitor Status
+   - Go to UptimeRobot Dashboard
+   - You should see your monitor listed
+   - Status should show "Up" (green) if Render service is running
+   - Status will show "Down" (red) if Render service isn't deployed yet
+
+3.2 Test
+   - UptimeRobot will ping your URL every 5 minutes
+   - This prevents Render from spinning down after 15 minutes
+   - Your service will stay alive 24/7!
+
+================================================================================
+WHAT IF YOU DON'T HAVE RENDER URL YET?
+================================================================================
+
+If you haven't deployed to Render yet:
+
+OPTION 1: Skip for Now (Recommended)
+   - Close this UptimeRobot page
+   - Deploy to Render first (follow RENDER_DEPLOYMENT_STEPS.txt)
+   - Get your Render service URL
+   - Come back to UptimeRobot later
+   - Go to: https://uptimerobot.com
+   - Click "Add New Monitor"
+   - Then follow the steps above
+
+OPTION 2: Create Monitor with Placeholder
+   - Enter a placeholder URL: https://placeholder.onrender.com
+   - Create the monitor
+   - Later, edit the monitor and change the URL to your actual Render URL
+
+================================================================================
+RECOMMENDED SETTINGS FOR YOUR API
+================================================================================
+
+Monitor Type: HTTP(s)
+URL: https://your-service-name.onrender.com
+Monitoring Interval: 5 minutes (free tier)
+Alert When: Down for 1 minute
+HTTP Method: GET
+Expected Status Code: 200 (or 200-299)
+
+This configuration:
+✅ Pings your API every 5 minutes
+✅ Prevents 15-minute auto spin-down
+✅ Keeps your service alive 24/7
+✅ Sends alerts if service goes down
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: Monitor shows "Down" immediately
+SOLUTION:
+- Check if Render service is deployed and running
+- Verify the URL is correct
+- Make sure URL starts with "https://"
+- Check Render service logs for errors
+
+PROBLEM: Can't find where to edit monitor
+SOLUTION:
+- Go to UptimeRobot Dashboard
+- Click on your monitor name
+- Click "Edit" button
+- Update settings
+
+PROBLEM: Want to change monitoring interval
+SOLUTION:
+- Free tier: 5 minutes minimum
+- Paid tier: Can go lower (1 minute)
+- 5 minutes is perfect for keeping service alive
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+Current Page: "Create your first monitor"
+What to Enter:
+  - Monitoring Type: HTTP / website monitoring (already selected)
+  - URL: https://your-render-service.onrender.com
+
+After Creating:
+  - Set interval to 5 minutes
+  - Monitor will ping every 5 minutes
+  - Service stays alive!
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+After setting up UptimeRobot:
+
+1. ✅ Monitor is created and running
+2. ✅ Pinging your Render API every 5 minutes
+3. ✅ Service will stay alive 24/7
+4. ✅ No more 15-minute spin-down issues!
+
+You're all set! 🎉
+
+================================================================================
+

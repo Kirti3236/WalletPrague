@@ -1,0 +1,283 @@
+================================================================================
+  RENDER.COM DEPLOYMENT STEPS
+  Deploy YaPague Backend API
+================================================================================
+
+You're currently on the Render dashboard. Follow these steps:
+
+================================================================================
+STEP 1: SELECT WEB SERVICE (NOT WORKER!)
+================================================================================
+
+On the Render dashboard, you see several options:
+
+✅ SELECT: "Web Services" 
+   - Description: "Dynamic web app. Ideal for full-stack apps, API servers, and mobile backends."
+   - Click: "New Web Service →"
+
+❌ DO NOT SELECT: "Background Workers" (that's for job queues)
+
+================================================================================
+STEP 2: CONNECT GIT REPOSITORY
+================================================================================
+
+After clicking "New Web Service", you'll see:
+
+2.1 Connect Repository
+   - Option A: Connect GitHub (RECOMMENDED)
+     * Click "Connect GitHub" or "Connect account"
+     * Authorize Render to access your GitHub
+     * Select your repository: "yapague-backend"
+     * Click "Connect"
+   
+   - Option B: Connect GitLab/Bitbucket
+     * Similar process for other Git providers
+
+2.2 Select Repository
+   - Choose: yapague-backend (or your repo name)
+   - Click "Connect"
+
+================================================================================
+STEP 3: CONFIGURE WEB SERVICE
+================================================================================
+
+Fill in the configuration form:
+
+3.1 Basic Settings
+   - Name: yapague-backend (or your preferred name)
+   - Region: Choose closest to your users
+     * Options: US East, US West, EU West, etc.
+   - Branch: main (or master, depending on your repo)
+   - Root Directory: (leave empty if root, or specify if needed)
+
+3.2 Build & Deploy Settings
+   - Environment: Node
+   - Build Command: npm install && npm run build
+   - Start Command: node dist/main.js
+
+3.3 Plan Selection
+   - Plan: Free (select this for development/testing)
+   - This gives you 750 hours/month
+
+3.4 Advanced Settings (Click to expand)
+   - Auto-Deploy: Yes (deploys on every git push)
+   - Health Check Path: / (or leave empty)
+   - Health Check Timeout: 300 (5 minutes)
+
+================================================================================
+STEP 4: ADD ENVIRONMENT VARIABLES
+================================================================================
+
+IMPORTANT: Add all environment variables BEFORE first deployment!
+
+Click "Advanced" → "Environment Variables" or find "Environment" section.
+
+Add these variables (one by one):
+
+4.1 Application Settings
+   NODE_ENV = production
+   PORT = (leave empty - Render sets this automatically)
+   BASE_URL = https://yapague-backend.onrender.com
+     (Replace "yapague-backend" with your actual service name)
+
+4.2 Database (Supabase)
+   DB_HOST = [Your Supabase Host]
+     Example: xyz123.supabase.co
+   DB_PORT = 5432
+   DB_USERNAME = postgres
+   DB_PASSWORD = [Your Supabase Database Password]
+   DB_NAME = postgres
+   DB_LOGGING = false
+
+4.3 File Storage (Cloudinary)
+   CLOUDINARY_CLOUD_NAME = [Your Cloudinary Cloud Name]
+   CLOUDINARY_API_KEY = [Your Cloudinary API Key]
+   CLOUDINARY_API_SECRET = [Your Cloudinary API Secret]
+
+4.4 Email Service
+   
+   IF USING GMAIL:
+   SMTP_HOST = smtp.gmail.com
+   SMTP_PORT = 587
+   SMTP_USER = [Client's Gmail Address]
+   SMTP_PASS = [Gmail App Password]
+
+   IF USING SENDGRID:
+   SENDGRID_API_KEY = [Your SendGrid API Key]
+   SENDGRID_FROM_EMAIL = [Your SendGrid Email]
+
+4.5 JWT & Security (Generate these if not done)
+   JWT_SECRET = [Generate: openssl rand -base64 32]
+   JWT_EXPIRES_IN = 15m
+   JWT_REFRESH_SECRET = [Generate: openssl rand -base64 32]
+   JWT_REFRESH_EXPIRES_IN = 7d
+   SESSION_SECRET = [Generate: openssl rand -base64 32]
+   ENCRYPTION_KEY = [Generate: openssl rand -base64 32]
+   ENCRYPTION_IV = [Generate: openssl rand -base64 16]
+
+4.6 CORS & Other Settings
+   CORS_ORIGIN = *
+     (Change to specific domain in production)
+   CORS_CREDENTIALS = true
+   SWAGGER_ENABLED = true
+     (Set to false in production)
+   API_VERSION = v1
+   LOG_LEVEL = info
+   BCRYPT_ROUNDS = 12
+   RATE_LIMIT_TTL = 60
+   RATE_LIMIT_LIMIT = 100
+
+HOW TO GENERATE SECRETS (Run in terminal):
+   openssl rand -base64 32    # For JWT_SECRET, JWT_REFRESH_SECRET, etc.
+   openssl rand -base64 16    # For ENCRYPTION_IV
+
+================================================================================
+STEP 5: CREATE WEB SERVICE
+================================================================================
+
+5.1 Review Settings
+   - Double-check all environment variables are added
+   - Verify build and start commands
+   - Confirm plan is "Free"
+
+5.2 Create Service
+   - Click "Create Web Service" button
+   - Render will start building your application
+   - This takes 5-10 minutes
+
+5.3 Monitor Build
+   - Watch the build logs in real-time
+   - Check for any errors
+   - Build process:
+     * Installing dependencies (npm install)
+     * Building application (npm run build)
+     * Starting service (node dist/main.js)
+
+================================================================================
+STEP 6: VERIFY DEPLOYMENT
+================================================================================
+
+6.1 Check Build Status
+   - Wait for build to complete
+   - Status should show "Live" when ready
+   - If build fails, check logs for errors
+
+6.2 Test API
+   - Your API URL will be: https://yapague-backend.onrender.com
+     (Replace with your actual service name)
+   - Test endpoints:
+     * https://your-app.onrender.com (root)
+     * https://your-app.onrender.com/docs (Swagger)
+     * https://your-app.onrender.com/v1/public/auth/register
+
+6.3 Check Logs
+   - Go to "Logs" tab
+   - Verify no errors
+   - Check database connection messages
+
+================================================================================
+STEP 7: SET UP UPTIMEROBOT (Prevent Spin-Down)
+================================================================================
+
+7.1 Go to UptimeRobot
+   - Open: https://uptimerobot.com
+   - Sign in with client's account
+
+7.2 Create Monitor
+   - Click "Add New Monitor"
+   - Monitor Type: HTTP(s)
+   - Friendly Name: YaPague API
+   - URL: https://yapague-backend.onrender.com
+     (Your actual Render service URL)
+   - Monitoring Interval: 5 minutes
+   - Click "Create Monitor"
+
+7.3 Verify
+   - Monitor should show "Up" status
+   - This pings your API every 5 minutes
+   - Prevents 15-minute auto spin-down
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: Build fails
+SOLUTION:
+- Check build logs for errors
+- Verify all dependencies in package.json
+- Check Node version compatibility
+- Ensure build command is correct
+
+PROBLEM: Service won't start
+SOLUTION:
+- Check start command: node dist/main.js
+- Verify dist/ folder exists after build
+- Check environment variables are set
+- Review logs for startup errors
+
+PROBLEM: Database connection fails
+SOLUTION:
+- Verify Supabase credentials
+- Check DB_HOST is correct (no https://, just hostname)
+- Verify database password is correct
+- Check Supabase allows connections from Render IPs
+
+PROBLEM: Service spins down after 15 min
+SOLUTION:
+- Set up UptimeRobot (Step 7)
+- Or upgrade to paid tier (no spin-down)
+
+PROBLEM: Environment variables not working
+SOLUTION:
+- Verify all variables are added
+- Check for typos in variable names
+- Ensure no extra spaces
+- Restart service after adding variables
+
+================================================================================
+SUCCESS CHECKLIST
+================================================================================
+
+After deployment, verify:
+
+[ ] Build completed successfully
+[ ] Service shows "Live" status
+[ ] API responds at root URL
+[ ] Swagger docs accessible at /docs
+[ ] Database connection works
+[ ] No errors in logs
+[ ] UptimeRobot monitor set up
+[ ] Can access API endpoints
+
+================================================================================
+NEXT STEPS AFTER DEPLOYMENT
+================================================================================
+
+1. ✅ Test all API endpoints
+2. ✅ Verify file uploads work (if Cloudinary configured)
+3. ✅ Test email sending (if configured)
+4. ✅ Update CORS_ORIGIN to your frontend domain
+5. ✅ Set SWAGGER_ENABLED=false for production
+6. ✅ Monitor logs for any issues
+7. ✅ Share API URL with client
+
+================================================================================
+YOUR API WILL BE AVAILABLE AT:
+================================================================================
+
+https://[your-service-name].onrender.com
+
+Example: https://yapague-backend.onrender.com
+
+Swagger Docs: https://[your-service-name].onrender.com/docs
+
+================================================================================
+END OF DEPLOYMENT GUIDE
+================================================================================
+
+Follow these steps in order. Don't skip adding environment variables!
+
+Good luck! 🚀
+
+================================================================================
+

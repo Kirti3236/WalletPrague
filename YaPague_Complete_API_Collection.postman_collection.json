@@ -1,0 +1,4463 @@
+{
+  "info": {
+    "_postman_id": "e47c2476-ac01-41a4-84bd-001a4b093af1",
+    "name": "YaPague API - Complete Collection (All Endpoints)",
+    "description": "Complete API collection for YaPague backend with ALL endpoints, payloads, and environment variables. Generated automatically from all controllers.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "\ud83c\udf10 Authentication",
+      "item": [
+        {
+          "name": "Register User (Multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user with file uploads"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.accessToken) {",
+                  "        pm.environment.set(\"None\", jsonData.data.accessToken);",
+                  "        if (jsonData.data.user && jsonData.data.user.id) {",
+                  "            pm.environment.set(\"userId\", jsonData.data.user.id);",
+                  "        }",
+                  "        console.log(\"\u2705 Token saved to environment\");",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register User (JSON)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/auth/register-json",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "auth",
+                "register-json"
+              ]
+            },
+            "description": "Register a new user without file uploads",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_first_name\": \"John\",\n  \"user_last_name\": \"Doe\",\n  \"user_DNI_number\": \"{{testUserDNI}}\",\n  \"user_email\": \"{{testUserEmail}}\",\n  \"user_phone_number\": \"+50499999999\",\n  \"user_password\": \"{{testUserPassword}}\",\n  \"confirm_password\": \"{{testUserPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.accessToken) {",
+                  "        pm.environment.set(\"None\", jsonData.data.accessToken);",
+                  "        if (jsonData.data.user && jsonData.data.user.id) {",
+                  "            pm.environment.set(\"userId\", jsonData.data.user.id);",
+                  "        }",
+                  "        console.log(\"\u2705 Token saved to environment\");",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as regular user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_DNI_number\": \"{{testUserDNI}}\",\n  \"user_password\": \"{{testUserPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.accessToken) {",
+                  "        pm.environment.set(\"None\", jsonData.data.accessToken);",
+                  "        if (jsonData.data.user && jsonData.data.user.id) {",
+                  "            pm.environment.set(\"userId\", jsonData.data.user.id);",
+                  "        }",
+                  "        console.log(\"\u2705 Token saved to environment\");",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as admin user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_DNI_number\": \"{{adminDNI}}\",\n  \"user_password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.accessToken) {",
+                  "        pm.environment.set(\"None\", jsonData.data.accessToken);",
+                  "        if (jsonData.data.user && jsonData.data.user.id) {",
+                  "            pm.environment.set(\"userId\", jsonData.data.user.id);",
+                  "        }",
+                  "        console.log(\"\u2705 Token saved to environment\");",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Request password reset",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_DNI_number\": \"{{testUserDNI}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refresh access token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udc64 User Management",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "profile"
+              ]
+            },
+            "description": "Get current user profile"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/get-single-user/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "get-single-user",
+                "{{userId}}"
+              ]
+            },
+            "description": "Get user by ID"
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "list"
+              ]
+            },
+            "description": "List all users"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "logout"
+              ]
+            },
+            "description": "User logout"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "reset-password"
+              ]
+            },
+            "description": "Reset password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_password\": \"NewPassword123!\",\n  \"confirm_password\": \"NewPassword123!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My AML Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/aml-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "aml-status"
+              ]
+            },
+            "description": "Get user AML compliance status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb0 Wallets",
+      "item": [
+        {
+          "name": "Get Wallet Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/wallets/dashboard?currency=LPS",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "wallets",
+                "dashboard?currency=LPS"
+              ]
+            },
+            "description": "Get wallet balance and transactions"
+          }
+        },
+        {
+          "name": "Get Wallet by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/wallets/{{walletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "wallets",
+                "{{walletId}}"
+              ]
+            },
+            "description": "Get wallet details"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb3 Payment Methods",
+      "item": [
+        {
+          "name": "Add Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payment-methods/cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payment-methods",
+                "cards"
+              ]
+            },
+            "description": "Add a card payment method",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"card_number\": \"4111111111111111\",\n  \"cardholder_name\": \"John Doe\",\n  \"expiry_month\": \"12\",\n  \"expiry_year\": \"2025\",\n  \"card_type\": \"visa\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Bank Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payment-methods/bank-accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payment-methods",
+                "bank-accounts"
+              ]
+            },
+            "description": "Add a bank account payment method",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"bank_name\": \"Banco Central Honduras\",\n  \"account_number\": \"1234567890\",\n  \"account_type\": \"checking\",\n  \"routing_number\": \"123456\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List User Cards",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payment-methods/cards/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payment-methods",
+                "cards",
+                "{{userId}}"
+              ]
+            },
+            "description": "List user's cards"
+          }
+        },
+        {
+          "name": "List User Bank Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payment-methods/bank-accounts/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payment-methods",
+                "bank-accounts",
+                "{{userId}}"
+              ]
+            },
+            "description": "List user's bank accounts"
+          }
+        },
+        {
+          "name": "Delete Card",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payment-methods/cards/{{userId}}/{{cardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payment-methods",
+                "cards",
+                "{{userId}}",
+                "{{cardId}}"
+              ]
+            },
+            "description": "Delete a card"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb5 Deposits",
+      "item": [
+        {
+          "name": "Deposit from Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/deposits/from-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "deposits",
+                "from-card"
+              ]
+            },
+            "description": "Deposit money from saved card",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"wallet_id\": \"{{walletId}}\",\n  \"payment_method_id\": \"{{paymentMethodId}}\",\n  \"amount\": \"500\",\n  \"currency\": \"LPS\",\n  \"description\": \"Test deposit from card\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deposit from Bank",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/deposits/from-bank",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "deposits",
+                "from-bank"
+              ]
+            },
+            "description": "Deposit money from saved bank account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"wallet_id\": \"{{walletId}}\",\n  \"payment_method_id\": \"{{bankAccountId}}\",\n  \"amount\": \"1000\",\n  \"currency\": \"LPS\",\n  \"description\": \"Test deposit from bank\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb8 Withdrawals",
+      "item": [
+        {
+          "name": "Generate Withdrawal Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/withdrawals/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "withdrawals",
+                "generate"
+              ]
+            },
+            "description": "Generate cash withdrawal code",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"wallet_id\": \"{{walletId}}\",\n  \"amount\": \"500\",\n  \"currency\": \"LPS\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd10 Payments (QR & Codes)",
+      "item": [
+        {
+          "name": "Create Payment Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "request"
+              ]
+            },
+            "description": "Create QR/code payment request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"wallet_id\": \"{{walletId}}\",\n  \"amount\": \"100\",\n  \"currency\": \"LPS\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Redeem Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/redeem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "redeem"
+              ]
+            },
+            "description": "Redeem QR/code payment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_id\": \"{{qrId}}\",\n  \"receiver_wallet_id\": \"{{walletId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/generate-qr",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "generate-qr"
+              ]
+            },
+            "description": "Generate payment QR code",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"wallet_id\": \"{{walletId}}\",\n  \"amount\": \"100\",\n  \"currency\": \"LPS\",\n  \"description\": \"Payment for services\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Payment Code Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/code/{{paymentCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "code",
+                "{{paymentCode}}"
+              ]
+            },
+            "description": "Get payment code details"
+          }
+        },
+        {
+          "name": "Share Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/share",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "share"
+              ]
+            },
+            "description": "Generate shareable payment link",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_id\": \"{{qrId}}\",\n  \"share_method\": \"whatsapp\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Scan QR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/scan-qr",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "scan-qr"
+              ]
+            },
+            "description": "Process payment by QR scan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_data\": \"{{qrData}}\",\n  \"scanner_wallet_id\": \"{{walletId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Redeem by Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/redeem-by-code",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "redeem-by-code"
+              ]
+            },
+            "description": "Process payment by code entry",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{paymentCode}}\",\n  \"receiver_wallet_id\": \"{{walletId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validate Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/payments/validate-code",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "payments",
+                "validate-code"
+              ]
+            },
+            "description": "Validate payment code",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{paymentCode}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd04 Transfers (P2P)",
+      "item": [
+        {
+          "name": "Validate Recipient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transfers/validate-recipient",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transfers",
+                "validate-recipient"
+              ]
+            },
+            "description": "Validate recipient by DNI",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient_dni\": \"12345678\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Transfer by DNI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transfers/by-dni",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transfers",
+                "by-dni"
+              ]
+            },
+            "description": "Execute P2P transfer by DNI",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sender_wallet_id\": \"{{walletId}}\",\n  \"recipient_dni\": \"12345678\",\n  \"amount\": \"100\",\n  \"currency\": \"LPS\",\n  \"description\": \"P2P transfer\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2P Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transfers/p2p",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transfers",
+                "p2p"
+              ]
+            },
+            "description": "Execute P2P transfer",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sender_wallet_id\": \"{{walletId}}\",\n  \"receiver_wallet_id\": \"{{receiverWalletId}}\",\n  \"amount\": \"100\",\n  \"currency\": \"LPS\",\n  \"description\": \"P2P transfer\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Transfer Confirmation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transfers/{{transferId}}/confirmation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transfers",
+                "{{transferId}}",
+                "confirmation"
+              ]
+            },
+            "description": "Get transfer confirmation details"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcca Transactions",
+      "item": [
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transactions/history?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transactions",
+                "history?page=1&limit=20"
+              ]
+            },
+            "description": "Get paginated transaction history"
+          }
+        },
+        {
+          "name": "Search Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transactions/search?query=test&page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transactions",
+                "search?query=test&page=1&limit=20"
+              ]
+            },
+            "description": "Search transactions"
+          }
+        },
+        {
+          "name": "Get Transaction Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "Get transaction details"
+          }
+        },
+        {
+          "name": "Get Transaction Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/transactions/{{transactionId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "transactions",
+                "{{transactionId}}",
+                "status"
+              ]
+            },
+            "description": "Get transaction status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83c\udfe6 Banks",
+      "item": [
+        {
+          "name": "List Nearby Banks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/banks/nearby?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "banks",
+                "nearby?limit=20"
+              ]
+            },
+            "description": "List nearby bank locations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd10 Admin - Limit Management",
+      "item": [
+        {
+          "name": "List All Policies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/policies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "policies"
+              ]
+            },
+            "description": "List all limit policies"
+          }
+        },
+        {
+          "name": "Create Limit Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/policies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "policies"
+              ]
+            },
+            "description": "Create a new limit policy",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"policy_code\": \"custom\",\n  \"policy_name\": \"Custom Policy\",\n  \"max_transaction_amount\": 10000,\n  \"max_daily_amount\": 50000,\n  \"max_monthly_amount\": 200000,\n  \"max_daily_count\": 20,\n  \"max_monthly_count\": 200,\n  \"is_active\": true,\n  \"description\": \"Custom limit policy\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Limit Policy",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/policies/{{policyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "policies",
+                "{{policyId}}"
+              ]
+            },
+            "description": "Update a limit policy",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"max_transaction_amount\": 15000,\n  \"is_active\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Assign Policy to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "assign"
+              ]
+            },
+            "description": "Assign limit policy to user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"policy_code\": \"standard\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Limit Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/user/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "user",
+                "{{userId}}"
+              ]
+            },
+            "description": "Get user limit status"
+          }
+        },
+        {
+          "name": "Update User Limit",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/limits/user/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "limits",
+                "user",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update user limit override",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"policy_code\": \"premium\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcca User Limits (Self)",
+      "item": [
+        {
+          "name": "Get My Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/limits/user/limits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "limits",
+                "user",
+                "limits"
+              ]
+            },
+            "description": "Get my limit policy and usage"
+          }
+        },
+        {
+          "name": "Check Limit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/limits/user/limits/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "limits",
+                "user",
+                "limits",
+                "check"
+              ]
+            },
+            "description": "Check if amount is within limits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udee1\ufe0f Admin - Risk Management",
+      "item": [
+        {
+          "name": "Evaluate Transaction Risk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/risk/evaluate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "risk",
+                "evaluate"
+              ]
+            },
+            "description": "Evaluate transaction risk",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"transaction_amount\": 2500,\n  \"transaction_type\": \"p2p_transfer\",\n  \"recipient_id\": \"{{receiverUserId}}\",\n  \"user_ip\": \"192.168.1.1\",\n  \"device_id\": \"device-uuid\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Limit Counters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/risk/counters?user_id={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "risk",
+                "counters?user_id={{userId}}"
+              ]
+            },
+            "description": "Get user limit counters"
+          }
+        },
+        {
+          "name": "List Active Restrictions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/risk/restrictions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "risk",
+                "restrictions"
+              ]
+            },
+            "description": "List active restrictions and blocks"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd12 Admin - Restrictions",
+      "item": [
+        {
+          "name": "Create Restriction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/restrictions/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "restrictions",
+                "{{userId}}"
+              ]
+            },
+            "description": "Create restriction for user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"transaction_limit\",\n  \"value\": \"1000\",\n  \"description\": \"Temporary restriction\",\n  \"is_active\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List User Restrictions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/restrictions/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "restrictions",
+                "{{userId}}"
+              ]
+            },
+            "description": "List user restrictions"
+          }
+        },
+        {
+          "name": "Toggle Restriction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/restrictions/{{restrictionId}}/toggle",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "restrictions",
+                "{{restrictionId}}",
+                "toggle"
+              ]
+            },
+            "description": "Toggle restriction active status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udea8 Admin - AML Alerts",
+      "item": [
+        {
+          "name": "List AML Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/aml-alerts?status=open&alert_level=high",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "aml-alerts?status=open&alert_level=high"
+              ]
+            },
+            "description": "List AML alerts"
+          }
+        },
+        {
+          "name": "Get AML Alert Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/aml-alerts/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "aml-alerts",
+                "stats"
+              ]
+            },
+            "description": "Get AML alert statistics"
+          }
+        },
+        {
+          "name": "Get AML Alert Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/aml-alerts/{{alertId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "aml-alerts",
+                "{{alertId}}"
+              ]
+            },
+            "description": "Get detailed AML alert"
+          }
+        },
+        {
+          "name": "Review AML Alert",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/aml-alerts/{{alertId}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "aml-alerts",
+                "{{alertId}}",
+                "review"
+              ]
+            },
+            "description": "Mark alert as reviewed",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin_notes\": \"Under review\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resolve AML Alert",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/aml-alerts/{{alertId}}/resolve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "aml-alerts",
+                "{{alertId}}",
+                "resolve"
+              ]
+            },
+            "description": "Resolve alert",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution_type\": \"false_positive\",\n  \"admin_notes\": \"Resolved as false positive\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcca Admin - Accounting",
+      "item": [
+        {
+          "name": "List Chart of Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "accounts"
+              ]
+            },
+            "description": "List chart of accounts"
+          }
+        },
+        {
+          "name": "Create Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "accounts"
+              ]
+            },
+            "description": "Create new accounting account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_code\": \"1000\",\n  \"account_name\": \"Cash Account\",\n  \"account_type\": \"asset\",\n  \"description\": \"Main cash account\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/accounts/{{accountId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "accounts",
+                "{{accountId}}"
+              ]
+            },
+            "description": "Update accounting account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_name\": \"Updated Cash Account\",\n  \"description\": \"Updated description\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Trial Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/trial-balance?as_of_date=2025-01-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "trial-balance?as_of_date=2025-01-01"
+              ]
+            },
+            "description": "Get trial balance"
+          }
+        },
+        {
+          "name": "Create Journal Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journal-entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journal-entries"
+              ]
+            },
+            "description": "Create journal entry",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"journal_id\": \"{{journalId}}\",\n  \"entry_date\": \"2025-01-01\",\n  \"description\": \"Test entry\",\n  \"debit_account_id\": \"{{debitAccountId}}\",\n  \"credit_account_id\": \"{{creditAccountId}}\",\n  \"amount\": 100.0,\n  \"transaction_id\": \"{{transactionId}}\",\n  \"transaction_type\": \"p2p_transfer\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Account Ledger",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/account/{{accountId}}/ledger",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "account",
+                "{{accountId}}",
+                "ledger"
+              ]
+            },
+            "description": "Get account ledger"
+          }
+        },
+        {
+          "name": "Reverse Journal Entry",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journal-entries/{{entryId}}/reverse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journal-entries",
+                "{{entryId}}",
+                "reverse"
+              ]
+            },
+            "description": "Reverse journal entry"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validate Zero-Sum",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/validate-zero-sum",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "validate-zero-sum"
+              ]
+            },
+            "description": "Validate zero-sum",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"start_date\": \"2025-01-01\",\n  \"end_date\": \"2025-01-31\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Account Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/account/{{accountId}}/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "account",
+                "{{accountId}}",
+                "balance"
+              ]
+            },
+            "description": "Get account balance"
+          }
+        },
+        {
+          "name": "Create Journal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals"
+              ]
+            },
+            "description": "Create new journal",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"journal_type\": \"p2p_transfer\",\n  \"source_type\": \"transfer\",\n  \"idempotency_key\": \"{{idempotencyKey}}\",\n  \"entries\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Journals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals"
+              ]
+            },
+            "description": "List all journals"
+          }
+        },
+        {
+          "name": "Get Journal by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals/{{journalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals",
+                "{{journalId}}"
+              ]
+            },
+            "description": "Get journal by ID"
+          }
+        },
+        {
+          "name": "Get Journal Entries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals/{{journalId}}/entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals",
+                "{{journalId}}",
+                "entries"
+              ]
+            },
+            "description": "Get journal entries"
+          }
+        },
+        {
+          "name": "Post Journal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals/{{journalId}}/post",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals",
+                "{{journalId}}",
+                "post"
+              ]
+            },
+            "description": "Post journal"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reverse Journal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/accounting/journals/{{journalId}}/reverse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "accounting",
+                "journals",
+                "{{journalId}}",
+                "reverse"
+              ]
+            },
+            "description": "Reverse journal"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd04 Admin - Reconciliation",
+      "item": [
+        {
+          "name": "Upload Bank Statement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "upload"
+              ]
+            },
+            "description": "Upload bank statement (CSV/OFX)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bank_name\": \"Banco Central Honduras\",\n  \"statement_period_start\": \"2025-01-01\",\n  \"statement_period_end\": \"2025-01-31\",\n  \"file_data\": \"base64_encoded_file_data\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Statements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/statements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "statements"
+              ]
+            },
+            "description": "List bank statements"
+          }
+        },
+        {
+          "name": "Get Statement Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/statements/{{statementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "statements",
+                "{{statementId}}"
+              ]
+            },
+            "description": "Get statement details"
+          }
+        },
+        {
+          "name": "Match Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/match",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "match"
+              ]
+            },
+            "description": "Match statement line with transaction",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statement_line_id\": \"{{statementLineId}}\",\n  \"transaction_id\": \"{{transactionId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Matches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "matches"
+              ]
+            },
+            "description": "List matched transactions"
+          }
+        },
+        {
+          "name": "Get Exceptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/exceptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "exceptions"
+              ]
+            },
+            "description": "List unmatched exceptions"
+          }
+        },
+        {
+          "name": "Update Exception",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/exceptions/{{exceptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "exceptions",
+                "{{exceptionId}}"
+              ]
+            },
+            "description": "Update exception status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"notes\": \"Resolved manually\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Reconciliation Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reconciliation/report?start_date=2025-01-01&end_date=2025-01-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reconciliation",
+                "report?start_date=2025-01-01&end_date=2025-01-31"
+              ]
+            },
+            "description": "Get reconciliation report"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udccb Admin - Audit Logs",
+      "item": [
+        {
+          "name": "List Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/audit/logs?limit=100&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "audit",
+                "logs?limit=100&offset=0"
+              ]
+            },
+            "description": "List audit logs"
+          }
+        },
+        {
+          "name": "Verify Hash Chain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/audit/verify-chain",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "audit",
+                "verify-chain"
+              ]
+            },
+            "description": "Verify hash chain integrity",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_type\": \"transaction\",\n  \"entity_id\": \"{{transactionId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Export Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/audit/export?format=csv&from_date=2025-01-01&to_date=2025-01-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "audit",
+                "export?format=csv&from_date=2025-01-01&to_date=2025-01-31"
+              ]
+            },
+            "description": "Export audit logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcc8 Admin - Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/dashboard/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "dashboard",
+                "metrics"
+              ]
+            },
+            "description": "Get dashboard KPIs and metrics"
+          }
+        },
+        {
+          "name": "Get Dashboard Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/dashboard/alerts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "dashboard",
+                "alerts"
+              ]
+            },
+            "description": "Get active alerts for dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcca Admin - Reports",
+      "item": [
+        {
+          "name": "Generate Transaction Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reports/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reports",
+                "transactions"
+              ]
+            },
+            "description": "Generate transaction report",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"start_date\": \"2025-01-01\",\n  \"end_date\": \"2025-01-31\",\n  \"format\": \"csv\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Generate User Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reports/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reports",
+                "users"
+              ]
+            },
+            "description": "Generate user summary report"
+          }
+        },
+        {
+          "name": "Generate AML Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reports/aml-summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reports",
+                "aml-summary"
+              ]
+            },
+            "description": "Generate AML/fraud summary"
+          }
+        },
+        {
+          "name": "Generate Reconciliation Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/reports/reconciliation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "reports",
+                "reconciliation"
+              ]
+            },
+            "description": "Generate reconciliation report"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb8 Admin - Refunds",
+      "item": [
+        {
+          "name": "Create Refund Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "request"
+              ]
+            },
+            "description": "Create refund request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"original_transaction_id\": \"{{transactionId}}\",\n  \"requester_user_id\": \"{{userId}}\",\n  \"reason\": \"Customer requested refund\",\n  \"requested_amount\": 500.0,\n  \"admin_notes\": \"Email from customer\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Refund Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "requests"
+              ]
+            },
+            "description": "List refund requests"
+          }
+        },
+        {
+          "name": "Get Refund Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/requests/{{refundId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "requests",
+                "{{refundId}}"
+              ]
+            },
+            "description": "Get refund request details"
+          }
+        },
+        {
+          "name": "Approve Refund",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/requests/{{refundId}}/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "requests",
+                "{{refundId}}",
+                "approve"
+              ]
+            },
+            "description": "Approve refund request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin_notes\": \"Verified duplicate charge\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Refund",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/requests/{{refundId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "requests",
+                "{{refundId}}",
+                "reject"
+              ]
+            },
+            "description": "Reject refund request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin_notes\": \"Refund not justified\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/requests/{{refundId}}/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "requests",
+                "{{refundId}}",
+                "process"
+              ]
+            },
+            "description": "Process approved refund",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin_notes\": \"Processing refund\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Processing Log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/refunds/processing-log?limit=100&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "refunds",
+                "processing-log?limit=100&offset=0"
+              ]
+            },
+            "description": "Get refund processing log"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcbc Admin - Disputes",
+      "item": [
+        {
+          "name": "List All Disputes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/disputes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "disputes"
+              ]
+            },
+            "description": "List all disputes"
+          }
+        },
+        {
+          "name": "Get Dispute Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/disputes/{{disputeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "disputes",
+                "{{disputeId}}"
+              ]
+            },
+            "description": "Get dispute details"
+          }
+        },
+        {
+          "name": "Update Dispute Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/disputes/{{disputeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "disputes",
+                "{{disputeId}}"
+              ]
+            },
+            "description": "Update dispute status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"resolution\": \"Refund issued\",\n  \"admin_notes\": \"Dispute resolved\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcbc User - Disputes",
+      "item": [
+        {
+          "name": "File Dispute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/disputes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "disputes"
+              ]
+            },
+            "description": "File a dispute",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transaction_id\": \"{{transactionId}}\",\n  \"reason\": \"Unauthorized transaction\",\n  \"description\": \"I did not authorize this transaction\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List My Disputes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/disputes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "disputes"
+              ]
+            },
+            "description": "List user disputes"
+          }
+        },
+        {
+          "name": "Get Dispute Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/disputes/{{disputeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "disputes",
+                "{{disputeId}}"
+              ]
+            },
+            "description": "Get dispute details"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd14 Admin - Webhooks",
+      "item": [
+        {
+          "name": "Register Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks"
+              ]
+            },
+            "description": "Register webhook URL",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/webhook\",\n  \"events\": [\n    \"transaction.completed\",\n    \"payment.redeemed\"\n  ],\n  \"secret\": \"webhook_secret\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Webhooks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks"
+              ]
+            },
+            "description": "List all webhooks"
+          }
+        },
+        {
+          "name": "Get Webhook Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks/{{webhookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks",
+                "{{webhookId}}"
+              ]
+            },
+            "description": "Get webhook details"
+          }
+        },
+        {
+          "name": "Update Webhook",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks/{{webhookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks",
+                "{{webhookId}}"
+              ]
+            },
+            "description": "Update webhook",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/webhook-updated\",\n  \"events\": [\n    \"transaction.completed\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Webhook",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks/{{webhookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks",
+                "{{webhookId}}"
+              ]
+            },
+            "description": "Delete webhook"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retry Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks/{{webhookId}}/retry",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks",
+                "{{webhookId}}",
+                "retry"
+              ]
+            },
+            "description": "Retry failed webhook",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": \"{{eventId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Webhook Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/webhooks/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "webhooks",
+                "logs"
+              ]
+            },
+            "description": "Get webhook delivery logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb8 Admin - Settlements",
+      "item": [
+        {
+          "name": "Create Settlement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/settlements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "settlements"
+              ]
+            },
+            "description": "Create settlement",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"batch_id\": \"BATCH-2025-01-01\",\n  \"settlement_date\": \"2025-01-01\",\n  \"total_amount\": 100000.0,\n  \"currency\": \"LPS\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Settlements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/settlements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "settlements"
+              ]
+            },
+            "description": "List all settlements"
+          }
+        },
+        {
+          "name": "Get Settlement Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/settlements/{{settlementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "settlements",
+                "{{settlementId}}"
+              ]
+            },
+            "description": "Get settlement details"
+          }
+        },
+        {
+          "name": "Update Settlement Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/settlements/{{settlementId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "settlements",
+                "{{settlementId}}",
+                "status"
+              ]
+            },
+            "description": "Update settlement status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"notes\": \"Settlement completed\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb0 Admin - Fee Management",
+      "item": [
+        {
+          "name": "List Fee Policies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/fees/policies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "fees",
+                "policies"
+              ]
+            },
+            "description": "List all fee policies"
+          }
+        },
+        {
+          "name": "Get Fee Policy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/fees/policies/{{policyCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "fees",
+                "policies",
+                "{{policyCode}}"
+              ]
+            },
+            "description": "Get fee policy"
+          }
+        },
+        {
+          "name": "Create Fee Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/fees/policies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "fees",
+                "policies"
+              ]
+            },
+            "description": "Create fee policy",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"policy_code\": \"standard_fee\",\n  \"policy_name\": \"Standard Fee Policy\",\n  \"fee_type\": \"percentage\",\n  \"fee_value\": 2.5,\n  \"min_fee\": 1.0,\n  \"max_fee\": 50.0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Fee Policy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {adminToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/admin/fees/policies/{{policyCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "admin",
+                "fees",
+                "policies",
+                "{{policyCode}}"
+              ]
+            },
+            "description": "Update fee policy",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fee_value\": 3.0,\n  \"max_fee\": 75.0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"idempotencyKey\", pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcb0 User - Fees",
+      "item": [
+        {
+          "name": "List My Fees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/fees",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "fees"
+              ]
+            },
+            "description": "List fees for transactions"
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udccb User - Statements",
+      "item": [
+        {
+          "name": "Get Statement History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/statements/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "statements",
+                "history"
+              ]
+            },
+            "description": "Get statement history"
+          }
+        },
+        {
+          "name": "Export Statement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/statements/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "statements",
+                "export"
+              ]
+            },
+            "description": "Export statement to CSV or PDF",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"2025-01\",\n  \"format\": \"csv\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Statement by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/statements/{{statementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "statements",
+                "{{statementId}}"
+              ]
+            },
+            "description": "Get detailed statement"
+          }
+        },
+        {
+          "name": "Export CSV (Legacy)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/statements/2025-01/export-csv",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "statements",
+                "2025-01",
+                "export-csv"
+              ]
+            },
+            "description": "Export statement as CSV (legacy)"
+          }
+        },
+        {
+          "name": "Export JSON (Legacy)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {userToken}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/private/user/statements/2025-01/export-json",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "private",
+                "user",
+                "statements",
+                "2025-01",
+                "export-json"
+              ]
+            },
+            "description": "Export statement as JSON (legacy)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

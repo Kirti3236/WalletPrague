@@ -22,13 +22,13 @@ export const getDatabaseConfig = (
     sync: { alter: true },
     logging: dbLogging
       ? (sql: string) => {
-          console.log(`🗄️  [DB Query]: ${sql}`);
-        }
+        console.log(`🗄️  [DB Query]: ${sql}`);
+      }
       : false,
     dialectOptions: isProduction
       ? {
-          ssl: { rejectUnauthorized: false },
-        }
+        ssl: { rejectUnauthorized: false },
+      }
       : {},
     pool: {
       max: 5, // Maximum connections
